@@ -7,10 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  Ubuntu:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: make install
@@ -19,3 +17,15 @@ jobs:
       run: t# test/ci-test.t#
     - name: clean
       run: sudo make clean;
+
+  Windows:
+    runs-on: windows-latest
+    needs: Ubuntu
+    steps:
+    - uses: actions/checkout@v2
+    - name: make
+      run: make
+    - name: run
+      run: .\tsharp.exe test\ci-test.t#
+    - name: clean
+      run: make clean
