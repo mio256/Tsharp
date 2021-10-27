@@ -1,7 +1,7 @@
 
 func main() do
 
-	if ("Foo" == "Foo") == true do
+	if ("Foo" == "Foo") == ("T#" == "T#") do
 		print("It worked!");
 	end;
 
