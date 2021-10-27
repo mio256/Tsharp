@@ -76,6 +76,10 @@ func main() do
     if 3 > 2 do
         print("Hello World!");
     end;
+
+    if ("Foo" == "Foo") == ("T#" == "T#") do
+        print("T# Programming Language!");
+    end;
 end;
 ```
 
