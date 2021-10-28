@@ -152,6 +152,16 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
         return ast_string;
     }
 
+    if (strcmp(node->function_call_name, "exit") == 0)
+    {
+        if (node->function_call_args_size != 0)
+        {
+            printf("Error: function exit() expected at most 0 argument got %zu\n", node->function_call_args_size);
+            exit(1);
+        }
+        exit(1);
+    }
+
     AST_T* fdef = scope_get_func_definition(
         node->scope,
         node->function_call_name
