@@ -14,7 +14,6 @@ jobs:
     - name: make install
       run: sudo make install
     - name: run
-      run: t# test/ci-test.t#
       run: t# test/arith-test.t#
     - name: clean
       run: sudo make clean;
