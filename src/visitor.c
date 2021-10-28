@@ -67,9 +67,9 @@ static AST_T* builtin_function_sleep(visitor_T* visitor, AST_T** args, int args_
 
         switch (visited_ast->type)
         {
-            case AST_STRING: printf("TypeError: an integer is required\n"); exit(1); break;
+            case AST_STRING: printf("TypeError: function sleep() expected type int\n"); exit(1); break;
             case AST_INT: sleep(visited_ast->int_value); break;
-            case AST_BOOL: printf("TypeError: an integer is required\n"); exit(1); break;
+            case AST_BOOL: printf("TypeError: function sleep() expected type int\n"); exit(1); break;
             default: printf("%p", visited_ast); break;
         }
     }
@@ -121,7 +121,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
     {
         if (node->args_size > 1)
         {
-            printf("ERROR: function input() expected at most 1 argument got %zu\n", node->args_size);
+            printf("Error: function input() expected at most 1 argument got %zu\n", node->args_size);
             exit(1);
         }
         if (node->args[0] != (void*) 0)
@@ -129,7 +129,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
             AST_T* visited_ast = visitor_visit(visitor, node->args[0]);
             if (visited_ast->type != AST_STRING)
             {
-                printf("ERROR: function input() expected type string\n");
+                printf("Error: function input() expected type string\n");
                 exit(1);
             }
             printf("%s", visited_ast->string_value);
