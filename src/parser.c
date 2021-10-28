@@ -121,7 +121,6 @@ AST_T* parser_parse_statements(parser_T* parser, scope_T* scope, char* func_name
 
     compound->compound_value[0] = ast_statement;
     compound->compound_size += 1;
-    //while ((parser->prev_token->type != TOKEN_COLON && parser->current_token->type == TOKEN_SEMI) || (parser->current_token->type == TOKEN_END && parser->prev_token->type == TOKEN_COLON))
     while(parser->current_token->type == TOKEN_SEMI)
     {
         if (parser->current_token->type == TOKEN_SEMI)
@@ -232,9 +231,7 @@ AST_T* parser_parse_function_call(parser_T* parser, scope_T* scope, char* func_n
     ast->scope = scope;
 
     if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
-    {
         return parser_parse_compare(parser, scope, ast, func_name);
-    }
 
     return ast;
 }
@@ -367,10 +364,6 @@ AST_T* parser_parse_paren(parser_T* parser, scope_T* scope, char* func_name)
 
     if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
         return parser_parse_compare(parser, scope, ast, func_name);
-    else
-    /*
-    if (parser->current_token->type == TOKEN_PLUS || parser->current_token->type == TOKEN_MINUS)
-        return parser_parse_expr(parser, scope, func_name, ast);*/
 
     return ast;
 }
@@ -400,9 +393,7 @@ AST_T* parser_parse_variable(parser_T* parser, scope_T* scope, char* func_name)
     }
 
     if (parser->current_token->type == TOKEN_PLUS_PLUS || parser->current_token->type == TOKEN_MINUS_MINUS)
-    {
         return parser_parse_binop_inc_dec(parser, scope, token_value, func_name);
-    }
 
     AST_T* ast = init_ast(AST_VARIABLE);
     
@@ -430,19 +421,13 @@ AST_T* parser_parse_variable(parser_T* parser, scope_T* scope, char* func_name)
     }
 
     if (parser->current_token->type == TOKEN_EQUALS)
-    {
         return parser_parse_variable_update_value_from_other_func(parser, scope, token_value, variable_name);
-    }
 
     if (parser->current_token->type == TOKEN_PLUS_PLUS || parser->current_token->type == TOKEN_MINUS_MINUS)
-    {
         return parser_parse_binop_inc_dec(parser, scope, variable_name, token_value);
-    }
 
     if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
-    {
         return parser_parse_compare(parser, scope, ast, func_name);
-    }
 
     return ast;
 }
@@ -584,9 +569,7 @@ AST_T* parser_parse_string(parser_T* parser, scope_T* scope, char* func_name)
     ast_string->scope = scope;
 
     if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
-    {
         return parser_parse_compare(parser, scope, ast_string, func_name);
-    }
 
     return ast_string;
 }
@@ -603,9 +586,7 @@ AST_T* parser_parse_int(parser_T* parser, scope_T* scope, char* func_name)
     ast_int->scope = scope;
 
     if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
-    {
         return parser_parse_compare(parser, scope, ast_int, func_name);
-    }
 
     return ast_int;
 }
@@ -620,9 +601,7 @@ AST_T* parser_parse_bool(parser_T* parser, scope_T* scope, char* func_name)
     ast_bool->scope = scope;
 
     if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS)
-    {
         return parser_parse_compare(parser, scope, ast_bool, func_name);
-    }
 
     return ast_bool;
 }
@@ -630,19 +609,13 @@ AST_T* parser_parse_bool(parser_T* parser, scope_T* scope, char* func_name)
 AST_T* parser_parse_id(parser_T* parser, scope_T* scope, char* func_name)
 {
     if (strcmp(parser->current_token->value, "func") == 0)
-    {
         return parser_parse_function_definition(parser, scope);
-    }
 
     if (strcmp(parser->current_token->value, "if") == 0)
-    {
         return parser_parse_if(parser, scope, func_name);
-    }
 
     if (strcmp(parser->current_token->value, "while") == 0)
-    {
         return parser_parse_while(parser, scope, func_name);
-    }
 
     return parser_parse_variable(parser, scope, func_name);
 }
