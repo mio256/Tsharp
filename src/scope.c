@@ -61,11 +61,11 @@ AST_T* scope_find_func(scope_T* scope, const char* name)
 
     if (strcmp(name, "main") == 0)
     {
-        printf("ERROR: Function main is undeclared\n");
+        printf("Error: function main is undeclared\n");
         exit(1);
     }
 
-    printf("ERROR: Undifined function %s\n", name);
+    printf("Error: undifined function '%s'\n", name);
     exit(1);
 }
 
