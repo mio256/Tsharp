@@ -1,0 +1,48 @@
+func Something() do
+	num = 123;
+end;
+
+func main() do
+	if (2 + 3) == 5 do
+		print("[test 1] passed");
+	else
+		print("[test 1] failed");
+	end;
+
+	if ((3 * 2) + 1) == 7 do
+		print("[test 2] passed");
+	else
+		print("[test 2] failed");
+	end;
+
+	if ((20 + 5) - (2 * 1)) == 23 do
+		print("[test 3] passed");
+	else
+		print("[test 3] failed");
+	end;
+
+	if (2 * (5 + 2)) == 14 do
+		print("[test 4] passed");
+	else
+		print("[test 4] failed");
+	end;
+    
+	Something();
+	if (Something.num * 4) == 492 do
+		print("[test 5] passed");
+	else
+		print("[test 5] failed");
+	end;
+
+	if (Something.num * (4 + 3)) == 861 do
+		print("[test 6] passed");
+	else
+		print("[test 6] failed");
+	end;
+
+	if ((Something.num + 3) * 4) == 504 do
+		print("[test 7] passed");
+	else
+		print("[test 7] failed");
+	end;
+end;
