@@ -219,7 +219,7 @@ token_T* lexer_collect_int(lexer_T* lexer)
         }
         else
         {
-            printf("ERROR: expecting integer '%c' (line %d)\n", lexer->c, lexer->line_n);
+            printf("Error: expecting integer '%c' (line %d)\n", lexer->c, lexer->line_n);
             exit(1);
         }
     }
