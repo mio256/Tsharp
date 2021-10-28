@@ -12,12 +12,12 @@ typedef struct TOKEN_STRUCT
         /* 04 */TOKEN_RPAREN, // )
         /* 05 */TOKEN_LBRACE, // {
         /* 06 */TOKEN_RBRACE, // }
-        /* 07 */TOKEN_EQUAL, // =
+        /* 07 */TOKEN_EQUALS, // =
         /* 08 */TOKEN_COMMA, // ,
         /* 09 */TOKEN_DOT, // .
         /* 10 */TOKEN_GREATER_THAN,
         /* 11 */TOKEN_LESS_THAN,
-        /* 12 */TOKEN_EQUALS, // ==
+        /* 12 */TOKEN_IS_EQUALS, // ==
         /* 13 */TOKEN_NOT_EQUALS,
         /* 14 */TOKEN_END, // } -> end
         /* 15 */TOKEN_DO, // { -> do

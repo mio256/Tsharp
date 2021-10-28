@@ -231,7 +231,7 @@ AST_T* parser_parse_function_call(parser_T* parser, scope_T* scope, char* func_n
 
     ast->scope = scope;
 
-    if (parser->current_token->type == TOKEN_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
+    if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
     {
         return parser_parse_compare(parser, scope, ast, func_name);
     }
@@ -259,7 +259,7 @@ AST_T* parser_parse_variable_definition(parser_T* parser, scope_T* scope, char* 
 
     strcpy(ast->variable_definition_func_name, func_name);
 
-    parser_eat(parser, TOKEN_EQUAL);
+    parser_eat(parser, TOKEN_EQUALS);
 
     AST_T* variable_definition_value = parser_parse_expr(parser, scope, func_name);
     ast->variable_definition_value = variable_definition_value;
@@ -287,7 +287,7 @@ AST_T* parser_parse_variable_update_value_from_other_func(parser_T* parser, scop
 
     strcpy(ast->variable_definition_func_name, func_name);
 
-    parser_eat(parser, TOKEN_EQUAL);
+    parser_eat(parser, TOKEN_EQUALS);
 
     AST_T* variable_definition_value = parser_parse_expr(parser, scope, func_name);
     ast->variable_definition_value = variable_definition_value;
@@ -365,7 +365,7 @@ AST_T* parser_parse_paren(parser_T* parser, scope_T* scope, char* func_name)
     parser_eat(parser, TOKEN_RPAREN);
     ast->scope = scope;
 
-    if (parser->current_token->type == TOKEN_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
+    if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
         return parser_parse_compare(parser, scope, ast, func_name);
     else
     /*
@@ -381,7 +381,7 @@ AST_T* parser_parse_variable(parser_T* parser, scope_T* scope, char* func_name)
 
     parser_eat(parser, TOKEN_ID);
 
-    if (parser->current_token->type == TOKEN_EQUAL) {
+    if (parser->current_token->type == TOKEN_EQUALS) {
         if (strcmp(func_name, "\0") == 0)
         {
             printf("SyntaxError: non-declaration statement outside function body\n");
@@ -429,7 +429,7 @@ AST_T* parser_parse_variable(parser_T* parser, scope_T* scope, char* func_name)
         ast->scope = scope;
     }
 
-    if (parser->current_token->type == TOKEN_EQUAL)
+    if (parser->current_token->type == TOKEN_EQUALS)
     {
         return parser_parse_variable_update_value_from_other_func(parser, scope, token_value, variable_name);
     }
@@ -439,7 +439,7 @@ AST_T* parser_parse_variable(parser_T* parser, scope_T* scope, char* func_name)
         return parser_parse_binop_inc_dec(parser, scope, variable_name, token_value);
     }
 
-    if (parser->current_token->type == TOKEN_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
+    if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
     {
         return parser_parse_compare(parser, scope, ast, func_name);
     }
@@ -583,7 +583,7 @@ AST_T* parser_parse_string(parser_T* parser, scope_T* scope, char* func_name)
 
     ast_string->scope = scope;
 
-    if (parser->current_token->type == TOKEN_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
+    if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
     {
         return parser_parse_compare(parser, scope, ast_string, func_name);
     }
@@ -602,7 +602,7 @@ AST_T* parser_parse_int(parser_T* parser, scope_T* scope, char* func_name)
 
     ast_int->scope = scope;
 
-    if (parser->current_token->type == TOKEN_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
+    if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
     {
         return parser_parse_compare(parser, scope, ast_int, func_name);
     }
@@ -619,7 +619,7 @@ AST_T* parser_parse_bool(parser_T* parser, scope_T* scope, char* func_name)
 
     ast_bool->scope = scope;
 
-    if (parser->current_token->type == TOKEN_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS)
+    if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS)
     {
         return parser_parse_compare(parser, scope, ast_bool, func_name);
     }

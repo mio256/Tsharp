@@ -282,7 +282,7 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
     AST_T* visited_left = visitor_visit(visitor, node->left);
     AST_T* visited_right = visitor_visit(visitor, node->right);
 
-    if (node->compare_op == TOKEN_EQUALS)
+    if (node->compare_op == TOKEN_IS_EQUALS)
     {
         if (visited_left->type == AST_STRING && visited_right->type == AST_STRING)
         {
