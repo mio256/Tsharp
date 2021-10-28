@@ -1,6 +1,5 @@
 
-
 func main() do
-	text = input();
+	text = input("input here: ");
 	print(text);
 end;
