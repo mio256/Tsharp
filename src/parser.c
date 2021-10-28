@@ -359,7 +359,7 @@ AST_T* parser_parse_function_definition(parser_T* parser, scope_T* scope)
 
 AST_T* parser_parse_paren(parser_T* parser, scope_T* scope, char* func_name)
 {
-    AST_T* ast = init_ast(AST_LIST);
+    AST_T* ast = init_ast(AST_PAREN);
     parser_eat(parser, TOKEN_LPAREN);
     ast->paren_value = parser_parse_expr(parser, scope, func_name);
     parser_eat(parser, TOKEN_RPAREN);

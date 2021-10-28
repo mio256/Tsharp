@@ -18,7 +18,7 @@ AST_T* visitor_visit(visitor_T* visitor, AST_T* node)
     switch (node->type)
     {
         case AST_BINOP: return visitor_visit_binop(visitor, node); break;
-        case AST_LIST: return visitor_visit_paren(visitor, node); break;
+        case AST_PAREN: return visitor_visit_paren(visitor, node); break;
         case AST_FUNCTION_DEFINITION: return visitor_visit_function_definition(visitor, node); break;
         case AST_VARIABLE_DEFINITION: return visitor_visit_variable_definition(visitor, node); break;
         case AST_FUNCTION_CALL: return visitor_visit_function_call(visitor, node); break;
