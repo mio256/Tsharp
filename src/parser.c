@@ -193,25 +193,25 @@ AST_T* parser_parse_function_call(parser_T* parser, scope_T* scope, char* func_n
     AST_T* ast = init_ast(AST_FUNCTION_CALL);
     ast->function_call_name = parser->prev_token->value;
     parser_eat(parser, TOKEN_LPAREN);
-    ast->args = calloc(1, sizeof(struct AST_STRUCT*));
+    ast->function_call_args = calloc(1, sizeof(struct AST_STRUCT*));
     
     if (parser->current_token->type != TOKEN_RPAREN)
     {
         AST_T* ast_expr = parser_parse_expr(parser, scope, func_name);
-        ast->args[0] = ast_expr;
-        ast->args_size += 1;
+        ast->function_call_args[0] = ast_expr;
+        ast->function_call_args_size += 1;
     }
 
     while (parser->current_token->type == TOKEN_COMMA)
     {
         parser_eat(parser, TOKEN_COMMA);
         AST_T* ast_expr = parser_parse_expr(parser, scope, func_name);
-        ast->args_size += 1;
-        ast->args = realloc(
-            ast->args,
-            ast->args_size * sizeof(struct AST_STRUCT)
+        ast->function_call_args_size += 1;
+        ast->function_call_args = realloc(
+            ast->function_call_args,
+            ast->function_call_args_size * sizeof(struct AST_STRUCT)
         );
-        ast->args[ast->args_size-1] = ast_expr;
+        ast->function_call_args[ast->function_call_args_size-1] = ast_expr;
     }
     parser_eat(parser, TOKEN_RPAREN);
     ast->scope = scope;

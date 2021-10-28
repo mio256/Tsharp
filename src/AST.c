@@ -25,8 +25,8 @@ AST_T* init_ast(int type)
 
     // AST_FUNCTION_CALL
     ast->function_call_name = (void*) 0;
-    ast->args = (void*) 0;
-    ast->args_size = 0;
+    ast->function_call_args = (void*) 0;
+    ast->function_call_args_size = 0;
 
     // AST_IF
     ast->op = (void*) 0;

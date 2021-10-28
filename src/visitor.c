@@ -86,19 +86,19 @@ AST_T* visitor_visit_paren(visitor_T* visitor, AST_T* node)
 AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
 {
     if (strcmp(node->function_call_name, "print") == 0)
-        return builtin_function_print(visitor, node->args, node->args_size);
+        return builtin_function_print(visitor, node->function_call_args, node->function_call_args_size);
 
     if (strcmp(node->function_call_name, "sleep") == 0)
-        return builtin_function_sleep(visitor, node->args, node->args_size);
+        return builtin_function_sleep(visitor, node->function_call_args, node->function_call_args_size);
 
     if (strcmp(node->function_call_name, "len") == 0)
     {
-        if (node->args_size != 1)
+        if (node->function_call_args_size != 1)
         {
             printf("Error: function len() expected one argument\n");
             exit(1);
         }
-        AST_T* visited_value = visitor_visit(visitor, node->args[0]);
+        AST_T* visited_value = visitor_visit(visitor, node->function_call_args[0]);
         if (visited_value->type != AST_STRING)
         {
             switch (visited_value->type)
@@ -119,14 +119,14 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
 
     if (strcmp(node->function_call_name, "input") == 0)
     {
-        if (node->args_size > 1)
+        if (node->function_call_args_size > 1)
         {
-            printf("Error: function input() expected at most 1 argument got %zu\n", node->args_size);
+            printf("Error: function input() expected at most 1 argument got %zu\n", node->function_call_args_size);
             exit(1);
         }
-        if (node->args[0] != (void*) 0)
+        if (node->function_call_args[0] != (void*) 0)
         {
-            AST_T* visited_ast = visitor_visit(visitor, node->args[0]);
+            AST_T* visited_ast = visitor_visit(visitor, node->function_call_args[0]);
             if (visited_ast->type != AST_STRING)
             {
                 printf("Error: function input() expected type string\n");
@@ -163,10 +163,10 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
         exit(1);
     }
 
-    for (int i = 0; i < (int) node->args_size; i++)
+    for (int i = 0; i < (int) node->function_call_args_size; i++)
     {
         AST_T* ast_var = (AST_T*) fdef->function_definition_args[i];
-        AST_T* ast_value = (AST_T*) node->args[i];
+        AST_T* ast_value = (AST_T*) node->function_call_args[i];
         AST_T* ast = init_ast(AST_VARIABLE_DEFINITION);
         ast->variable_definition_value = ast_value;
         ast->variable_definition_variable_name = calloc(strlen(ast_var->variable_name) + 1, sizeof(char));
