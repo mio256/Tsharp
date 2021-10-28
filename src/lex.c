@@ -75,6 +75,10 @@ token_T* lexer_get_next_token(lexer_T* lexer)
                 lexer_skip_inline_comment(lexer);
                 continue;
             }
+            else
+            {
+                return lexer_advance_token(lexer, init_token(TOKEN_DIV, value)); break;
+            }
         }
 
         if (lexer->c == '=')
@@ -131,8 +135,7 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             }
             else
             {
-                printf("SyntaxError: unexpected '%c' (line %d)\n", lexer->c, lexer->line_n);
-                exit(1);
+                return lexer_advance_token(lexer, init_token(TOKEN_PLUS, value));
             }
         }
 
@@ -151,13 +154,14 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             }
             else
             {
-                printf("SyntaxError: unexpected '%c' (line %d)\n", lexer->c, lexer->line_n);
-                exit(1);
+                return lexer_advance_token(lexer, init_token(TOKEN_MINUS, value));
             }
         }
 
         switch (lexer->c)
         {
+            case '%': return lexer_advance_token(lexer, init_token(TOKEN_REM, lexer_get_current_char_as_string(lexer))); break;
+            case '*': return lexer_advance_token(lexer, init_token(TOKEN_MUL, lexer_get_current_char_as_string(lexer))); break;
             case '>': return lexer_advance_token(lexer, init_token(TOKEN_GREATER_THAN, lexer_get_current_char_as_string(lexer))); break;
             case '<': return lexer_advance_token(lexer, init_token(TOKEN_LESS_THAN, lexer_get_current_char_as_string(lexer))); break;
             case '.': return lexer_advance_token(lexer, init_token(TOKEN_DOT, lexer_get_current_char_as_string(lexer))); break;

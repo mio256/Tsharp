@@ -17,6 +17,7 @@ typedef struct AST_STRUCT
         AST_BOOL,
         AST_BINOP_INC_DEC,
         AST_LIST,
+        AST_BINOP,
         AST_COMPOUND,
         AST_NOOP,
     } type;
@@ -66,6 +67,11 @@ typedef struct AST_STRUCT
 
     // AST_LIST
     struct AST_STRUCT* paren_value;
+
+    // AST_BINOP
+    struct AST_STRUCT* binop_left;
+    struct AST_STRUCT* binop_right;
+    int binop_op;
 
     // AST_STRING
     char* string_value;

@@ -27,7 +27,12 @@ typedef struct TOKEN_STRUCT
         /* 19 */TOKEN_PLUS_PLUS, // ++
         /* 20 */TOKEN_MINUS_MINUS, // --
         /* 21 */TOKEN_ELIF, // ELIF
-        /* 21 */TOKEN_EOF // End Of File
+        /* 22 */TOKEN_PLUS, // +
+        /* 23 */TOKEN_MINUS, // -
+        /* 24 */TOKEN_MUL, // *
+        /* 25 */TOKEN_DIV, // /
+        /* 26 */TOKEN_REM, // %
+        /* 27 */TOKEN_EOF // End Of File
     } type;
 
     char* value;

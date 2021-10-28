@@ -1,6 +1,7 @@
 #include "include/visitor.h"
 #include "include/scope.h"
 #include "include/AST.h"
+#include "include/token.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +18,7 @@ AST_T* visitor_visit(visitor_T* visitor, AST_T* node)
 {
     switch (node->type)
     {
+        case AST_BINOP: return visitor_visit_binop(visitor, node); break;
         case AST_LIST: return visitor_visit_paren(visitor, node); break;
         case AST_FUNCTION_DEFINITION: return visitor_visit_function_definition(visitor, node); break;
         case AST_VARIABLE_DEFINITION: return visitor_visit_variable_definition(visitor, node); break;
@@ -92,7 +94,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
     if (strcmp(node->function_call_name, "add") == 0)
     {
         AST_T* visited_ast_left = visitor_visit(visitor, node->args[0]);
-        AST_T* visited_ast_right = visitor_visit(visitor, node->args[0]);
+        AST_T* visited_ast_right = visitor_visit(visitor, node->args[1]);
         long int int_value = visited_ast_left->int_value + visited_ast_right->int_value;
         AST_T* ast_int = init_ast(AST_INT);
         ast_int->int_value = int_value;
@@ -103,7 +105,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
     if (strcmp(node->function_call_name, "minus") == 0)
     {
         AST_T* visited_ast_left = visitor_visit(visitor, node->args[0]);
-        AST_T* visited_ast_right = visitor_visit(visitor, node->args[0]);
+        AST_T* visited_ast_right = visitor_visit(visitor, node->args[1]);
         long int int_value = visited_ast_left->int_value - visited_ast_right->int_value;
         AST_T* ast_int = init_ast(AST_INT);
         ast_int->int_value = int_value;
@@ -114,7 +116,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
     if (strcmp(node->function_call_name, "mul") == 0)
     {
         AST_T* visited_ast_left = visitor_visit(visitor, node->args[0]);
-        AST_T* visited_ast_right = visitor_visit(visitor, node->args[0]);
+        AST_T* visited_ast_right = visitor_visit(visitor, node->args[1]);
         long int int_value = visited_ast_left->int_value * visited_ast_right->int_value;
         AST_T* ast_int = init_ast(AST_INT);
         ast_int->int_value = int_value;
@@ -125,7 +127,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
     if (strcmp(node->function_call_name, "div") == 0)
     {
         AST_T* visited_ast_left = visitor_visit(visitor, node->args[0]);
-        AST_T* visited_ast_right = visitor_visit(visitor, node->args[0]);
+        AST_T* visited_ast_right = visitor_visit(visitor, node->args[1]);
         long int int_value = visited_ast_left->int_value / visited_ast_right->int_value;
         AST_T* ast_int = init_ast(AST_INT);
         ast_int->int_value = int_value;
@@ -312,6 +314,39 @@ AST_T* visitor_visit_if(visitor_T* visitor, AST_T* node)
     return node;
 }
 
+AST_T* visitor_visit_binop(visitor_T* visitor, AST_T* node)
+{
+    AST_T* left_value =  visitor_visit(visitor, node->binop_left);
+    AST_T* right_value =  visitor_visit(visitor, node->binop_right);
+
+    if (left_value->type != AST_INT && right_value->type != AST_INT)
+    {
+        printf("ERROR: expected integer\n");
+        exit(1);
+    }
+
+    long int int_value;
+    if (node->binop_op == TOKEN_PLUS)
+        int_value = left_value->int_value + right_value->int_value;
+    else
+    if (node->binop_op == TOKEN_MINUS)
+        int_value = left_value->int_value - right_value->int_value;
+    else
+    if (node->binop_op == TOKEN_MUL)
+        int_value = left_value->int_value * right_value->int_value;
+    else
+    if (node->binop_op == TOKEN_DIV)
+        int_value = left_value->int_value / right_value->int_value;
+    else
+    if (node->binop_op == TOKEN_REM)
+        int_value = left_value->int_value % right_value->int_value;
+
+    AST_T* ast_int = init_ast(AST_INT);
+    ast_int->int_value = int_value;
+
+    return ast_int;
+}
+
 AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
 {
     char* value;
@@ -319,42 +354,30 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
     AST_T* visited_left = visitor_visit(visitor, node->left);
     AST_T* visited_right = visitor_visit(visitor, node->right);
 
-    if (node->compare_op == 12)
+    if (node->compare_op == TOKEN_EQUALS)
     {
         if (visited_left->type == AST_STRING && visited_right->type == AST_STRING)
         {
             if (strcmp(visited_left->string_value, visited_right->string_value) == 0)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         if (visited_left->type == AST_INT && visited_right->type == AST_INT)
         {
             if (visited_left->int_value == visited_right->int_value)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         if (visited_left->type == AST_BOOL && visited_right->type == AST_BOOL)
         {
             if (strcmp(visited_left->bool_value, visited_right->bool_value) == 0)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         {
@@ -363,18 +386,14 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
         }
     }
     else
-    if (node->compare_op == 10)
+    if (node->compare_op == TOKEN_GREATER_THAN)
     {
         if (visited_left->type == AST_INT && visited_right->type == AST_INT)
         {
             if (visited_left->int_value > visited_right->int_value)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         {
@@ -383,18 +402,14 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
         }
     }
     else
-    if (node->compare_op == 11)
+    if (node->compare_op == TOKEN_LESS_THAN)
     {
         if (visited_left->type == AST_INT && visited_right->type == AST_INT)
         {
             if (visited_left->int_value < visited_right->int_value)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         {
@@ -403,42 +418,30 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
         }
     }
     else
-    if (node->compare_op == 13)
+    if (node->compare_op == TOKEN_NOT_EQUALS)
     {
         if (visited_left->type == AST_STRING && visited_right->type == AST_STRING)
         {
             if (strcmp(visited_left->string_value, visited_right->string_value) != 0)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         if (visited_left->type == AST_INT && visited_right->type == AST_INT)
         {
             if (visited_left->int_value != visited_right->int_value)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         if (visited_left->type == AST_BOOL && visited_right->type == AST_BOOL)
         {
             if (strcmp(visited_left->bool_value, visited_right->bool_value) != 0)
-            {
                 value = "true";
-            }
             else
-            {
                 value = "false";
-            }
         }
         else
         {

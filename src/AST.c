@@ -52,6 +52,11 @@ AST_T* init_ast(int type)
     // AST_PAREN
     ast->paren_value = (void*) 0;
 
+    // AST_BINOP
+    ast->binop_left = (void*) 0;
+    ast->binop_right = (void*) 0;
+    ast->binop_op = 0;
+
     // AST_STRING
     ast->string_value = (void*) 0;
 

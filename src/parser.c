@@ -70,12 +70,26 @@ void parser_eat(parser_T* parser, int token_type)
         }
         switch (token_type)
         {
-            case 3: printf("Expected (\n"); break;
-            case 4: printf("Expected )\n"); break;
-            case 5: printf("Expected {\n"); break;
-            case 6: printf("Expected }\n"); break;
-            case 7: printf("Expected =\n"); break;
-            case 8: printf("Expected ,\n"); break;
+            case 3: printf("Expected '('\n"); break;
+            case 4: printf("Expected ')'\n"); break;
+            case 5: printf("Expected '{'\n"); break;
+            case 6: printf("Expected '}'\n"); break;
+            case 7: printf("Expected '='\n"); break;
+            case 8: printf("Expected ','\n"); break;
+            case 9: printf("Expected '.'\n"); break;
+            case 10: printf("Expected '>'\n"); break;
+            case 11: printf("Expected '<'\n"); break;
+            case 12: printf("Expected '=='\n"); break;
+            case 13: printf("Expected '!='\n"); break;
+            case 14: printf("Expected 'end' or ';'\n"); break;
+            case 15: printf("Expected 'do'\n"); break;
+            case 16: printf("Expected 'else'\n"); break;
+            case 19: printf("Expected '++'\n"); break;
+            case 20: printf("Expected '--'\n"); break;
+            case 21: printf("Expected 'elif'\n"); break;
+            case 22: printf("Expected '+'\n"); break;
+            case 23: printf("Expected '-'\n"); break;
+            default: printf("Expected somthing\n");
         }
         exit(1);
     }
@@ -131,7 +145,7 @@ AST_T* parser_parse_statements(parser_T* parser, scope_T* scope, char* func_name
     return compound;
 }
 
-AST_T* parser_parse_expr(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_factor(parser_T* parser, scope_T* scope, char* func_name)
 {
     switch (parser->current_token->type)
     {
@@ -144,6 +158,42 @@ AST_T* parser_parse_expr(parser_T* parser, scope_T* scope, char* func_name)
     }
 
     return init_ast(AST_NOOP);
+}
+
+AST_T* parser_parse_term(parser_T* parser, scope_T* scope, char* func_name)
+{
+    AST_T* ast_left;
+    ast_left = parser_parse_factor(parser, scope, func_name);
+
+    while (parser->current_token->type == TOKEN_MUL || parser->current_token->type == TOKEN_DIV || parser->current_token->type == TOKEN_REM)
+    {
+        AST_T* ast_binop = init_ast(AST_BINOP);
+        ast_binop->binop_left = ast_left;
+        ast_binop->binop_op = parser->current_token->type;
+        parser_eat(parser, parser->current_token->type);
+        ast_binop->binop_right = parser_parse_expr(parser, scope, func_name);
+
+        ast_binop->scope = scope;
+        return ast_binop;
+    }
+
+    return ast_left;
+}
+
+AST_T* parser_parse_expr(parser_T* parser, scope_T* scope, char* func_name)
+{
+    AST_T* ast_left = parser_parse_term(parser, scope, func_name);
+    while (parser->current_token->type == TOKEN_PLUS || parser->current_token->type == TOKEN_MINUS)
+    {
+        AST_T* ast_binop = init_ast(AST_BINOP);
+        ast_binop->binop_left = ast_left;
+        ast_binop->binop_op = parser->current_token->type;
+        parser_eat(parser, parser->current_token->type);
+        ast_binop->binop_right = parser_parse_expr(parser, scope, func_name);
+        return ast_binop;
+    }
+  
+    return ast_left;
 }
 
 AST_T* parser_parse_function_call(parser_T* parser, scope_T* scope, char* func_name){
@@ -314,10 +364,14 @@ AST_T* parser_parse_paren(parser_T* parser, scope_T* scope, char* func_name)
     ast->paren_value = parser_parse_expr(parser, scope, func_name);
     parser_eat(parser, TOKEN_RPAREN);
     ast->scope = scope;
+
     if (parser->current_token->type == TOKEN_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS || parser->current_token->type == TOKEN_GREATER_THAN || parser->current_token->type == TOKEN_LESS_THAN)
-    {
         return parser_parse_compare(parser, scope, ast, func_name);
-    }
+    else
+    /*
+    if (parser->current_token->type == TOKEN_PLUS || parser->current_token->type == TOKEN_MINUS)
+        return parser_parse_expr(parser, scope, func_name, ast);*/
+
     return ast;
 }
 
