@@ -67,9 +67,9 @@ static AST_T* builtin_function_sleep(visitor_T* visitor, AST_T** args, int args_
 
         switch (visited_ast->type)
         {
-            case AST_STRING: printf("ERROR: mismatched types\n"); exit(1); break;
+            case AST_STRING: printf("TypeError: an integer is required\n"); exit(1); break;
             case AST_INT: sleep(visited_ast->int_value); break;
-            case AST_BOOL: printf("ERROR: mismatched types\n"); exit(1); break;
+            case AST_BOOL: printf("TypeError: an integer is required\n"); exit(1); break;
             default: printf("%p", visited_ast); break;
         }
     }
@@ -95,14 +95,19 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
     {
         if (node->args_size != 1)
         {
-            printf("ERROR: function len expected one argument\n");
+            printf("Error: function len() expected one argument\n");
             exit(1);
         }
         AST_T* visited_value = visitor_visit(visitor, node->args[0]);
         if (visited_value->type != AST_STRING)
         {
-            printf("ERROR: function len expected type string\n");
-            exit(1); 
+            switch (visited_value->type)
+            {
+                case AST_INT: printf("TypeError: 'int' has no len()\n"); break;
+                case AST_BOOL: printf("TypeError: 'bool' has no len()\n"); break;
+                default: printf("TypeError: function len() expected type string\n"); break;
+            }
+            exit(1);
         }
 
         long int int_value = strlen(visited_value->string_value);
@@ -116,7 +121,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
     {
         if (node->args_size > 1)
         {
-            printf("ERROR: function input expected one argument\n");
+            printf("ERROR: function input() expected at most 1 argument got %zu\n", node->args_size);
             exit(1);
         }
         if (node->args[0] != (void*) 0)
@@ -124,7 +129,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
             AST_T* visited_ast = visitor_visit(visitor, node->args[0]);
             if (visited_ast->type != AST_STRING)
             {
-                printf("ERROR: function input expected type string\n");
+                printf("ERROR: function input() expected type string\n");
                 exit(1);
             }
             printf("%s", visited_ast->string_value);
@@ -154,7 +159,7 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
 
     if (fdef == (void*) 0)
     {
-        printf("Error: undefined function %s\n", node->function_call_name);
+        printf("Error: undefined function '%s'\n", node->function_call_name);
         exit(1);
     }
 
@@ -244,7 +249,7 @@ AST_T* visitor_visit_binop(visitor_T* visitor, AST_T* node)
 
     if (left_value->type != AST_INT && right_value->type != AST_INT)
     {
-        printf("ERROR: expected integer\n");
+        printf("ERROR: expected type integer\n");
         exit(1);
     }
 
@@ -303,10 +308,7 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
                 value = "false";
         }
         else
-        {
-            printf("ERROR: mismatched types\n");
-            exit(1);
-        }
+            value = "false";
     }
     else
     if (node->compare_op == TOKEN_GREATER_THAN)
@@ -319,8 +321,8 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
                 value = "false";
         }
         else
-        {
-            printf("ERROR: mismatched types\n");
+        {   
+            printf("TypeError: '>' not supported between different data types\n");
             exit(1);
         }
     }
@@ -336,7 +338,7 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
         }
         else
         {
-            printf("ERROR: mismatched types\n");
+            printf("TypeError: '<' not supported between different data types\n");
             exit(1);
         }
     }
@@ -367,10 +369,7 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
                 value = "false";
         }
         else
-        {
-            printf("ERROR: mismatched types\n");
-            exit(1);
-        }
+            value = "true";
     }
 
     AST_T* ast_bool = init_ast(AST_BOOL);
@@ -385,20 +384,16 @@ AST_T* visitor_visit_while(visitor_T* visitor, AST_T* node)
 
     if (visited_op->type != AST_BOOL)
     {
-        printf("ERROR: while loop unexpected value\n");
+        printf("Error: while loop unexpected value\n");
         exit(1);
     }
 
     while (1) {
         visited_op = visitor_visit(visitor, node->op);
         if (strcmp(visited_op->bool_value, "true") == 0)
-        {
             visitor_visit(visitor, node->while_body);
-        }
         else
-        {
             return node;
-        }
     }
     return node;
 }
@@ -413,7 +408,7 @@ AST_T* visitor_visit_binop_inc_dec(visitor_T* visitor, AST_T* node)
 
     if (vdef == (void*) 0)
     {
-        printf("ERROR: undifined variable '%s'\n", node->variable_name);
+        printf("Error: undifined variable '%s'\n", node->binop_inc_dec_variable);
         exit(1);
     }
     
@@ -421,7 +416,7 @@ AST_T* visitor_visit_binop_inc_dec(visitor_T* visitor, AST_T* node)
 
     if (visited_value->type != AST_INT)
     {
-        printf("ERROR: mismatched types\n");
+        printf("TypeError: variable '%s' value type expected integer\n", node->binop_inc_dec_variable);
         exit(1);
     }
 
@@ -474,7 +469,7 @@ AST_T* visitor_visit_variable(visitor_T* visitor, AST_T* node)
     if (vdef != (void*) 0)
         return visitor_visit(visitor, vdef->variable_definition_value);
 
-    printf("ERROR: undifined variable '%s'\n", node->variable_name);
+    printf("Error: undifined variable '%s'\n", node->variable_name);
     exit(1);
 }
 
