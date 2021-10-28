@@ -19,14 +19,14 @@ $ t# <filename>.t#
 ```
 
 > Hello World
-```py
+```pascal
 func main() do
     print("Hello World");
 end;
 ```
 
 > Function call
-```py
+```pascal
 func SampleFunc() do
     print("Function call!");
 end;
@@ -37,7 +37,7 @@ end;
 ```
 
 > Variable
-```py
+```pascal
 func main() do
     name = "T#";
     print(name);
@@ -45,7 +45,7 @@ end;
 ```
 
 > Call variables from other functions
-```py
+```pascal
 func SampleFunc() do
     name = "T#";
 end;
@@ -57,7 +57,7 @@ end;
 ```
 
 > If statement
-```py
+```pascal
 func main() do
     if 10 == 10 do
         print("Hello World!");
@@ -84,7 +84,7 @@ end;
 ```
 
 > While loop
-```py
+```pascal
 func main() do
     num = 0;
     while num < 101 do
@@ -95,7 +95,7 @@ end;
 ```
 
 > FizzBuzz
-```py
+```pascal
 func main() do
     i = 1;
     while i < 101 do
