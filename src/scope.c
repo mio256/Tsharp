@@ -98,6 +98,7 @@ AST_T* scope_change_variable_definition(scope_T* scope, const char* name, const 
         {
             if (strcmp(vdef->variable_definition_func_name, fname) == 0)
             {
+                free(scope->variable_definitions[i]->variable_definition_value);
                 scope->variable_definitions[i]->variable_definition_value = value;
             }
         }

@@ -165,7 +165,6 @@ AST_T* parser_parse_term(parser_T* parser, scope_T* scope, char* func_name)
         ast_binop->binop_op = parser->current_token->type;
         parser_eat(parser, parser->current_token->type);
         ast_binop->binop_right = parser_parse_expr(parser, scope, func_name);
-
         ast_binop->scope = scope;
         return ast_binop;
     }
@@ -225,18 +224,19 @@ AST_T* parser_parse_variable_definition(parser_T* parser, scope_T* scope, char* 
 {
     AST_T* ast = init_ast(AST_VARIABLE_DEFINITION);
     char * variable_name = parser->prev_token->value;
+
     ast->variable_definition_variable_name = calloc(
         strlen(variable_name) + 1,
         sizeof(char)
     );
-
     strcpy(ast->variable_definition_variable_name, variable_name);
+
     ast->variable_definition_func_name = calloc(
         strlen(func_name) + 1,
         sizeof(char)
     );
-
     strcpy(ast->variable_definition_func_name, func_name);
+
     parser_eat(parser, TOKEN_EQUALS);
     AST_T* variable_definition_value = parser_parse_expr(parser, scope, func_name);
     ast->variable_definition_value = variable_definition_value;
@@ -247,18 +247,19 @@ AST_T* parser_parse_variable_definition(parser_T* parser, scope_T* scope, char* 
 AST_T* parser_parse_variable_update_value_from_other_func(parser_T* parser, scope_T* scope, char* func_name, char* variable_name)
 {
     AST_T* ast = init_ast(AST_VARIABLE_DEFINITION);
+
     ast->variable_definition_variable_name = calloc(
         strlen(variable_name) + 1,
         sizeof(char)
     );
-
     strcpy(ast->variable_definition_variable_name, variable_name);
+
     ast->variable_definition_func_name = calloc(
         strlen(func_name) + 1,
         sizeof(char)
     );
-
     strcpy(ast->variable_definition_func_name, func_name);
+
     parser_eat(parser, TOKEN_EQUALS);
     AST_T* variable_definition_value = parser_parse_expr(parser, scope, func_name);
     ast->variable_definition_value = variable_definition_value;
@@ -270,12 +271,14 @@ AST_T* parser_parse_function_definition(parser_T* parser, scope_T* scope)
 {
     AST_T* ast = init_ast(AST_FUNCTION_DEFINITION);
     parser_eat(parser, TOKEN_ID);
+
     char* function_name = parser->current_token->value;
     ast->function_definition_name = calloc(
         strlen(function_name) + 1,
         sizeof(char)
     );
     strcpy(ast->function_definition_name, function_name);
+
     parser_eat(parser, TOKEN_ID);
     parser_eat(parser, TOKEN_LPAREN);
 
@@ -371,9 +374,7 @@ AST_T* parser_parse_variable(parser_T* parser, scope_T* scope, char* func_name)
     else
     {
         ast->variable_func_name = func_name;
-
         ast->variable_name = token_value;
-
         ast->scope = scope;
     }
     if (parser->current_token->type == TOKEN_EQUALS)
@@ -419,15 +420,12 @@ AST_T* parser_parse_if(parser_T* parser, scope_T* scope, char* func_name)
         while (parser->current_token->type == TOKEN_ELIF)
         {
             parser_eat(parser, TOKEN_ELIF);
-
             ast->elif_size += 1;
-
             ast->elifop =
                 realloc(
                     ast->elifop,
                     ast->elif_size * sizeof(struct AST_STRUCT*)
                 );
-
             AST_T* elifop = parser_parse_expr(parser, scope, func_name);
             ast->elifop[ast->elif_size-1] = elifop;
             parser_eat(parser, TOKEN_DO);

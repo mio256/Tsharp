@@ -200,11 +200,40 @@ AST_T* visitor_visit_variable_definition(visitor_T* visitor, AST_T* node)
 
     if (vdef != (void*) 0)
     {
+        AST_T* visited_ast = visitor_visit(visitor, node->variable_definition_value);
+        AST_T* ast = init_ast(AST_VARIABLE_DEFINITION);
+        if (visited_ast->type == AST_STRING)
+        {
+            char* string = calloc(strlen(visited_ast->string_value) + 1, sizeof(char));
+            strcpy(string, visited_ast->string_value);
+            AST_T* ast_string = init_ast(AST_STRING);
+            ast_string->string_value = string;
+            ast->variable_definition_value = ast_string;
+        }
+        else
+        if (visited_ast->type == AST_INT)
+        {
+            long int *int_value;
+            int_value = &visited_ast->int_value;
+            AST_T* ast_int = init_ast(AST_INT);
+            ast_int->int_value = *int_value;
+            ast->variable_definition_value = ast_int;
+        }
+        else
+        if (visited_ast->type == AST_BOOL)
+        {
+            char* bool_value = calloc(strlen(visited_ast->bool_value) + 1, sizeof(char));
+            strcpy(bool_value, visited_ast->bool_value);
+            AST_T* ast_bool = init_ast(AST_BOOL);
+            ast_bool->bool_value = bool_value;
+            ast->variable_definition_value = ast_bool;
+        }
+
         scope_change_variable_definition(
             node->scope,
             node->variable_definition_variable_name,
             node->variable_definition_func_name,
-            node->variable_definition_value
+            ast->variable_definition_value
         );
         return node;
     }
