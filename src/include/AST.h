@@ -18,6 +18,7 @@ typedef struct AST_STRUCT
         AST_BINOP_INC_DEC,
         AST_PAREN,
         AST_BINOP,
+        AST_TYPE,
         AST_COMPOUND,
         AST_NOOP,
     } type;
@@ -81,6 +82,9 @@ typedef struct AST_STRUCT
 
     // AST_BOOL
     char* bool_value;
+
+    // AST_TYPE
+    char* type_value;
 
     // AST_COMPOUND
     struct AST_STRUCT** compound_value;

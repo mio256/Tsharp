@@ -35,6 +35,8 @@ AST_T* visitor_visit_int(visitor_T* visitor, AST_T* node);
 
 AST_T* visitor_visit_bool(visitor_T* visitor, AST_T* node);
 
+AST_T* visitor_visit_type(visitor_T* visitor, AST_T* node);
+
 AST_T* visitor_visit_variable(visitor_T* visitor, AST_T* node);
 
 AST_T* visitor_visit_compound(visitor_T* visitor, AST_T* node);

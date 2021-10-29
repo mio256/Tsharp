@@ -30,6 +30,7 @@ AST_T* visitor_visit(visitor_T* visitor, AST_T* node)
         case AST_STRING: return visitor_visit_string(visitor, node); break;
         case AST_INT: return visitor_visit_int(visitor, node); break;
         case AST_BOOL: return visitor_visit_bool(visitor, node); break;
+        case AST_TYPE: return visitor_visit_type(visitor, node); break;
         case AST_COMPOUND: return visitor_visit_compound(visitor, node); break;
         case AST_NOOP: return node; break;
     }
@@ -51,6 +52,7 @@ static AST_T* builtin_function_print(visitor_T* visitor, AST_T** args, int args_
             case AST_STRING: printf("%s", visited_ast->string_value); break;
             case AST_INT: printf("%ld", visited_ast->int_value); break;
             case AST_BOOL: printf("%s", visited_ast->bool_value); break;
+            case AST_TYPE: printf("%s", visited_ast->type_value); break;
             default: printf("%p", visited_ast); break;
         }
     }
@@ -70,6 +72,7 @@ static AST_T* builtin_function_sleep(visitor_T* visitor, AST_T** args, int args_
             case AST_STRING: printf("TypeError: function sleep() expected type int\n"); exit(1); break;
             case AST_INT: sleep(visited_ast->int_value); break;
             case AST_BOOL: printf("TypeError: function sleep() expected type int\n"); exit(1); break;
+            case AST_TYPE: printf("TypeError: function sleep() expected type int\n"); exit(1); break;
             default: printf("%p", visited_ast); break;
         }
     }
@@ -162,6 +165,37 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
         exit(1);
     }
 
+    if (strcmp(node->function_call_name, "type") == 0)
+    {
+        if (node->function_call_args_size != 1)
+        {
+            printf("Error: function type() expected at most 1 argument got %zu\n", node->function_call_args_size);
+            exit(1);
+        }
+        AST_T* visited_ast = visitor_visit(visitor, node->function_call_args[0]);
+        AST_T* ast_type = init_ast(AST_TYPE);
+        if (visited_ast->type == AST_STRING)
+        {
+            ast_type->type_value = "string";       
+        }
+        else
+        if (visited_ast->type == AST_INT)
+        {
+            ast_type->type_value = "int";
+        }
+        else
+        if (visited_ast->type == AST_BOOL)
+        {
+            ast_type->type_value = "bool";
+        }
+        else
+        if (visited_ast->type == AST_TYPE)
+        {
+            ast_type->type_value = "type";
+        }
+        return ast_type;
+    }
+
     AST_T* fdef = scope_get_func_definition(
         node->scope,
         node->function_call_name
@@ -227,6 +261,15 @@ AST_T* visitor_visit_variable_definition(visitor_T* visitor, AST_T* node)
             AST_T* ast_bool = init_ast(AST_BOOL);
             ast_bool->bool_value = bool_value;
             ast->variable_definition_value = ast_bool;
+        }
+        else
+        if (visited_ast->type == AST_TYPE)
+        {
+            char* type_value = calloc(strlen(visited_ast->type_value) + 1, sizeof(char));
+            strcpy(type_value, visited_ast->type_value);
+            AST_T* ast_type = init_ast(AST_TYPE);
+            ast_type->type_value = type_value;
+            ast->variable_definition_value = ast_type;
         }
 
         scope_change_variable_definition(
@@ -347,6 +390,14 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
                 value = "false";
         }
         else
+        if (visited_left->type == AST_TYPE && visited_right->type == AST_TYPE)
+        {
+            if (strcmp(visited_left->type_value, visited_right->type_value) == 0)
+                value = "true";
+            else
+                value = "false";
+        }
+        else
             value = "false";
     }
     else
@@ -403,6 +454,14 @@ AST_T* visitor_visit_compare(visitor_T* visitor, AST_T* node)
         if (visited_left->type == AST_BOOL && visited_right->type == AST_BOOL)
         {
             if (strcmp(visited_left->bool_value, visited_right->bool_value) != 0)
+                value = "true";
+            else
+                value = "false";
+        }
+        else
+        if (visited_left->type == AST_TYPE && visited_right->type == AST_TYPE)
+        {
+            if (strcmp(visited_left->type_value, visited_right->type_value) != 0)
                 value = "true";
             else
                 value = "false";
@@ -493,6 +552,11 @@ AST_T* visitor_visit_int(visitor_T* visitor, AST_T* node)
 }
 
 AST_T* visitor_visit_bool(visitor_T* visitor, AST_T* node)
+{
+    return node;
+}
+
+AST_T* visitor_visit_type(visitor_T* visitor, AST_T* node)
 {
     return node;
 }
