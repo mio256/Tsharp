@@ -23,4 +23,11 @@ func main() do
         print("Hello World!");
     end;
 
+    typeValue = type(100);
+    if type(10) == typeValue do
+        print(type(10));
+    else
+        print("expected type int -> ", typeValue);
+    end;
+
 end;

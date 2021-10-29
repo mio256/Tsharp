@@ -1,0 +1,10 @@
+
+// string, int, bool, type
+
+func main() do
+	text = "Hello World";
+	print(type(text));
+
+	type = type(text);
+	print(type(type));
+end;
