@@ -47,4 +47,12 @@ func main() do
 	else
 		print("[test 7] failed");
 	end;
+
+	num = 10;
+	num = num;
+	if num == 10 do
+		print("[test 8] passed");
+	else
+		print("[test 8] failed");
+	end;
 end;
