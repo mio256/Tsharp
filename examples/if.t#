@@ -30,4 +30,8 @@ func main() do
         print("expected type int -> ", typeValue);
     end;
 
+    if type(10) == int do
+        print("10 is int");
+    end;
+
 end;
