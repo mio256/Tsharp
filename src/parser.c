@@ -146,6 +146,7 @@ AST_T* parser_parse_factor(parser_T* parser, scope_T* scope, char* func_name)
         case TOKEN_STRING: return parser_parse_string(parser, scope, func_name);
         case TOKEN_INT: return parser_parse_int(parser, scope, func_name);
         case TOKEN_BOOL: return parser_parse_bool(parser, scope, func_name);
+        case TOKEN_TYPE: return parser_parse_type(parser, scope, func_name);
         case TOKEN_ID: return parser_parse_id(parser, scope, func_name);
         default: return 0;
     }
@@ -532,6 +533,17 @@ AST_T* parser_parse_bool(parser_T* parser, scope_T* scope, char* func_name)
     if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS)
         return parser_parse_compare(parser, scope, ast_bool, func_name);
     return ast_bool;
+}
+
+AST_T* parser_parse_type(parser_T* parser, scope_T* scope, char* func_name)
+{
+    AST_T* ast_type = init_ast(AST_TYPE);
+    ast_type->type_value = parser->current_token->value;
+    parser_eat(parser, TOKEN_TYPE);
+    ast_type->scope = scope;
+    if (parser->current_token->type == TOKEN_IS_EQUALS || parser->current_token->type == TOKEN_NOT_EQUALS)
+        return parser_parse_compare(parser, scope, ast_type, func_name);
+    return ast_type;
 }
 
 AST_T* parser_parse_id(parser_T* parser, scope_T* scope, char* func_name)

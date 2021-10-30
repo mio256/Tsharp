@@ -243,29 +243,22 @@ token_T* lexer_collect_id(lexer_T* lexer)
     }
 
     if (strcmp(value, "end") == 0)
-    {
         return init_token(TOKEN_END, value);
-    }
 
     if (strcmp(value, "do") == 0)
-    {
         return init_token(TOKEN_DO, value);
-    }
 
     if (strcmp(value, "else") == 0)
-    {
         return init_token(TOKEN_ELSE, value);
-    }
 
     if (strcmp(value, "true") == 0 || strcmp(value, "false") == 0)
-    {
         return init_token(TOKEN_BOOL, value);
-    }
 
     if (strcmp(value, "elif") == 0)
-    {
         return init_token(TOKEN_ELIF, value);
-    }
+
+    if (strcmp(value, "string") == 0 || strcmp(value, "int") == 0 || strcmp(value, "bool") == 0)
+        return init_token(TOKEN_TYPE, value);
 
     return init_token(TOKEN_ID, value);
 }

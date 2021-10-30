@@ -57,6 +57,8 @@ AST_T* parser_parse_int(parser_T* parser, scope_T* scope, char* func_name);
 
 AST_T* parser_parse_bool(parser_T* parser, scope_T* scope, char* func_name);
 
+AST_T* parser_parse_type(parser_T* parser, scope_T* scope, char* func_name);
+
 AST_T* parser_parse_id(parser_T* parser, scope_T* scope, char* func_name);
 
 #endif
