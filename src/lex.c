@@ -60,6 +60,11 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             return lexer_collect_string(lexer);
         }
 
+        if (lexer->c == '\'')
+        {
+            return lexer_collect_string_single_quot(lexer);
+        }
+
         if (isdigit(lexer->c))
         { 
             return lexer_collect_int(lexer);
@@ -188,6 +193,28 @@ token_T* lexer_collect_string(lexer_T* lexer)
     value[0] = '\0';
 
     while (lexer->c != '"')
+    {
+        char* s = lexer_get_current_char_as_string(lexer);
+        value = realloc(value, (strlen(value) + strlen(s) + 1) * sizeof(char));
+        strcat(value, s);
+
+        lexer_advance(lexer);
+    }
+
+    lexer_advance(lexer);
+
+    return init_token(TOKEN_STRING, value);
+}
+
+token_T* lexer_collect_string_single_quot(lexer_T* lexer)
+{
+    lexer_advance(lexer);
+
+    char* value = calloc(1, sizeof(char));
+
+    value[0] = '\0';
+
+    while (lexer->c != '\'')
     {
         char* s = lexer_get_current_char_as_string(lexer);
         value = realloc(value, (strlen(value) + strlen(s) + 1) * sizeof(char));
