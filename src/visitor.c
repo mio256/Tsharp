@@ -61,6 +61,39 @@ static AST_T* builtin_function_print(visitor_T* visitor, AST_T** args, int args_
     return init_ast(AST_NOOP);
 }
 
+static AST_T* builtin_function_read_file(visitor_T* visitor, AST_T** args, int args_size)
+{
+    AST_T* visited_file_name = visitor_visit(visitor, args[0]);
+
+    if (visited_file_name->type != AST_STRING)
+    {
+        printf("TypeError: function char() fist and second argument must be a string\n");
+        exit(1);
+    }
+    char* buffer = 0;
+    long length;
+
+    FILE*f = fopen(visited_file_name->string_value, "rb");
+    if (f)
+    {
+        fseek(f, 0, SEEK_END);
+        length = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        buffer = calloc(length, length);
+        if (buffer)
+            fread(buffer, 1, length, f);
+
+        fclose(f);
+        AST_T* ast_string = init_ast(AST_STRING);
+        ast_string->string_value = buffer;
+
+        return ast_string;
+    }
+
+    printf("Error: reading file %s\n", visited_file_name->string_value);
+    exit(2);
+}
+
 static AST_T* builtin_function_sleep(visitor_T* visitor, AST_T** args, int args_size)
 {
     for (int i = 0; i < args_size; i++)
@@ -112,7 +145,6 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
             }
             exit(1);
         }
-
         long int int_value = strlen(visited_value->string_value);
         AST_T* ast_int = init_ast(AST_INT);
         ast_int->int_value = int_value; 
@@ -140,7 +172,6 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
 
         char input_text[100];
         char* text;
-
         fgets(input_text, 100, stdin);
         int last = strlen(input_text) - 1;
         if (last >= 0 && input_text[last] == '\n')
@@ -148,10 +179,8 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
 
         text = calloc(strlen(input_text) + 1, sizeof(char));
         strcpy(text, input_text);
-
         AST_T* ast_string = init_ast(AST_STRING);
         ast_string->string_value = text;
-
         return ast_string;
     }
 
@@ -174,26 +203,64 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
         }
         AST_T* visited_ast = visitor_visit(visitor, node->function_call_args[0]);
         AST_T* ast_type = init_ast(AST_TYPE);
-        if (visited_ast->type == AST_STRING)
-        {
+        if (visited_ast->type == AST_STRING) {
             ast_type->type_value = "string";       
-        }
-        else
-        if (visited_ast->type == AST_INT)
-        {
+        } else
+        if (visited_ast->type == AST_INT) {
             ast_type->type_value = "int";
-        }
-        else
-        if (visited_ast->type == AST_BOOL)
-        {
+        } else
+        if (visited_ast->type == AST_BOOL) {
             ast_type->type_value = "bool";
-        }
-        else
-        if (visited_ast->type == AST_TYPE)
-        {
+        } else
+        if (visited_ast->type == AST_TYPE) {
             ast_type->type_value = "type";
         }
         return ast_type;
+    }
+
+    if (strcmp(node->function_call_name, "char") == 0)
+    {
+        if (node->function_call_args_size != 2)
+        {
+            printf("Error: function char() expected at most and least 2 arguments but got %zu\n", node->function_call_args_size);
+            exit(1);
+        }
+        AST_T* visited_string = visitor_visit(visitor, node->function_call_args[0]);
+        AST_T* visited_index = visitor_visit(visitor, node->function_call_args[1]);
+        if (visited_string->type != AST_STRING && visited_index->type != AST_INT)
+        {
+            printf("TypeError: function char() fist argument must be a string, second argument must be int\n");
+            exit(1);
+        }
+        AST_T* ast_string = init_ast(AST_STRING);
+        char* string = visited_string->string_value;
+        char str[2]; str[0] = string[visited_index->int_value]; str[1] = '\0';
+        char* test = calloc(strlen(str) + 1, sizeof(char));
+        strcpy(test, str);
+        ast_string->string_value = test;
+        return ast_string;
+    }
+
+    if (strcmp(node->function_call_name, "file") == 0)
+    {
+        if (node->function_call_args_size != 2)
+        {
+            printf("Error: function file() expected at most and least 2 arguments but got %zu\n", node->function_call_args_size);
+            exit(1);
+        }
+
+        AST_T* visited_type = visitor_visit(visitor, node->function_call_args[1]);
+        if (visited_type->type != AST_STRING)
+        {
+            printf("TypeError: function char() fist and second argument must be a string\n");
+            exit(1);
+        }
+
+        if (strcmp(visited_type->string_value, "r") == 0)
+            return builtin_function_read_file(visitor, node->function_call_args, node->function_call_args_size);
+
+        printf("Error: function file() only can read files\n");
+        exit(1);
     }
 
     AST_T* fdef = scope_get_func_definition(
