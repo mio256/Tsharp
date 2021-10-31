@@ -11,6 +11,10 @@ WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT 
 > Install
 ```
 $ make
+
+If it doesn't work, run the next command
+
+$ gcc -o ./tsharp.exe src/*.c
 ```
 
 ### Run
