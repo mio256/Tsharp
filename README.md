@@ -6,12 +6,14 @@
 
 WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT WITHOUT ANY NOTICE!
 
-### Install & Run
+### Install
 
 > Install
 ```
 $ make
 ```
+
+### Run
 
 > Run
 ```
