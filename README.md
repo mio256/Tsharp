@@ -10,12 +10,16 @@ WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT 
 
 > Install
 ```
-$ sudo make install
+$ make
 ```
 
 > Run
 ```
-$ t# <filename>.t#
+$ ./tsharp.out <filename>.t#
+
+or
+
+$ ./tsharp.exe <filename>.t#
 ```
 
 > Hello World
