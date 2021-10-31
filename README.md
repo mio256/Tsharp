@@ -14,7 +14,7 @@ $ make
 
 If it doesn't work, run the next command
 
-$ gcc -o ./tsharp.exe src/*.c
+$ gcc -o tsharp.exe src/*.c
 ```
 
 ### Run
