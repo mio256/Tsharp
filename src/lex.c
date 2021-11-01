@@ -283,7 +283,7 @@ token_T* lexer_collect_id(lexer_T* lexer)
 
     value[0] = '\0';
 
-    while (isalnum(lexer->c))
+    while (isalnum(lexer->c) || lexer->c == '_')
     {
         char* s = lexer_get_current_char_as_string(lexer);
         value = realloc(value, (strlen(value) + strlen(s) + 1) * sizeof(char));
