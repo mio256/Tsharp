@@ -45,6 +45,23 @@ void lexer_skip_inline_comment(lexer_T* lexer)
         lexer_advance(lexer);
 }
 
+void lexer_skip_block_comment(lexer_T* lexer)
+{
+    while (1)
+    {
+        lexer_advance(lexer);
+        if (lexer->c == '*')
+        {
+            lexer_advance(lexer);
+            if (lexer->c == '/')
+            {
+                lexer_advance(lexer);
+                return;
+            }
+        }
+    }
+}
+
 token_T* lexer_get_next_token(lexer_T* lexer)
 {
     while (lexer->c != '\0' && lexer->i < strlen(lexer->contents))
@@ -78,6 +95,12 @@ token_T* lexer_get_next_token(lexer_T* lexer)
             {
                 lexer_advance(lexer);
                 lexer_skip_inline_comment(lexer);
+                continue;
+            }
+            if (lexer->c == '*')
+            {
+                lexer_advance(lexer);
+                lexer_skip_block_comment(lexer);
                 continue;
             }
             else
