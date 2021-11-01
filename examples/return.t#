@@ -1,0 +1,10 @@
+
+func add(x, y) do
+	print("reseved: ", x, " ", y);
+end return x + y;
+
+func main() do
+	print("Hello World");
+	a = add(1, 20);
+	print(a);
+end;
