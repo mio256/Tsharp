@@ -288,6 +288,11 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
 
     visitor_visit(visitor, fdef->function_definition_body);
 
+    if (fdef->function_return_value != (void*) 0)
+    {
+        return visitor_visit(visitor, fdef->function_return_value);
+    }
+
     return node;
 }
 

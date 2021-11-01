@@ -316,6 +316,11 @@ AST_T* parser_parse_function_definition(parser_T* parser, scope_T* scope)
 
     ast->function_definition_body = parser_parse_statements(parser, scope, function_name);
     parser_eat(parser, TOKEN_END);
+    if (parser->current_token->type == TOKEN_RETURN)
+    {
+        parser_eat(parser, TOKEN_RETURN);
+        ast->function_return_value = parser_parse_expr(parser, scope, function_name);
+    }
     ast->scope = scope;
     return ast;
 }

@@ -287,6 +287,9 @@ token_T* lexer_collect_id(lexer_T* lexer)
     if (strcmp(value, "string") == 0 || strcmp(value, "int") == 0 || strcmp(value, "bool") == 0)
         return init_token(TOKEN_TYPE, value);
 
+    if (strcmp(value, "return") == 0)
+        return init_token(TOKEN_RETURN, value);
+
     return init_token(TOKEN_ID, value);
 }
 
