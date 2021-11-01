@@ -401,6 +401,24 @@ AST_T* visitor_visit_binop(visitor_T* visitor, AST_T* node)
     AST_T* left_value =  visitor_visit(visitor, node->binop_left);
     AST_T* right_value =  visitor_visit(visitor, node->binop_right);
 
+    if (left_value->type == AST_STRING && right_value->type == AST_STRING)
+    {
+        char* value = calloc(1, sizeof(char));
+        value[0] = '\0';
+
+        char* s = left_value->string_value;
+        value = realloc(value, (strlen(value) + strlen(s) + 1) * sizeof(char));
+        strcat(value, s);
+
+        s = right_value->string_value;
+        value = realloc(value, (strlen(value) + strlen(s) + 1) * sizeof(char));
+        strcat(value, s);
+
+        AST_T* ast_string = init_ast(AST_STRING);
+        ast_string->string_value = value;
+        return ast_string;
+    }
+
     if (left_value->type != AST_INT && right_value->type != AST_INT)
     {
         printf("ERROR: expected type integer\n");
