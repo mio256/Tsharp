@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 visitor_T* init_visitor()
 {
@@ -261,6 +262,49 @@ AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node)
 
         printf("Error: function file() only can read files\n");
         exit(1);
+    }
+
+    if (strcmp(node->function_call_name, "isalpha") == 0)
+    {
+        if (node->function_call_args_size != 1)
+        {
+            printf("Error: function file() expected at most and least 1 arguments but got %zu\n", node->function_call_args_size);
+            exit(1);
+        }
+
+        AST_T* visited_ast = visitor_visit(visitor, node->function_call_args[0]);
+        char* bool_value;
+        if (visited_ast->type == AST_STRING) {
+            char* text = visited_ast->string_value;
+            char text2[2];
+            if (text[1])
+            {
+                printf("Error: function isalpha() expected character but got characters\n");
+                exit(1);
+            }
+            strcpy(text2, text);
+            if (isalpha(text2[0]))
+            {
+                bool_value = "true";
+            }
+            else
+            {
+                bool_value = "false";
+            }
+        }
+        else
+        if (visited_ast->type == AST_INT)
+        {
+            bool_value = "false";
+        }
+        else
+        {
+            bool_value = "false";
+        }
+
+        AST_T* ast = init_ast(AST_BOOL);
+        ast->bool_value = bool_value;
+        return ast;
     }
 
     AST_T* fdef = scope_get_func_definition(
