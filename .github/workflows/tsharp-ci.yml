@@ -1,4 +1,4 @@
-name: T# CI
+name: T# Test CI
 
 on:
   push:
