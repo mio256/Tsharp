@@ -1,21 +1,5 @@
 // T# Programming Language
 
 func main() do
-    print("Hello World 😆\n");
-    print("T# Programming Language\n");
-
-    text = "shion";
-    text = "Ibuki";
-    text = "Hello World\n";
-    num = 10;
-    print(text);
-
-    print(num);
-    print("\n");
-
-    if 1 do
-        print("if true print true\n");
-    else
-        print("this is else body\n");
-    end;
+    println("Hello 🌏");
 end;
