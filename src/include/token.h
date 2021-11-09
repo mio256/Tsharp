@@ -10,12 +10,10 @@ typedef struct TOKEN_STRUCT
         TOKEN_SEMI,
         TOKEN_LPAREN,
         TOKEN_RPAREN,
-        TOKEN_EQUALS,
         TOKEN_COMMA,
         TOKEN_DOT,
         TOKEN_END,
         TOKEN_DO,
-        TOKEN_ELSE,
         TOKEN_INT,
         TOKEN_EOF
     } type;

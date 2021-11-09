@@ -94,7 +94,6 @@ token_T* lexer_get_next_token(lexer_T* lexer)
 
         switch (lexer->c)
         {
-            case '=': return lexer_advance_token(lexer, init_token(TOKEN_EQUALS, lexer_get_current_char_as_string(lexer))); break;
             case '.': return lexer_advance_token(lexer, init_token(TOKEN_DOT, lexer_get_current_char_as_string(lexer))); break;
             case ',': return lexer_advance_token(lexer, init_token(TOKEN_COMMA, lexer_get_current_char_as_string(lexer))); break;
             case '(': return lexer_advance_token(lexer, init_token(TOKEN_LPAREN, lexer_get_current_char_as_string(lexer))); break;
@@ -180,9 +179,6 @@ token_T* lexer_collect_id(lexer_T* lexer)
 
     if (strcmp(value, "do") == 0)
         return init_token(TOKEN_DO, value);
-
-    if (strcmp(value, "else") == 0)
-        return init_token(TOKEN_ELSE, value);
 
     return init_token(TOKEN_ID, value);
 }

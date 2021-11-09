@@ -22,19 +22,13 @@ AST_T* parser_parse_statement(parser_T* parser, scope_T* scope, char* func_name)
 
 AST_T* parser_parse_statements(parser_T* parser, scope_T* scope, char* func_name);
 
-AST_T* parser_parse_statements_body(parser_T* parser, scope_T* scope, char* func_name);
+// AST_T* parser_parse_statements_body(parser_T* parser, scope_T* scope, char* func_name);
 
 AST_T* parser_parse_expr(parser_T* parser, scope_T* scope, char* func_name);
 
 AST_T* parser_parse_function_call(parser_T* parser, scope_T* scope, char* func_name);
 
-AST_T* parser_parse_variable_definition(parser_T* parser, scope_T* scope, char* func_name);
-
 AST_T* parser_parse_function_definition(parser_T* parser, scope_T* scope);
-
-AST_T* parser_parse_if(parser_T* parser, scope_T* scope, char* func_name);
-
-AST_T* parser_parse_variable(parser_T* parser, scope_T* scope, char* func_name);
 
 AST_T* parser_parse_string(parser_T* parser, scope_T* scope, char* func_name);
 
