@@ -1,5 +1,5 @@
 ifeq ($(OS), Windows_NT)
-	exec = tsharp.exe
+	exec = tsh.exe
 else
 	exec = tsh.out
 endif
