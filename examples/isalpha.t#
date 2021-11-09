@@ -1,9 +1,0 @@
-
-func main() do
-	text = "";
-	num = 0;
-
-	if isalpha(text) do
-		print("text is alphabet!");
-	end;
-end;

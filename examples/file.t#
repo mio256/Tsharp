@@ -1,5 +1,0 @@
-
-func main() do
-	text = file("examples/main.t#", "r");
-	print(text);
-end;

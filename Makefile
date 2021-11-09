@@ -1,7 +1,7 @@
 ifeq ($(OS), Windows_NT)
 	exec = tsharp.exe
 else
-	exec = tsharp.out
+	exec = tsh.out
 endif
 
 sources = $(wildcard src/*.c)
@@ -19,7 +19,7 @@ install:
 ifeq ($(OS), Windows_NT)
 	echo "Not Available in Windows"
 else
-	cp ./tsharp.out /usr/local/bin/t#
+	cp ./tsh.out /usr/local/bin/tsh
 endif
 
 clean:

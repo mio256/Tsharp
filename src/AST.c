@@ -9,20 +9,19 @@ AST_T* init_ast(int type)
     ast->scope = (void*) 0;
 
     // AST_VARIABLE_DEFINITION
-    ast->variable_definition_variable_name = (void*) 0;
+    ast->variable_definition_v_name = (void*) 0;
+    ast->variable_definition_f_name = (void*) 0;
     ast->variable_definition_value = (void*) 0;
-    ast->variable_definition_func_name = (void*) 0;
 
     // AST_FUNCTION_DEFINITION
-    ast->function_definition_body = (void*) 0;
     ast->function_definition_name = (void*) 0;
+    ast->function_definition_body = (void*) 0;
     ast->function_definition_args = (void*) 0;
-    ast->function_return_value = (void*) 0;
     ast->function_definition_args_size = 0;
-
+    
     // AST_VARIABLE
     ast->variable_name = (void*) 0;
-    ast->variable_func_name = (void*) 0;
+    ast->variable_f_name = (void*) 0;
 
     // AST_FUNCTION_CALL
     ast->function_call_name = (void*) 0;
@@ -30,45 +29,15 @@ AST_T* init_ast(int type)
     ast->function_call_args_size = 0;
 
     // AST_IF
-    ast->op = (void*) 0;
+    ast->if_op = (void*) 0;
     ast->if_body = (void*) 0;
     ast->else_body = (void*) 0;
-    ast->elifop = (void*) 0;
-    ast->elifbody = (void*) 0;
-    ast->elif_size = 0;
-
-    // AST_COMPARE
-    ast->left = (void*) 0;
-    ast->right = (void*) 0;
-    ast->compare_op = 0;
-
-    // AST_WHILE
-    ast->while_body = (void*) 0;
-
-    // AST_BINOP_INC_DEC
-    ast->binop_inc_dec_variable = (void*) 0;
-    ast->binop_inc_dec_op = 0;
-    ast->binop_inc_dec_func_name = (void*) 0;
-
-    // AST_PAREN
-    ast->paren_value = (void*) 0;
-
-    // AST_BINOP
-    ast->binop_left = (void*) 0;
-    ast->binop_right = (void*) 0;
-    ast->binop_op = 0;
 
     // AST_STRING
     ast->string_value = (void*) 0;
 
     // AST_INT
-    ast->int_value = 0;
-
-    // AST_BOOL
-    ast->bool_value = (void*) 0;
-
-    // AST_TYPE
-    ast->type_value = (void*) 0;
+    ast->int_value = (void*) 0;
 
     // AST_COMPOUND
     ast->compound_value = (void*) 0;

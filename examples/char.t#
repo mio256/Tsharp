@@ -1,5 +1,0 @@
-
-func main() do
-	text = "Hello World";
-	print(char(text, 0));
-end;

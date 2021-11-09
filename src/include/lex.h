@@ -5,11 +5,8 @@
 typedef struct LEXER_STRUCT
 {
     char c;
-
     unsigned int i;
-
     char* contents;
-
     unsigned int line_n;
 } lexer_T;
 

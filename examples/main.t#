@@ -1,20 +1,21 @@
-
-func Something(name, age) do
-    num = 10;
-    print(name);
-    print(age);
-end;
+// T# Programming Language
 
 func main() do
-    Something("Ibuki", 17);
-    
-    if Something.num == 10 do
-        print("num is 10!");
-    end;
+    print("Hello World 😆\n");
+    print("T# Programming Language\n");
 
-    if (2 + 2) == 4 do
-        print("it worked!");
-    end;
+    text = "shion";
+    text = "Ibuki";
+    text = "Hello World\n";
+    num = 10;
+    print(text);
 
-    print("Hello World");
+    print(num);
+    print("\n");
+
+    if 1 do
+        print("if true print true\n");
+    else
+        print("this is else body\n");
+    end;
 end;

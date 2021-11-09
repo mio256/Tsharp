@@ -1,5 +1,0 @@
-
-func main() do
-	text = input("input here: ");
-	print(text);
-end;
