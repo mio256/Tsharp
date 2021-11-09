@@ -19,41 +19,16 @@ make
 
 > Run
 ```
-$ ./tsh.out main <filename>.t#
+$ ./tsh.out <filename>.t#
 ```
 
 > Hello World
 ```pascal
 func main() do
-    print("Hello World");
+    println("Hello 🌏");
 end;
 ```
 
-> Variable
-```pascal
-func main() do
-    name = "T#";
-    print(name);
-
-    num = 1234;
-    print(num);
-end;
-```
-
-> If statement
-```pascal
-func main() do
-    if 1 do
-        print("Hello World");
-    end;
-
-    if 0 do
-        print("Hello World");
-    else
-        print("else!");
-    end;
-end;
-```
 
 ### Vim Syntax Highlighting
 - <a href="https://github.com/ibukiyoshidaa/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
