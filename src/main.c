@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
         visitor_visit(visitor, node);
 
         AST_T* fdef = scope_find_func(parser->scope, "main");
+
+        free(lexer); free(parser); free(node); free(visitor);
     }
     else
     {
