@@ -16,6 +16,7 @@ AST_T* visitor_visit(visitor_T* visitor, AST_T* node)
 {
     switch (node->type)
     {
+        case AST_PRINT: return visitor_visit_print(visitor, node); break;
         case AST_PUSH: return visitor_visit_push(visitor, node); break;
         case AST_STRING: return visitor_visit_string(visitor, node); break;
         case AST_INT: return visitor_visit_int(visitor, node); break;
@@ -29,9 +30,28 @@ AST_T* visitor_visit(visitor_T* visitor, AST_T* node)
     return init_ast(AST_NOOP);
 }
 
+static AST_T* builtin_function_print(visitor_T* visitor, AST_T* arg)
+{
+    AST_T* visited_ast = visitor_visit(visitor, arg);
+
+    switch (visited_ast->type) {
+        case AST_STRING: printf("%s", visited_ast->string_value); break;
+        case AST_INT: printf("%ld", visited_ast->int_value); break;
+    }
+    printf("\n");
+}
+
 AST_T* visitor_visit_push(visitor_T* visitor, AST_T* node)
 {
     stack_push_value(node->stack, node->push_value);
+    return node;
+}
+
+AST_T* visitor_visit_print(visitor_T* visitor, AST_T* node)
+{
+    AST_T* stackv = stack_get_first_value(node->stack);
+    builtin_function_print(visitor, stackv);
+    stack_drop_first_value(node->stack);
     return node;
 }
 

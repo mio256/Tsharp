@@ -12,4 +12,8 @@ stack_T* init_stack();
 
 AST_T* stack_push_value(stack_T* stack, AST_T* pushv);
 
+AST_T* stack_get_first_value(stack_T* stack);
+
+AST_T* stack_drop_first_value(stack_T* stack);
+
 #endif

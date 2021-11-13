@@ -8,6 +8,7 @@ typedef struct AST_STRUCT
         AST_STRING,
         AST_INT,
         AST_PUSH,
+        AST_PRINT,
         AST_COMPOUND,
         AST_NOOP,
     } type;

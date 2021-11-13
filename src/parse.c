@@ -99,6 +99,14 @@ AST_T* parser_parse_push(parser_T* parser, stack_T* stack)
     return ast;
 }
 
+AST_T* parser_parse_print(parser_T* parser, stack_T* stack)
+{
+    AST_T* ast = init_ast(AST_PRINT);
+    parser_eat(parser, TOKEN_ID);
+    ast->stack = stack;
+    return ast;
+}
+
 AST_T* parser_parse_string(parser_T* parser, stack_T* stack)
 {
     AST_T* ast_string = init_ast(AST_STRING);
@@ -123,6 +131,9 @@ AST_T* parser_parse_id(parser_T* parser, stack_T* stack)
 {
     if (strcmp(parser->current_token->value, "push") == 0)
         return parser_parse_push(parser, stack);
+
+    if (strcmp(parser->current_token->value, "print") == 0)
+        return parser_parse_print(parser, stack);
 
     return init_ast(AST_NOOP);
 }

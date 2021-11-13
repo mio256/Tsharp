@@ -24,3 +24,24 @@ AST_T* stack_push_value(stack_T* stack, AST_T* pushv)
     stack->stack[stack->stack_size-1] = pushv;
     return pushv;
 }
+
+AST_T* stack_get_first_value(stack_T* stack)
+{
+    if (stack->stack_size == 0) {
+        printf("PrintError: stack is empty [ ]\n");
+        exit(1);
+    }
+    AST_T* stackv = stack->stack[stack->stack_size-1];
+    return stackv;
+}
+
+AST_T* stack_drop_first_value(stack_T* stack)
+{
+    if (stack->stack_size == 0) {
+        printf("DropError: stack is empty [ ]\n");
+        exit(1);
+    }
+    stack->stack_size -= 1;
+    free(stack->stack[stack->stack_size-1]);
+    return (void*) 0;
+}
