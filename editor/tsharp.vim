@@ -13,7 +13,7 @@ endif
 syntax keyword tsharpTodos TODO XXX FIXME NOTE
 
 " Language keywords
-syntax keyword tsharpKeywords func if else elif while do for print end type
+syntax keyword tsharpKeywords push print + dup drop
 
 " Comments
 syntax region tsharpCommentLine start="//" end="$"   contains=tsharpTodos
