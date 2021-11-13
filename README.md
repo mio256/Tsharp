@@ -30,7 +30,7 @@ print:
 ```
 
 > dup example
-```
+```pascal
 push::"Hello World": dup: print: print:
 ```
 
