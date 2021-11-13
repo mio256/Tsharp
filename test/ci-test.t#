@@ -1,5 +1,5 @@
 
 // Hello World
-push::"Hello World";
+push::"Hello World":
 
-print;
+print:
