@@ -6,7 +6,7 @@
 
 WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT WITHOUT ANY NOTICE!
 
-> Something like Forth and Porth, but in C.
+Something like Forth and Porth, but in C. <a href="https://en.wikipedia.org/wiki/Stack-oriented_programming">Stack-oriented programming</a>
 
 ### Install
 
