@@ -5,28 +5,17 @@
 typedef struct AST_STRUCT
 {
     enum {
-        AST_FUNCTION_DEFINITION,
-        AST_FUNCTION_CALL,
-        AST_COMPARE,
-        AST_IF,
         AST_STRING,
         AST_INT,
+        AST_PUSH,
         AST_COMPOUND,
         AST_NOOP,
     } type;
 
-    struct SCOPE_STRUCT* scope;
+    struct STACK_STRUCT* stack;
 
-    // AST_FUNCTION_DEFINITION
-    char* function_definition_name;
-    struct AST_STRUCT* function_definition_body;
-    struct AST_STRUCT** function_definition_args;
-    size_t function_definition_args_size;
-
-    // AST_FUNCTION_CALL
-    char* function_call_name;
-    struct AST_STRUCT** function_call_args;
-    size_t function_call_args_size;
+    //AST_PUSH
+    struct AST_STRUCT* push_value;
 
     // AST_STRING
     char* string_value;
