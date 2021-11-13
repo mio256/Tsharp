@@ -1,13 +1,16 @@
 // T# Programming Language
 
 // push to the stack
-push::"Hello World";
-push::100;
+push::"Hello World":
+push::100:
 
 // print the first value of the stack
-print;
-print;
+print:
+print:
 
+push::100:
+
+print:
 // TODO: if statements
 // push::20;
 
