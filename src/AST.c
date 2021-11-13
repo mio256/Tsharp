@@ -44,7 +44,7 @@ void ast_free(AST_T* ast)
     if (ast->int_value)
     {
         // printf("free int\n");
-        ast->int_value = 0;
+        ast->int_value = NULL;
     }
     
     // printf("free ast\n");

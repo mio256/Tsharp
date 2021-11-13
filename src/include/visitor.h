@@ -15,6 +15,8 @@ AST_T* visitor_visit_push(visitor_T* visitor, AST_T* node);
 
 AST_T* visitor_visit_print(visitor_T* visitor, AST_T* node);
 
+AST_T* visitor_visit_dup(visitor_T* visitor, AST_T* node);
+
 AST_T* visitor_visit_string(visitor_T* visitor, AST_T* node);
 
 AST_T* visitor_visit_int(visitor_T* visitor, AST_T* node);

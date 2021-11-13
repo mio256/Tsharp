@@ -10,6 +10,7 @@ typedef struct AST_STRUCT
         AST_PUSH,
         AST_PRINT,
         AST_COMPOUND,
+        AST_DUP,
         AST_NOOP,
     } type;
 

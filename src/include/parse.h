@@ -28,6 +28,8 @@ AST_T* parser_parse_push(parser_T* parser, stack_T* stack);
 
 AST_T* parser_parse_print(parser_T* parser, stack_T* stack);
 
+AST_T* parser_parse_dup(parser_T* parser, stack_T* stack);
+
 AST_T* parser_parse_string(parser_T* parser, stack_T* stack);
 
 AST_T* parser_parse_int(parser_T* parser, stack_T* stack);
