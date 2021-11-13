@@ -30,13 +30,23 @@ void ast_free(AST_T* ast)
         return;
 
     if (ast->push_value)
+    {
+        printf("free ast push\n");
         ast_free(ast->push_value);
+    }
 
     if (ast->string_value)
+    {
+        printf("free string\n");
         free(ast->string_value);
+    }
     
     if (ast->int_value)
+    {
+        printf("free int\n");
         ast->int_value = 0;
-
+    }
+    
+    printf("free ast\n");
     free(ast);
 }

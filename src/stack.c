@@ -41,7 +41,9 @@ AST_T* stack_drop_first_value(stack_T* stack)
         printf("DropError: stack is empty [ ]\n");
         exit(1);
     }
-    free(stack->stack[stack->stack_size-1]);
+    AST_T* ast = stack->stack[stack->stack_size-1];
+    ast_free(ast);
+    //free(stack->stack[stack->stack_size-1]);
     stack->stack_size -= 1;
     return (void*) 0;
 }
