@@ -30,4 +30,7 @@ typedef struct AST_STRUCT
 } AST_T;
 
 AST_T* init_ast(int type);
+
+void ast_free(AST_T* ast);
+
 #endif

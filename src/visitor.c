@@ -51,7 +51,7 @@ AST_T* visitor_visit_print(visitor_T* visitor, AST_T* node)
 {
     AST_T* stackv = stack_get_first_value(node->stack);
     builtin_function_print(visitor, stackv);
-    //stack_drop_first_value(node->stack);
+    stack_drop_first_value(node->stack);
     return node;
 }
 

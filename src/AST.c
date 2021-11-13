@@ -23,3 +23,20 @@ AST_T* init_ast(int type)
 
     return ast;
 }
+
+void ast_free(AST_T* ast)
+{
+    if (ast == (void*) 0)
+        return;
+
+    if (ast->push_value)
+        ast_free(ast->push_value);
+
+    if (ast->string_value)
+        free(ast->string_value);
+    
+    if (ast->int_value)
+        ast->int_value = 0;
+
+    free(ast);
+}
