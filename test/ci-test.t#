@@ -1,3 +1,5 @@
 
-// Just pushing string to the stack
+// Hello World
 push::"Hello World";
+
+print;
