@@ -24,9 +24,14 @@ $ ./tsh.out <filename>.t#
 
 > Hello World
 ```pascal
-push::"Hello World";
+push::"Hello World":
 
-print;
+print:
+```
+
+> dup example
+```
+push::"Hello World": dup: print: print:
 ```
 
 
