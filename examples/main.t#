@@ -2,8 +2,10 @@
 
 // push to the stack
 push::"Hello World";
+push::100;
 
 // print the first value of the stack
+print;
 print;
 
 // TODO: if statements
