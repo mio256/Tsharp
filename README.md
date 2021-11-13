@@ -6,7 +6,7 @@
 
 WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT WITHOUT ANY NOTICE!
 
-Something like Forth and Porth, but in C.
+> Something like Forth and Porth, but in C.
 
 ### Install
 
