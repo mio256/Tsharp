@@ -6,8 +6,6 @@
 
 WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT WITHOUT ANY NOTICE!
 
-<!---- Compile to C. ---->
-
 ### Install
 
 > Install
@@ -22,11 +20,9 @@ make
 $ ./tsh.out <filename>.t#
 ```
 
-> Hello World
 ```pascal
-func main() do
-    println("Hello 🌏");
-end;
+// push 100 to stack
+push::100;
 ```
 
 
