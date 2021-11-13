@@ -8,12 +8,10 @@ typedef struct TOKEN_STRUCT
         TOKEN_STRING,
         TOKEN_ID,
         TOKEN_SEMI,
-        TOKEN_LPAREN,
-        TOKEN_RPAREN,
-        TOKEN_COMMA,
         TOKEN_DOT,
         TOKEN_END,
         TOKEN_DO,
+        TOKEN_COLON,
         TOKEN_INT,
         TOKEN_EOF
     } type;

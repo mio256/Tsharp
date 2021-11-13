@@ -1,5 +1,5 @@
 #include "include/parse.h"
-#include "include/scope.h"
+#include "include/stack.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +10,7 @@ parser_T* init_parser(lexer_T* lexer)
     parser->lexer = lexer;
     parser->current_token = lexer_get_next_token(lexer);
     token_T* prev_token = parser->current_token;
-    parser->scope = init_scope();
+    parser->stack = init_stack();
     return parser;
 }
 
@@ -32,27 +32,27 @@ void parser_eat(parser_T* parser, int token_type)
     }
 }
 
-AST_T* parser_parse(parser_T* parser, scope_T* scope)
+AST_T* parser_parse(parser_T* parser, stack_T* stack)
 {
-    return parser_parse_statements(parser, scope, "");
+    return parser_parse_statements(parser, stack);
 }
 
-AST_T* parser_parse_statement(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_statement(parser_T* parser, stack_T* stack)
 {
     switch (parser->current_token->type)
     {
-        case TOKEN_ID: return parser_parse_id(parser, scope, func_name);
+        case TOKEN_ID: return parser_parse_id(parser, stack);
         default: return 0;
     }
 
     return init_ast(AST_NOOP);
 }
 
-AST_T* parser_parse_statements(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_statements(parser_T* parser, stack_T* stack)
 {
     AST_T* compound = init_ast(AST_COMPOUND);
     compound->compound_value = calloc(1, sizeof(struct AST_STRUCT*));
-    AST_T* ast_statement = parser_parse_statement(parser, scope, func_name);
+    AST_T* ast_statement = parser_parse_statement(parser, stack);
     compound->compound_value[0] = ast_statement;
     compound->compound_size += 1;
     while(parser->current_token->type == TOKEN_SEMI)
@@ -60,7 +60,7 @@ AST_T* parser_parse_statements(parser_T* parser, scope_T* scope, char* func_name
         if (parser->current_token->type == TOKEN_SEMI)
             parser_eat(parser, TOKEN_SEMI);
         
-        AST_T* ast_statement = parser_parse_statement(parser, scope, func_name);
+        AST_T* ast_statement = parser_parse_statement(parser, stack);
         if (ast_statement)
         {
             compound->compound_size += 1;
@@ -71,107 +71,58 @@ AST_T* parser_parse_statements(parser_T* parser, scope_T* scope, char* func_name
             compound->compound_value[compound->compound_size-1] = ast_statement;
         }
     }
-    compound->scope = scope;
+    compound->stack = stack;
     return compound;
 }
 
-AST_T* parser_parse_expr(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_expr(parser_T* parser, stack_T* stack)
 {
     switch (parser->current_token->type)
     {
-        case TOKEN_STRING: return parser_parse_string(parser, scope, func_name);
-        case TOKEN_INT: return parser_parse_int(parser, scope, func_name);
-        case TOKEN_ID: return parser_parse_id(parser, scope, func_name);
+        case TOKEN_STRING: return parser_parse_string(parser, stack);
+        case TOKEN_INT: return parser_parse_int(parser, stack);
+        case TOKEN_ID: return parser_parse_id(parser, stack);
         default: return 0;
     }
     return init_ast(AST_NOOP);
 }
 
-AST_T* parser_parse_function_call(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_push(parser_T* parser, stack_T* stack)
 {
-    AST_T* ast = init_ast(AST_FUNCTION_CALL);
-    
-    char* func_call_name = parser->prev_token->value;
-    ast->function_call_name = calloc(
-        strlen(func_call_name) + 1,
-        sizeof(char)
-    );
-    strcpy(ast->function_call_name, func_call_name);
+    AST_T* ast = init_ast(AST_PUSH);
+    parser_eat(parser, TOKEN_ID);
+    parser_eat(parser, TOKEN_COLON);
+    parser_eat(parser, TOKEN_COLON);
+    ast->push_value = parser_parse_expr(parser, stack);
 
-    parser_eat(parser, TOKEN_LPAREN);
-    ast->function_call_args = calloc(1, sizeof(struct AST_STRUCT*));
-    if (parser->current_token->type != TOKEN_RPAREN) {
-        AST_T* ast_expr = parser_parse_expr(parser, scope, func_name);
-        ast->function_call_args[0] = ast_expr;
-        ast->function_call_args_size++;
-    }
-    while (parser->current_token->type == TOKEN_COMMA) {
-        parser_eat(parser, TOKEN_COMMA);
-        AST_T* ast_expr = parser_parse_expr(parser, scope, func_name);
-        ast->function_call_args_size++;
-        ast->function_call_args = realloc(ast->function_call_args,ast->function_call_args_size * sizeof(struct AST_STRUCT));
-        ast->function_call_args[ast->function_call_args_size - 1] = ast_expr;
-    }
-    parser_eat(parser, TOKEN_RPAREN);
-
-    ast->scope = scope;
+    ast->stack = stack;
     return ast;
 }
 
-AST_T* parser_parse_function_definition(parser_T* parser, scope_T* scope)
-{
-    AST_T* ast = init_ast(AST_FUNCTION_DEFINITION);
-    parser_eat(parser, TOKEN_ID);
-
-    char* func_name = parser->current_token->value;
-    ast->function_definition_name = calloc(
-        strlen(func_name) + 1,
-        sizeof(char)
-    );
-    strcpy(ast->function_definition_name, func_name);
-    parser_eat(parser, TOKEN_ID);
-
-    parser_eat(parser, TOKEN_LPAREN);
-    parser_eat(parser, TOKEN_RPAREN);
-    parser_eat(parser, TOKEN_DO);
-
-    ast->function_definition_body = parser_parse_statements(parser, scope, func_name);
-
-    parser_eat(parser, TOKEN_END);
-
-    ast->scope = scope;
-    return ast;
-}
-
-AST_T* parser_parse_string(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_string(parser_T* parser, stack_T* stack)
 {
     AST_T* ast_string = init_ast(AST_STRING);
     ast_string->string_value = parser->current_token->value;
     parser_eat(parser, TOKEN_STRING);
-    ast_string->scope = scope;
+    ast_string->stack = stack;
     return ast_string;
 }
 
-AST_T* parser_parse_int(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_int(parser_T* parser, stack_T* stack)
 {
     char* endPtr;
     long int int_value = strtol(parser->current_token->value, &endPtr, 10);
     parser_eat(parser, TOKEN_INT);
     AST_T* ast_int = init_ast(AST_INT);
     ast_int->int_value = int_value;
-    ast_int->scope = scope;
+    ast_int->stack = stack;
     return ast_int;
 }
 
-AST_T* parser_parse_id(parser_T* parser, scope_T* scope, char* func_name)
+AST_T* parser_parse_id(parser_T* parser, stack_T* stack)
 {
-    if (strcmp(parser->current_token->value, "func") == 0)
-        return parser_parse_function_definition(parser, scope);
+    if (strcmp(parser->current_token->value, "push") == 0)
+        return parser_parse_push(parser, stack);
 
-    if (strcmp(func_name, "") == 0) {
-        printf("SyntaxError: non-declaration statement outside function body\n");
-        exit(1);
-    }
-    parser_eat(parser, TOKEN_ID);
-    return parser_parse_function_call(parser, scope, func_name);
+    return init_ast(AST_NOOP);
 }

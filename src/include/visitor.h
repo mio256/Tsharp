@@ -11,19 +11,11 @@ visitor_T* init_visitor();
 
 AST_T* visitor_visit(visitor_T* visitor, AST_T* node);
 
-AST_T* visitor_visit_function_call(visitor_T* visitor, AST_T* node);
-
-AST_T* visitor_visit_variable_definition(visitor_T* visitor, AST_T* node);
-
-AST_T* visitor_visit_function_definition(visitor_T* visitor, AST_T* node);
-
-AST_T* visitor_visit_if(visitor_T* visitor, AST_T* node);
+AST_T* visitor_visit_push(visitor_T* visitor, AST_T* node);
 
 AST_T* visitor_visit_string(visitor_T* visitor, AST_T* node);
 
 AST_T* visitor_visit_int(visitor_T* visitor, AST_T* node);
-
-AST_T* visitor_visit_variable(visitor_T* visitor, AST_T* node);
 
 AST_T* visitor_visit_compound(visitor_T* visitor, AST_T* node);
 
