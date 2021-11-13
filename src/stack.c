@@ -47,3 +47,10 @@ AST_T* stack_drop_first_value(stack_T* stack)
     stack->stack_size -= 1;
     return (void*) 0;
 }
+
+AST_T* stack_free(stack_T* stack)
+{
+    free(stack->stack);
+    stack->stack_size = 0;
+    return (void*) 0;
+}

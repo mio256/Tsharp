@@ -16,4 +16,6 @@ AST_T* stack_get_first_value(stack_T* stack);
 
 AST_T* stack_drop_first_value(stack_T* stack);
 
+AST_T* stack_free(stack_T* stack);
+
 #endif

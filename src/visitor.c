@@ -70,5 +70,6 @@ AST_T* visitor_visit_compound(visitor_T* visitor, AST_T* node)
     for (int i = 0; i < node->compound_size; i++)
         visitor_visit(visitor, node->compound_value[i]);
 
+    stack_free(node->stack);
     return init_ast(AST_NOOP);
 }

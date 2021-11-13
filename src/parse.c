@@ -55,10 +55,10 @@ AST_T* parser_parse_statements(parser_T* parser, stack_T* stack)
     AST_T* ast_statement = parser_parse_statement(parser, stack);
     compound->compound_value[0] = ast_statement;
     compound->compound_size += 1;
-    while(parser->current_token->type == TOKEN_SEMI)
+    while(parser->current_token->type == TOKEN_COLON)
     {
-        if (parser->current_token->type == TOKEN_SEMI)
-            parser_eat(parser, TOKEN_SEMI);
+        if (parser->current_token->type == TOKEN_COLON)
+            parser_eat(parser, TOKEN_COLON);
         
         AST_T* ast_statement = parser_parse_statement(parser, stack);
         if (ast_statement)
