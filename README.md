@@ -22,9 +22,11 @@ make
 $ ./tsh.out <filename>.t#
 ```
 
+> Hello World
 ```pascal
-// push 100 to stack
-push::100;
+push::"Hello World";
+
+print;
 ```
 
 
