@@ -12,26 +12,19 @@ Something like Forth and Porth, but in C. <a href="https://en.wikipedia.org/wiki
 
 > Install
 ```
-make
+go run main.go
 ```
 
 ### Run
 
 > Run
 ```
-$ ./tsh.out <filename>.t#
+$ ./main <filename>.t#
 ```
 
 > Hello World
 ```pascal
-push::"Hello World":
-
-print:
-```
-
-> dup example
-```pascal
-push::"Hello World": dup: print: print:
+push "Hello World" print
 ```
 
 
