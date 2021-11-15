@@ -13,7 +13,7 @@ Something like Forth and Porth, but written in Go.
 
 > Install
 ```
-go run main.go
+go build main.go
 ```
 
 ### Run
