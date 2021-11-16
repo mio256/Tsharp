@@ -23,8 +23,8 @@ jobs:
     needs: Ubuntu
     steps:
     - uses: actions/checkout@v2
-    - name: make
-      run: make
+    - name: sh build.sh
+      run: sh build.sh
     - name: run
       run: .\main test\ci-test.t#
     - name: clean
