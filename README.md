@@ -31,7 +31,7 @@ push "Hello World" print
 > Block
 ```pascal
 block Main do
-  push "Hello World" print
+    push "Hello World" print
 end
 
 call Main
