@@ -440,9 +440,15 @@ func VisitExpr(exprs []Expr) {
 // -----------------------------
 
 func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: ./main <filename>.t#")
+		os.Exit(0)
+	}
+
 	file, err := os.Open(os.Args[1])
 	if err != nil {
-		panic(err)
+		fmt.Println("Error: file '" + os.Args[1] + "' does not exist")
+		os.Exit(0)
 	}
 
 	lexer := LexerInit(file)
