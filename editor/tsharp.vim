@@ -11,7 +11,7 @@ if exists("b:current_syntax")
 endif
 
 " Language keywords
-syntax keyword tsharpKeywords push print + dup drop
+syntax keyword tsharpKeywords push print + dup drop block do end
 
 " Comments
 syntax region tsharpCommentLine start="//" end="$"   contains=tsharpTodos
