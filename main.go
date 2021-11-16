@@ -369,7 +369,7 @@ func (stack *Stack) OpPrint() {
 	if (len(stack.Values[len(stack.Values)-1].string_value) == 0) {
 		fmt.Println(stack.Values[len(stack.Values)-1].int_value)
 	} else {
-		fmt.Println(stack.Values[len(stack.Values)-1].string_value)
+		fmt.Print(stack.Values[len(stack.Values)-1].string_value)
 	}
 	stack.Values = stack.Values[:len(stack.Values)-1]
 }
