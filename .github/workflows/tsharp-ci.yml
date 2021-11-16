@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: make install
-      run: sudo make install
+    - name: sh build.sh
+      run: sh build.sh
     - name: run
-      run: tsh test/ci-test.t#
+      run: ./main test/ci-test.t#
     - name: clean
-      run: sudo make clean;
+      run: rm main;
 
   Windows:
     runs-on: windows-latest
@@ -26,6 +26,6 @@ jobs:
     - name: make
       run: make
     - name: run
-      run: .\tsh.exe test\ci-test.t#
+      run: .\main test\ci-test.t#
     - name: clean
-      run: make clean
+      run: rm main
