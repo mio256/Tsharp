@@ -1,5 +1,3 @@
-// I will rewrite this today (Tuesday, November 16~17, 2021)
-
 package main
 
 import (
@@ -8,12 +6,14 @@ import (
 	"io"
 	"unicode"
 	"os"
-	_"strconv"
+	"strconv"
 )
+
 
 // -----------------------------
 // ----------- Lexer -----------
 // -----------------------------
+
 type Token int
 const (
 	TOKEN_EOF = iota
@@ -24,6 +24,7 @@ const (
 	TOKEN_PLUS
 	TOKEN_MINUS
 	TOKEN_END
+	TOKEN_DO
 )
 
 var tokens = []string{
@@ -35,10 +36,11 @@ var tokens = []string{
 	TOKEN_PLUS: "TOKEN_PLUS",
 	TOKEN_MINUS: "TOKEN_MINUS",
 	TOKEN_END: "TOKEN_END",
+	TOKEN_DO: "TOKEN_DO",
 }
 
-func (t Token) String() string {
-	return tokens[t]
+func (token Token) String() string {
+	return tokens[token]
 }
 
 type Position struct {
@@ -87,6 +89,8 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 					lit := lexer.lexId()
 					if lit == "end" {
 						return startPos, TOKEN_END, lit
+					} else if lit == "do" {
+						return startPos, TOKEN_DO, lit
 					}
 					return startPos, TOKEN_ID, lit
 				} else if r == '"' {
@@ -174,6 +178,7 @@ func (lexer *Lexer) resetPosition() {
 // -----------------------------
 // ------------ AST ------------
 // -----------------------------
+
 type ExprType int
 const (
 	ExprVoid ExprType = iota
@@ -182,6 +187,9 @@ const (
 	ExprPush
 	ExprBlockdef
 	ExprPrint
+	ExprCall
+	ExprPlus
+	ExprMinus
 )
 
 type Expr struct {
@@ -190,10 +198,15 @@ type Expr struct {
 	AsStr string
 	AsPush *Push
 	AsBlockdef *Blockdef
+	AsCall *Call
 }
 
 type Push struct {
 	Arg Expr
+}
+
+type Call struct {
+	Value string
 }
 
 type Blockdef struct {
@@ -212,104 +225,120 @@ type Parser struct {
 	lexer Lexer
 }
 
-func ParseInit(lexer *Lexer) (Parser) {
+func ParserInit(lexer *Lexer) *Parser {
 	_, tok, lit := lexer.Lex()
-	parser := Parser{current_token_type: tok, current_token_value: lit, lexer: *lexer}
-	return parser
+	return &Parser{
+		current_token_type: tok,
+		current_token_value: lit,
+		lexer: *lexer,
+	}
 }
 
-func ParserEat(parser Parser, token Token) (Parser) {
+func (parser *Parser) ParserEat(token Token) {
 	if token != parser.current_token_type {
 		fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
 		os.Exit(0)
 	}
-
-	//fmt.Println("ParserEat func eated value: '" + parser.current_token_value + "'")
 	_, tok, lit := parser.lexer.Lex()
-
-	parser = Parser{current_token_type: tok, current_token_value: lit, lexer: parser.lexer}
-
-	return parser
+	parser.current_token_type = tok
+	parser.current_token_value = lit
 }
 
-func ParserParseExpr(parser Parser) (Expr, Parser) {
+func StrToInt(num string) int {
+	i, err := strconv.Atoi(num)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
+func ParserParseExpr(parser *Parser) (Expr) {
 	expr := Expr{}
 	switch parser.current_token_type {
 	case TOKEN_INT:
-		expr.Type = ExprStr
-		expr.AsStr = parser.current_token_value
-		parser = ParserEat(parser, TOKEN_INT)
+		expr.Type = ExprInt
+		expr.AsInt = StrToInt(parser.current_token_value)
+		parser.ParserEat(TOKEN_INT)
 	case TOKEN_STRING:
 		expr.Type = ExprStr
 		expr.AsStr = parser.current_token_value
-		parser = ParserEat(parser, TOKEN_STRING)
+		parser.ParserEat(TOKEN_STRING)
 	default:
 		fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
 		os.Exit(0)
 	}
-	return expr, parser
+	return expr
 }
 
-func ParserParseId(parser Parser) (Expr, Parser) {
-	expr := Expr{}
-	if parser.current_token_value == "push" {
-		parser = ParserEat(parser, TOKEN_ID)
-		expr.Type = ExprPush
-		argExpr, parser := ParserParseExpr(parser)
-		expr.AsPush = &Push{
-			Arg: argExpr,
-		}
-		//fmt.Println("current token value: '" + parser.current_token_value + "'")
-
-		return expr, parser
-	} else if parser.current_token_value == "block" {
-		parser = ParserEat(parser, TOKEN_ID)
-		expr.Type = ExprBlockdef
-		name := parser.current_token_value
-		parser = ParserEat(parser, TOKEN_ID)
-		parser = ParserEat(parser, TOKEN_ID)
-		exprs := []Expr{}
-		exprs, parser = ParserParse(parser)
-		expr.AsBlockdef = &Blockdef{
-			Name: name,
-			Body: exprs,
-		}
-		//fmt.Println("current token value after parsing block: '" + parser.current_token_value + "'")
-		parser = ParserEat(parser, TOKEN_END)
-		return expr, parser
-	} else if parser.current_token_value == "print" {
-		parser = ParserEat(parser, TOKEN_ID)
-		expr.Type = ExprPrint
-		//fmt.Println("current token value: '" + parser.current_token_value + "'")
-
-		return expr, parser
-	} else {
-		fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
-		os.Exit(0)
-	}
-
-	return expr, parser
-}
-
-func ParserParse(parser Parser) ([]Expr, Parser) {
+func ParserParse(parser *Parser)  ([]Expr, Parser) {
 	exprs := []Expr{}
-    expr := Expr{}
 
 	for parser.current_token_type != TOKEN_EOF || parser.current_token_type != TOKEN_END {
+		expr := Expr{}
 		if parser.current_token_type == TOKEN_ID {
-			expr, parser = ParserParseId(parser)
+			if parser.current_token_value == "push" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprPush
+				expr.AsPush = &Push{
+					Arg: ParserParseExpr(parser),
+				}
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "print" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprPrint
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "block" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprBlockdef
+				if parser.current_token_type != TOKEN_ID {
+					fmt.Println("SyntaxError: unexpected token value '" + parser.current_token_value + "'")
+					os.Exit(0)
+				}
+				name := parser.current_token_value
+				parser.ParserEat(TOKEN_ID)
+				parser.ParserEat(TOKEN_DO)
+				body, _ := ParserParse(parser)
+				expr.AsBlockdef = &Blockdef{
+					Name: name,
+					Body: body,
+				}
+				parser.ParserEat(TOKEN_END)
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "call" {
+				parser.ParserEat(TOKEN_ID)
+				if parser.current_token_type != TOKEN_ID {
+					fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
+					os.Exit(0)
+				}
+				expr.Type = ExprCall
+				expr.AsCall = &Call{
+					Value: parser.current_token_value,
+				}
+				parser.ParserEat(TOKEN_ID)
+				exprs = append(exprs, expr)
+			} else {
+				fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
+				os.Exit(0)
+			}
+		} else if parser.current_token_type == TOKEN_PLUS {
+			expr.Type = ExprPlus
+			parser.ParserEat(TOKEN_PLUS)
 			exprs = append(exprs, expr)
-		} else if parser.current_token_type == TOKEN_EOF {
-			return exprs, parser
+		} else if parser.current_token_type == TOKEN_MINUS {
+			expr.Type = ExprMinus
+			parser.ParserEat(TOKEN_MINUS)
+			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END {
-			return exprs, parser
+			return exprs, *parser
+		} else if parser.current_token_type == TOKEN_EOF {
+			return exprs, *parser
 		} else {
 			fmt.Println("SyntaxError: unexpected token value '" + parser.current_token_value + "'")
 			os.Exit(0)
 		}
 	}
-
-	return exprs, parser
+	
+	return exprs, *parser
 }
 
 
@@ -363,44 +392,63 @@ func (stack *Stack) OpMinus() {
 	theStack.OpPush(StackItem{int_value: x})
 }
 
+
 // -----------------------------
-// ---------- Visitor ----------
+// ------ Visitor / Scope ------
 // -----------------------------
 
-func VisitExpr(exprs[] Expr) {
+//BlockScope := make(map[string][]Expr)
+
+var BlockScope = map[string][]Expr{} // Block Scope
+
+func VisitExpr(exprs []Expr) {
 	for _, expr := range exprs {
 		switch expr.Type {
 		case ExprPush:
 			if expr.AsPush.Arg.Type == ExprInt {
 				theStack.OpPush(StackItem{int_value: expr.AsPush.Arg.AsInt})
-				// fmt.Println("push value: ", expr.AsPush.Arg.AsInt)
 			} else if expr.AsPush.Arg.Type == ExprStr {
 				theStack.OpPush(StackItem{string_value: expr.AsPush.Arg.AsStr})
-				//fmt.Println("push value: ", expr.AsPush.Arg.AsStr)
 			}
 		case ExprPrint:
 			theStack.OpPrint()
 		case ExprBlockdef:
-			//fmt.Println("----------- Block Body ------------")
-			VisitExpr(expr.AsBlockdef.Body)
-			//fmt.Println("------------ Block End ------------")
+			if _, ok := BlockScope[expr.AsBlockdef.Name]; ok {
+				fmt.Println("Error: we can't define blocks that are the same name")
+				os.Exit(0)
+			}
+			BlockScope[expr.AsBlockdef.Name] = expr.AsBlockdef.Body
+		case ExprCall:
+			if _, ok := BlockScope[expr.AsCall.Value]; ok {
+				BlockBody := BlockScope[expr.AsCall.Value]
+				VisitExpr(BlockBody)
+			} else {
+				fmt.Println("Error: undefined block '" + expr.AsCall.Value + "'")	
+			}
+		case ExprPlus:
+			theStack.OpPlus()
+		case ExprMinus:
+			theStack.OpMinus()
 		}
 	}
+	return
 }
+
+
+// -----------------------------
+// ------------ Main -----------
+// -----------------------------
 
 func main() {
 	file, err := os.Open(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
+
 	lexer := LexerInit(file)
-
-	parser := ParseInit(lexer)
-
+	parser := ParserInit(lexer)
 	exprs, _ := ParserParse(parser)
-
 	VisitExpr(exprs)
 
 	return
 }
-
