@@ -28,6 +28,15 @@ $ ./main <filename>.t#
 push "Hello World" print
 ```
 
+> Block
+```pascal
+block Main do
+  push "Hello World" print
+end
+
+call Main
+```
+
 
 ### Vim Syntax Highlighting
 - <a href="https://github.com/ibukiyoshidaa/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
