@@ -81,24 +81,24 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 				} else if unicode.IsDigit(r) {
 					startPos := lexer.pos
 					lexer.backup()
-					lit := lexer.lexInt()
-					return startPos, TOKEN_INT, lit
+					val := lexer.lexInt()
+					return startPos, TOKEN_INT, val
 				} else if unicode.IsLetter(r) {
 					startPos := lexer.pos
 					lexer.backup()
-					lit := lexer.lexId()
-					if lit == "end" {
-						return startPos, TOKEN_END, lit
-					} else if lit == "do" {
-						return startPos, TOKEN_DO, lit
+					val := lexer.lexId()
+					if val == "end" {
+						return startPos, TOKEN_END, val
+					} else if val == "do" {
+						return startPos, TOKEN_DO, val
 					}
-					return startPos, TOKEN_ID, lit
+					return startPos, TOKEN_ID, val
 				} else if r == '"' {
 					startPos := lexer.pos
 					lexer.backup()
-					lit := lexer.lexString()
+					val := lexer.lexString()
 					r, _, err = lexer.reader.ReadRune()
-					return startPos, TOKEN_STRING, lit
+					return startPos, TOKEN_STRING, val
 				}
         }
 	}
@@ -112,59 +112,59 @@ func (lexer *Lexer) backup() {
 }
 
 func (lexer *Lexer) lexId() string {
-	var lit string
+	var val string
 	for {
 		r, _, err := lexer.reader.ReadRune()
 		if err != nil {
 			if err == io.EOF {
-				return lit
+				return val
 			}
 		}
         lexer.pos.column++
 		if unicode.IsLetter(r) {
-			lit = lit + string(r)
+			val = val + string(r)
 		} else {
 			lexer.backup()
-			return lit
+			return val
 		}
 	}
 }
 
 func (lexer *Lexer) lexInt() string {
-	var lit string
+	var val string
 	for {
 		r, _, err := lexer.reader.ReadRune()
 		if err != nil {
 			if err == io.EOF {
-				return lit
+				return val
 			}
 		}
 		lexer.pos.column++
 		if unicode.IsDigit(r) {
-			lit = lit + string(r)
+			val = val + string(r)
 		} else {
 			lexer.backup()
-			return lit
+			return val
 		}
 	}
 }
 
 func (lexer *Lexer) lexString() string {
-	var lit string
+	var val string
 	r, _, err := lexer.reader.ReadRune()
 	for {
 		r, _, err = lexer.reader.ReadRune()
 		if err != nil {
 			if err == io.EOF {
-				return lit
+				return val
 			}
 		}
 		lexer.pos.column++
 		if r != '"' {
-			lit = lit + string(r)
+			val = val + string(r)
 		} else {
 			lexer.backup()
-			return lit
+			return val
 		}
 	}
 }
@@ -226,10 +226,10 @@ type Parser struct {
 }
 
 func ParserInit(lexer *Lexer) *Parser {
-	_, tok, lit := lexer.Lex()
+	_, tok, val := lexer.Lex()
 	return &Parser{
 		current_token_type: tok,
-		current_token_value: lit,
+		current_token_value: val,
 		lexer: *lexer,
 	}
 }
@@ -239,9 +239,9 @@ func (parser *Parser) ParserEat(token Token) {
 		fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
 		os.Exit(0)
 	}
-	_, tok, lit := parser.lexer.Lex()
+	_, tok, val := parser.lexer.Lex()
 	parser.current_token_type = tok
-	parser.current_token_value = lit
+	parser.current_token_value = val
 }
 
 func StrToInt(num string) int {
