@@ -2,7 +2,7 @@
     <h1> The T# Programming Language</h1>
 </div>
 
-[![T# Build](https://github.com/ibukiyoshidaa/Tsharp/actions/workflows/tsharp-ci.yml/badge.svg)](https://github.com/ibukiyoshidaa/Tsharp/actions/workflows/tsharp-ci.yml)
+[![Ubuntu](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml/badge.svg)](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml)
 
 WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT WITHOUT ANY NOTICE!
 
