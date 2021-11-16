@@ -28,4 +28,4 @@ jobs:
     - name: run
       run: .\main test\ci-test.t#
     - name: clean
-      run: Del "main.exe"
+      run: rm .\main.exe
