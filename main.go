@@ -273,7 +273,7 @@ func ParserParseExpr(parser *Parser) (Expr) {
 func ParserParse(parser *Parser)  ([]Expr, Parser) {
 	exprs := []Expr{}
 
-	for parser.current_token_type != TOKEN_EOF || parser.current_token_type != TOKEN_END {
+	for {
 		expr := Expr{}
 		if parser.current_token_type == TOKEN_ID {
 			if parser.current_token_value == "push" {
@@ -337,7 +337,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			os.Exit(0)
 		}
 	}
-	
+
 	return exprs, *parser
 }
 
