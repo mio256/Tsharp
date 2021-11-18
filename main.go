@@ -202,6 +202,7 @@ const (
 	ExprBool
 	ExprIf
 	ExprDup
+	ExprDrop
 )
 
 type Expr struct {
@@ -318,6 +319,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "dup" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprDup
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "drop" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprDrop
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "block" {
 				parser.ParserEat(TOKEN_ID)
@@ -440,6 +445,10 @@ func (stack *Stack) OpPrint() {
 	return
 }
 
+func (stack *Stack) OpDrop() {
+	stack.Values = stack.Values[:len(stack.Values)-1]
+}
+
 func (stack *Stack) OpPlus() {
 	a := stack.Values[len(stack.Values)-1].int_value
 	b := stack.Values[len(stack.Values)-2].int_value
@@ -511,6 +520,8 @@ func VisitExpr(exprs []Expr) {
 			theStack.OpPrint()
 		case ExprDup:
 			theStack.OpDup()
+		case ExprDrop:
+			theStack.OpDrop()
 		case ExprBlockdef:
 			if _, ok := BlockScope[expr.AsBlockdef.Name]; ok {
 				fmt.Println("Error: we can't define blocks that are the same name")
