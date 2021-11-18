@@ -1,3 +1,4 @@
 #!/bin/sh
 
-go build main.go
+go build -o tsh main.go
+sudo cp ./tsh /usr/local/bin/tsh
