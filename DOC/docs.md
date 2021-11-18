@@ -43,5 +43,11 @@ end
 ```pascal
 push "Hello World" push "T# Programming Language" drop print
 ```
-
 'drop' drops the top element of the stack.
+
+## For loop
+```pascal
+for push true do
+    push "Hello World!" print
+end
+```
