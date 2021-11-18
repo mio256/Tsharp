@@ -26,6 +26,7 @@ const (
 	TOKEN_END
 	TOKEN_DO
 	TOKEN_BOOL
+	TOKEN_ELSE
 )
 
 var tokens = []string{
@@ -39,6 +40,7 @@ var tokens = []string{
 	TOKEN_END: "TOKEN_END",
 	TOKEN_DO: "TOKEN_DO",
 	TOKEN_BOOL: "TOKEN_BOOL",
+	TOKEN_ELSE: "TOKEN_ELSE",
 }
 
 func (token Token) String() string {
@@ -95,6 +97,8 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 						return startPos, TOKEN_DO, val
 					} else if val == "true" || val == "false" {
 						return startPos, TOKEN_BOOL, val
+					} else if val == "else" {
+						return startPos, TOKEN_ELSE, val
 					}
 					return startPos, TOKEN_ID, val
 				} else if r == '"' {
@@ -225,6 +229,7 @@ type Blockdef struct {
 type If struct {
 	Op []Expr
 	Body []Expr
+	ElseBody []Expr
 }
 
 
@@ -331,12 +336,24 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				op, _ := ParserParse(parser)
 				parser.ParserEat(TOKEN_DO)
 				body, _ := ParserParse(parser)
-				parser.ParserEat(TOKEN_END)
-				expr.AsIf = &If{
-					Op: op,
-					Body: body,
+				if parser.current_token_type == TOKEN_ELSE {
+					parser.ParserEat(TOKEN_ELSE)
+					ElseBody, _ := ParserParse(parser)
+					parser.ParserEat(TOKEN_END)
+					expr.AsIf = &If{
+						Op: op,
+						Body: body,
+						ElseBody: ElseBody,
+					}
+					exprs = append(exprs, expr)
+				} else {
+					parser.ParserEat(TOKEN_END)
+					expr.AsIf = &If{
+						Op: op,
+						Body: body,
+					}
+					exprs = append(exprs, expr)
 				}
-				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "call" {
 				parser.ParserEat(TOKEN_ID)
 				if parser.current_token_type != TOKEN_ID {
@@ -362,6 +379,8 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			parser.ParserEat(TOKEN_MINUS)
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END {
+			return exprs, *parser
+		} else if parser.current_token_type == TOKEN_ELSE {
 			return exprs, *parser
 		} else if parser.current_token_type == TOKEN_DO {
 			return exprs, *parser
@@ -489,6 +508,10 @@ func VisitExpr(exprs []Expr) {
 			bool_value := theStack.RetBool()
 			if bool_value {
 				VisitExpr(expr.AsIf.Body)
+			} else {
+				if expr.AsIf.ElseBody != nil {
+					VisitExpr(expr.AsIf.ElseBody)
+				}
 			}
 		case ExprPlus:
 			theStack.OpPlus()
