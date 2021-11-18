@@ -5,11 +5,12 @@
 T# is a Stack-based programming language designed for building software.
 It's similar to Porth and Forth.
 
-## Install
+## Install & Run
 ```bash
 $ git clone https://github.com/Tsharp-lang/Tsharp
 $ cd tsharp
 $ go build main.go
+$ ./main exampes/main.t#
 ```
 
 ## Hello World
