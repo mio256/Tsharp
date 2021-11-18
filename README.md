@@ -54,6 +54,13 @@ else
 end
 ```
 
+> For loop
+```pascal
+for push true do
+    push "Hello World!" print
+end
+```
+
 > Dup
 ```pascal
 push "Hello World!" dup print print
