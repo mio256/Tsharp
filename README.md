@@ -45,7 +45,7 @@ if push true do
 end
 ```
 
-```
+```pascal
 if push false do
     push "Hello World" print
 else
