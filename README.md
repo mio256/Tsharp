@@ -45,6 +45,14 @@ if push true do
 end
 ```
 
+```
+if push false do
+    push "Hello World" print
+else
+    push "Hello World else body" print
+end
+```
+
 
 ### Vim Syntax Highlighting
 - <a href="https://github.com/ibukiyoshidaa/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
