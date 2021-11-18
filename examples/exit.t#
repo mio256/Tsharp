@@ -1,0 +1,6 @@
+
+push "Hello World!" print
+
+exit
+
+push "Hello World!" print
