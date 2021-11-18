@@ -54,7 +54,7 @@ end
 ```
 
 > Dup
-```
+```pascal
 push "Hello World!" dup print print
 ```
 
