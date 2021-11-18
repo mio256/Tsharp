@@ -201,6 +201,7 @@ const (
 	ExprMinus
 	ExprBool
 	ExprIf
+	ExprDup
 )
 
 type Expr struct {
@@ -313,6 +314,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "print" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrint
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "dup" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprDup
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "block" {
 				parser.ParserEat(TOKEN_ID)
@@ -444,6 +449,19 @@ func (stack *Stack) OpPlus() {
 	theStack.OpPush(StackItem{int_value: &x})
 }
 
+func (stack *Stack) OpDup() {
+	if stack.Values[len(stack.Values)-1].int_value != nil {
+		a := stack.Values[len(stack.Values)-1].int_value
+		theStack.OpPush(StackItem{int_value: a})
+	} else if stack.Values[len(stack.Values)-1].string_value != nil {
+		a := stack.Values[len(stack.Values)-1].string_value
+		theStack.OpPush(StackItem{string_value: a})
+	} else if stack.Values[len(stack.Values)-1].bool_value != nil {
+		a := stack.Values[len(stack.Values)-1].bool_value
+		theStack.OpPush(StackItem{bool_value: a})
+	}
+}
+
 func (stack *Stack) OpMinus() {
 	a := stack.Values[len(stack.Values)-1].int_value
 	b := stack.Values[len(stack.Values)-2].int_value
@@ -491,6 +509,8 @@ func VisitExpr(exprs []Expr) {
 			}
 		case ExprPrint:
 			theStack.OpPrint()
+		case ExprDup:
+			theStack.OpDup()
 		case ExprBlockdef:
 			if _, ok := BlockScope[expr.AsBlockdef.Name]; ok {
 				fmt.Println("Error: we can't define blocks that are the same name")
