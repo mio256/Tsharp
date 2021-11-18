@@ -14,14 +14,14 @@ Something like Forth and Porth, but written in Go.
 
 > Install
 ```
-go build main.go
+go build -o tsh main.go
 ```
 
 ### Run
 
 > Run
 ```
-$ ./main <filename>.t#
+$ ./tsh <filename>.t#
 ```
 
 > Hello World
