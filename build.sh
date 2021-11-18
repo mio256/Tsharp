@@ -1,4 +1,11 @@
 #!/bin/sh
 
 go build -o tsh main.go
-sudo cp ./tsh /usr/local/bin/tsh
+
+if [[ "$OSTYPE" =~ ^mac ]]; then
+    sudo cp ./tsh /usr/local/bin/tsh
+fi
+
+if [[ "$OSTYPE" =~ ^linux ]]; then
+    sudo cp ./tsh /usr/local/bin/tsh
+fi
