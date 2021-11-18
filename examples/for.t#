@@ -1,0 +1,4 @@
+
+for push true do
+    push "Hello World" print
+end
