@@ -7,6 +7,7 @@ import (
 	"unicode"
 	"os"
 	"strconv"
+	"github.com/fatih/color"
 )
 
 
@@ -528,14 +529,23 @@ func VisitExpr(exprs []Expr) {
 // -----------------------------
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: ./main <filename>.t#")
+	if len(os.Args) != 2 || os.Args[1] == "help" {
+		fmt.Println("Usage:")
+	    fmt.Println("  ./tsh <filename>.t#")
 		os.Exit(0)
 	}
 
 	file, err := os.Open(os.Args[1])
 	if err != nil {
-		fmt.Println("Error: file '" + os.Args[1] + "' does not exist")
+		fmt.Println("Error: file '" + os.Args[1] + "' does not exist.")
+
+		whilte := color.New(color.FgWhite)
+
+		fmt.Print("Run ")
+		boldWhite := whilte.Add(color.BgCyan)
+		boldWhite.Print(" tsh help ")
+		fmt.Println(" for usage.")
+
 		os.Exit(0)
 	}
 
