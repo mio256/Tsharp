@@ -204,6 +204,7 @@ const (
 	ExprDup
 	ExprDrop
 	ExprExit
+	ExprFor
 )
 
 type Expr struct {
@@ -215,6 +216,7 @@ type Expr struct {
 	AsCall *Call
 	AsBool bool
 	AsIf *If
+	AsFor *For
 }
 
 type Push struct {
@@ -234,6 +236,11 @@ type If struct {
 	Op []Expr
 	Body []Expr
 	ElseBody []Expr
+}
+
+type For struct {
+	Op []Expr
+	Body []Expr
 }
 
 
@@ -345,6 +352,18 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					Body: body,
 				}
 				parser.ParserEat(TOKEN_END)
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "for" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprFor
+				op, _ := ParserParse(parser)
+				parser.ParserEat(TOKEN_DO)
+				body, _ := ParserParse(parser)
+				parser.ParserEat(TOKEN_END)
+				expr.AsFor = &For{
+					Op: op,
+					Body: body,
+				}
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "if" {
 				parser.ParserEat(TOKEN_ID)
@@ -551,6 +570,12 @@ func VisitExpr(exprs []Expr) {
 				if expr.AsIf.ElseBody != nil {
 					VisitExpr(expr.AsIf.ElseBody)
 				}
+			}
+		case ExprFor:
+			VisitExpr(expr.AsFor.Op)
+			for theStack.RetBool() {
+				VisitExpr(expr.AsFor.Body)
+				VisitExpr(expr.AsFor.Op)
 			}
 		case ExprPlus:
 			theStack.OpPlus()
