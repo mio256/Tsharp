@@ -19,7 +19,7 @@ push "Hello World" print
 ```
 
 'push' will push the value to the stack.
-'print' will print the first arg inside the stack, then remove it.
+'print' will print the top element of the stack, then remove it.
 
 ## Block
 ```pascal
