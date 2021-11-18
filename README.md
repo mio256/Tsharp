@@ -38,6 +38,13 @@ end
 call Main
 ```
 
+> If Statement
+```pascal
+if push true do
+    push "Hello World!" print
+end
+```
+
 
 ### Vim Syntax Highlighting
 - <a href="https://github.com/ibukiyoshidaa/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
