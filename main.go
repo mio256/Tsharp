@@ -25,6 +25,7 @@ const (
 	TOKEN_MINUS
 	TOKEN_END
 	TOKEN_DO
+	TOKEN_BOOL
 )
 
 var tokens = []string{
@@ -37,6 +38,7 @@ var tokens = []string{
 	TOKEN_MINUS: "TOKEN_MINUS",
 	TOKEN_END: "TOKEN_END",
 	TOKEN_DO: "TOKEN_DO",
+	TOKEN_BOOL: "TOKEN_BOOL",
 }
 
 func (token Token) String() string {
@@ -91,6 +93,8 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 						return startPos, TOKEN_END, val
 					} else if val == "do" {
 						return startPos, TOKEN_DO, val
+					} else if val == "true" || val == "false" {
+						return startPos, TOKEN_BOOL, val
 					}
 					return startPos, TOKEN_ID, val
 				} else if r == '"' {
@@ -190,6 +194,7 @@ const (
 	ExprCall
 	ExprPlus
 	ExprMinus
+	ExprBool
 )
 
 type Expr struct {
@@ -199,6 +204,7 @@ type Expr struct {
 	AsPush *Push
 	AsBlockdef *Blockdef
 	AsCall *Call
+	AsBool bool
 }
 
 type Push struct {
@@ -263,6 +269,14 @@ func ParserParseExpr(parser *Parser) (Expr) {
 		expr.Type = ExprStr
 		expr.AsStr = parser.current_token_value
 		parser.ParserEat(TOKEN_STRING)
+	case TOKEN_BOOL:
+		expr.Type = ExprBool
+		if parser.current_token_value == "true" {
+			expr.AsBool = true
+		} else {
+			expr.AsBool = false
+		}
+		parser.ParserEat(TOKEN_BOOL)
 	default:
 		fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
 		os.Exit(0)
@@ -347,8 +361,9 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 // -----------------------------
 
 type StackItem struct {
-	string_value string
-	int_value int
+	string_value *string
+	int_value *int
+	bool_value *bool
 }
 
 type Stack struct {
@@ -366,30 +381,35 @@ func (stack *Stack) OpPrint() {
 		fmt.Println("PrintError: the stack is empty")
 		os.Exit(3)
 	}
-	if (len(stack.Values[len(stack.Values)-1].string_value) == 0) {
-		fmt.Println(stack.Values[len(stack.Values)-1].int_value)
-	} else {
-		fmt.Println(stack.Values[len(stack.Values)-1].string_value)
+
+	if stack.Values[len(stack.Values)-1].bool_value != nil {
+		fmt.Println(*stack.Values[len(stack.Values)-1].bool_value)
+	} else if stack.Values[len(stack.Values)-1].string_value != nil {
+		fmt.Println(*stack.Values[len(stack.Values)-1].string_value)
+	} else if stack.Values[len(stack.Values)-1].int_value != nil {
+		fmt.Println(*stack.Values[len(stack.Values)-1].int_value)
 	}
+
 	stack.Values = stack.Values[:len(stack.Values)-1]
+	return
 }
 
 func (stack *Stack) OpPlus() {
 	a := stack.Values[len(stack.Values)-1].int_value
 	b := stack.Values[len(stack.Values)-2].int_value
-	x := a + b
+	x := *a + *b
 	stack.Values = stack.Values[:len(stack.Values)-1]
 	stack.Values = stack.Values[:len(stack.Values)-1]
-	theStack.OpPush(StackItem{int_value: x})
+	theStack.OpPush(StackItem{int_value: &x})
 }
 
 func (stack *Stack) OpMinus() {
 	a := stack.Values[len(stack.Values)-1].int_value
 	b := stack.Values[len(stack.Values)-2].int_value
-	x := b - a
+	x := *b - *a
 	stack.Values = stack.Values[:len(stack.Values)-1]
 	stack.Values = stack.Values[:len(stack.Values)-1]
-	theStack.OpPush(StackItem{int_value: x})
+	theStack.OpPush(StackItem{int_value: &x})
 }
 
 
@@ -406,9 +426,11 @@ func VisitExpr(exprs []Expr) {
 		switch expr.Type {
 		case ExprPush:
 			if expr.AsPush.Arg.Type == ExprInt {
-				theStack.OpPush(StackItem{int_value: expr.AsPush.Arg.AsInt})
+				theStack.OpPush(StackItem{int_value: &expr.AsPush.Arg.AsInt})
 			} else if expr.AsPush.Arg.Type == ExprStr {
-				theStack.OpPush(StackItem{string_value: expr.AsPush.Arg.AsStr})
+				theStack.OpPush(StackItem{string_value: &expr.AsPush.Arg.AsStr})
+			} else if expr.AsPush.Arg.Type == ExprBool {
+				theStack.OpPush(StackItem{bool_value: &expr.AsPush.Arg.AsBool})
 			}
 		case ExprPrint:
 			theStack.OpPrint()
