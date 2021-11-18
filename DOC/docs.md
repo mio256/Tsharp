@@ -39,3 +39,9 @@ else
 end
 ```
 
+## Drop
+```pascal
+push "Hello World" push "T# Programming Language" drop print
+```
+
+'drop' drops the top element of the stack.
