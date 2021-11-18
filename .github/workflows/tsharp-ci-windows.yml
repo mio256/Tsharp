@@ -16,4 +16,4 @@ jobs:
     - name: run
       run: .\tsh test\ci-test.t#
     - name: clean
-      run: Del "tsh.exe"
+      run: Del "tsh"
