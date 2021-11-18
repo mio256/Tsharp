@@ -58,6 +58,11 @@ end
 push "Hello World!" dup print print
 ```
 
+> Drop
+```pascal
+push "Hello World" push "T# Programming Language" drop print
+```
+
 
 ### Vim Syntax Highlighting
 - <a href="https://github.com/ibukiyoshidaa/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
