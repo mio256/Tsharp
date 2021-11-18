@@ -195,6 +195,7 @@ const (
 	ExprPlus
 	ExprMinus
 	ExprBool
+	ExprIf
 )
 
 type Expr struct {
@@ -205,6 +206,7 @@ type Expr struct {
 	AsBlockdef *Blockdef
 	AsCall *Call
 	AsBool bool
+	AsIf *If
 }
 
 type Push struct {
@@ -217,6 +219,11 @@ type Call struct {
 
 type Blockdef struct {
 	Name string
+	Body []Expr
+}
+
+type If struct {
+	Op []Expr
 	Body []Expr
 }
 
@@ -318,6 +325,18 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				}
 				parser.ParserEat(TOKEN_END)
 				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "if" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprIf
+				op, _ := ParserParse(parser)
+				parser.ParserEat(TOKEN_DO)
+				body, _ := ParserParse(parser)
+				parser.ParserEat(TOKEN_END)
+				expr.AsIf = &If{
+					Op: op,
+					Body: body,
+				}
+				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "call" {
 				parser.ParserEat(TOKEN_ID)
 				if parser.current_token_type != TOKEN_ID {
@@ -343,6 +362,8 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			parser.ParserEat(TOKEN_MINUS)
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END {
+			return exprs, *parser
+		} else if parser.current_token_type == TOKEN_DO {
 			return exprs, *parser
 		} else if parser.current_token_type == TOKEN_EOF {
 			return exprs, *parser
@@ -379,7 +400,7 @@ func (stack *Stack) OpPush(item StackItem) {
 func (stack *Stack) OpPrint() {
 	if len(stack.Values)-1 < 0 {
 		fmt.Println("PrintError: the stack is empty")
-		os.Exit(3)
+		os.Exit(0)
 	}
 
 	if stack.Values[len(stack.Values)-1].bool_value != nil {
@@ -410,6 +431,22 @@ func (stack *Stack) OpMinus() {
 	stack.Values = stack.Values[:len(stack.Values)-1]
 	stack.Values = stack.Values[:len(stack.Values)-1]
 	theStack.OpPush(StackItem{int_value: &x})
+}
+
+func (stack *Stack) RetBool() (bool) {
+	if len(stack.Values)-1 < 0 {
+		fmt.Println("IfStatementError: the stack is empty. couldn't find bool.")
+		os.Exit(0)
+	}
+
+	if stack.Values[len(stack.Values)-1].bool_value == nil {
+		fmt.Println("Error: if op should be bool")
+		os.Exit(0)
+	}
+
+	bool_value := *stack.Values[len(stack.Values)-1].bool_value
+	stack.Values = stack.Values[:len(stack.Values)-1]
+	return bool_value
 }
 
 
@@ -446,6 +483,12 @@ func VisitExpr(exprs []Expr) {
 				VisitExpr(BlockBody)
 			} else {
 				fmt.Println("Error: undefined block '" + expr.AsCall.Value + "'")	
+			}
+		case ExprIf:
+			VisitExpr(expr.AsIf.Op)
+			bool_value := theStack.RetBool()
+			if bool_value {
+				VisitExpr(expr.AsIf.Body)
 			}
 		case ExprPlus:
 			theStack.OpPlus()
