@@ -1,0 +1,8 @@
+
+
+if push false do
+    push "Hello World!" print
+else
+    push "Hello World! this is from else body" print
+end
+
