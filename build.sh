@@ -2,10 +2,6 @@
 
 go build -o tsh main.go
 
-if [[ "$OSTYPE" =~ ^mac ]]; then
-    sudo cp ./tsh /usr/local/bin/tsh
-fi
-
-if [[ "$OSTYPE" =~ ^linux ]]; then
+if [[ "$OSTYPE" != ^msys ]]; then
     sudo cp ./tsh /usr/local/bin/tsh
 fi
