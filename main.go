@@ -231,16 +231,13 @@ const (
 	ExprBlockdef
 	ExprPrint
 	ExprCall
-	ExprPlus
-	ExprMinus
 	ExprBool
 	ExprIf
 	ExprDup
 	ExprDrop
 	ExprExit
-	ExprFor
-	ExprDIV
-	ExprMul
+	ExprFor	
+	ExprBinop
 	ExprCompare
 )
 
@@ -254,6 +251,7 @@ type Expr struct {
 	AsBool bool
 	AsIf *If
 	AsFor *For
+	AsBiniop int
 	AsCompare int
 }
 
@@ -444,19 +442,23 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				os.Exit(0)
 			}
 		} else if parser.current_token_type == TOKEN_PLUS {
-			expr.Type = ExprPlus
+			expr.Type = ExprBinop
+			expr.AsBiniop = TOKEN_PLUS
 			parser.ParserEat(TOKEN_PLUS)
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_MINUS {
-			expr.Type = ExprMinus
+			expr.Type = ExprBinop
+			expr.AsBiniop = TOKEN_MINUS
 			parser.ParserEat(TOKEN_MINUS)
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_DIV {
-			expr.Type = ExprDIV
+			expr.Type = ExprBinop
+			expr.AsBiniop = TOKEN_DIV
 			parser.ParserEat(TOKEN_DIV)
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_MUL {
-			expr.Type = ExprMul
+			expr.Type = ExprBinop
+			expr.AsBiniop = TOKEN_MUL
 			parser.ParserEat(TOKEN_MUL)
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_IS_EQUALS {
@@ -529,10 +531,26 @@ func (stack *Stack) OpDrop() {
 	stack.Values = stack.Values[:len(stack.Values)-1]
 }
 
-func (stack *Stack) OpPlus() {
-	a := stack.Values[len(stack.Values)-1].int_value
-	b := stack.Values[len(stack.Values)-2].int_value
-	x := *a + *b
+func (stack *Stack) OpBinop(value int) {
+	var x int
+	switch (value) {
+		case TOKEN_PLUS:
+			a := stack.Values[len(stack.Values)-1].int_value
+			b := stack.Values[len(stack.Values)-2].int_value
+			x = *a + *b
+		case TOKEN_MINUS:
+			a := stack.Values[len(stack.Values)-1].int_value
+			b := stack.Values[len(stack.Values)-2].int_value
+			x = *b - *a
+		case TOKEN_MUL:
+			a := stack.Values[len(stack.Values)-1].int_value
+			b := stack.Values[len(stack.Values)-2].int_value
+			x = *a * *b
+		case TOKEN_DIV:
+			a := stack.Values[len(stack.Values)-1].int_value
+			b := stack.Values[len(stack.Values)-2].int_value
+			x = *b / *a
+	}
 	stack.Values = stack.Values[:len(stack.Values)-1]
 	stack.Values = stack.Values[:len(stack.Values)-1]
 	theStack.OpPush(StackItem{int_value: &x})
@@ -551,33 +569,8 @@ func (stack *Stack) OpDup() {
 	}
 }
 
-func (stack *Stack) OpMinus() {
-	a := stack.Values[len(stack.Values)-1].int_value
-	b := stack.Values[len(stack.Values)-2].int_value
-	x := *b - *a
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	theStack.OpPush(StackItem{int_value: &x})
-}
 
-func (stack *Stack) OpDiv() {
-	a := stack.Values[len(stack.Values)-1].int_value
-	b := stack.Values[len(stack.Values)-2].int_value
-	x := *b / *a
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	theStack.OpPush(StackItem{int_value: &x})
-}
-
-func (stack *Stack) OpMul() {
-	a := stack.Values[len(stack.Values)-1].int_value
-	b := stack.Values[len(stack.Values)-2].int_value
-	x := *b * *a
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	theStack.OpPush(StackItem{int_value: &x})
-}
-
+// I will rewrite this function later
 func (stack *Stack) OpCompare(value int) (bool) {
 	if len(stack.Values)-1 < 1 {
 		fmt.Println("Error: expected more than two args in stack.")
@@ -722,14 +715,8 @@ func VisitExpr(exprs []Expr) {
 				VisitExpr(expr.AsFor.Body)
 				VisitExpr(expr.AsFor.Op)
 			}
-		case ExprPlus:
-			theStack.OpPlus()
-		case ExprMinus:
-			theStack.OpMinus()
-		case ExprDIV:
-			theStack.OpDiv()
-		case ExprMul:
-			theStack.OpMul()
+		case ExprBinop:
+			theStack.OpBinop(expr.AsBiniop)
 		case ExprCompare:
 			bool_value := theStack.OpCompare(expr.AsCompare)
 			theStack.OpPush(StackItem{bool_value: &bool_value})
