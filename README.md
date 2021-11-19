@@ -75,6 +75,17 @@ push "Hello World!" dup print print
 push "Hello World" push "T# Programming Language" drop print
 ```
 
+> Arithmetic
+```pascal
+push 34 push 35 + print
+
+push 100 push 40 - print
+
+push 200 push 5 / print
+
+push 10 push 2 * print
+```
+
 ### Contributors
 
 <a href="https://github.com/ibukiyoshidaa/Tsharp/graphs/contributors">
