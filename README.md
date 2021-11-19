@@ -1,6 +1,8 @@
 <div align="center">
     <h1> The T# Programming Language</h1>
     <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/DOC/docs.md">Docs</a>
+    |
+    <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/DOC/ドキュメント.md">Docs(日本語)</a>
 </div>
 
 [![Ubuntu](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml/badge.svg)](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml)
