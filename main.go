@@ -564,6 +564,11 @@ func (stack *Stack) OpMul() {
 }
 
 func (stack *Stack) OpCompare(value int) (bool) {
+	if len(stack.Values)-1 < 0 {
+		fmt.Println("Error: expected more than two args in stack.")
+		os.Exit(0)
+	}
+
 	switch (value) {
 		case TOKEN_IS_EQUALS:
 			if stack.Values[len(stack.Values)-1].int_value != nil {
