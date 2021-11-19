@@ -3,6 +3,8 @@
     <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/DOC/docs.md">Docs</a>
     |
     <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/DOC/ドキュメント.md">Docs(日本語)</a>
+    |
+    <a href="https://github.com/ibukiyoshidaa/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
 </div>
 
 [![Ubuntu](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml/badge.svg)](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml)
@@ -72,11 +74,6 @@ push "Hello World!" dup print print
 ```pascal
 push "Hello World" push "T# Programming Language" drop print
 ```
-
-
-### Vim Syntax Highlighting
-- <a href="https://github.com/ibukiyoshidaa/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
-
 
 ### Contributors
 
