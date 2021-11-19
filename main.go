@@ -31,6 +31,7 @@ const (
 	TOKEN_DIV
 	TOKEN_MUL
 	TOKEN_IS_EQUALS
+	TOKEN_NOT_EQUALS
 )
 
 var tokens = []string{
@@ -48,6 +49,7 @@ var tokens = []string{
 	TOKEN_DIV: "TOKEN_DIV",
 	TOKEN_MUL: "TOKEN_MUL",
 	TOKEN_IS_EQUALS: "TOKEN_IS_EQUALS",
+	TOKEN_NOT_EQUALS: "TOKEN_NOT_EQUALS",
 }
 
 func (token Token) String() string {
@@ -98,6 +100,14 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 					lexer.pos.column++
 					if r == '=' {
 						return lexer.pos, TOKEN_IS_EQUALS, "=="
+					}
+				} else if r == '!' {
+					r, _, err := lexer.reader.ReadRune()
+					if r == '\n' {break}
+					if err != nil {panic(err)}
+					lexer.pos.column++
+					if r == '=' {
+						return lexer.pos, TOKEN_NOT_EQUALS, "!="
 					}
 				} else if r == '#' {
 					for {
@@ -454,6 +464,11 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.AsCompare = TOKEN_IS_EQUALS
 			parser.ParserEat(TOKEN_IS_EQUALS)
 			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_NOT_EQUALS {
+			expr.Type = ExprCompare
+			expr.AsCompare = TOKEN_NOT_EQUALS
+			parser.ParserEat(TOKEN_NOT_EQUALS)
+			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END {
 			return exprs, *parser
 		} else if parser.current_token_type == TOKEN_ELSE {
@@ -564,53 +579,74 @@ func (stack *Stack) OpMul() {
 }
 
 func (stack *Stack) OpCompare(value int) (bool) {
-	if len(stack.Values)-1 < 0 {
+	if len(stack.Values)-1 < 1 {
 		fmt.Println("Error: expected more than two args in stack.")
 		os.Exit(0)
 	}
-
+    var bool_value bool
 	switch (value) {
 		case TOKEN_IS_EQUALS:
 			if stack.Values[len(stack.Values)-1].int_value != nil {
 				a := stack.Values[len(stack.Values)-1].int_value
 				if stack.Values[len(stack.Values)-2].int_value == nil {
-					stack.Values = stack.Values[:len(stack.Values)-1]
-					stack.Values = stack.Values[:len(stack.Values)-1]
-					return false
+					bool_value = false
+				} else {
+					b := stack.Values[len(stack.Values)-2].int_value
+					if *a != *b {bool_value = false} else {bool_value = true}
 				}
-				b := stack.Values[len(stack.Values)-2].int_value
-				stack.Values = stack.Values[:len(stack.Values)-1]
-				stack.Values = stack.Values[:len(stack.Values)-1]
-				if *a != *b {return false} else {return true}
 			} else if stack.Values[len(stack.Values)-1].string_value != nil {
 				a := stack.Values[len(stack.Values)-1].string_value
 				if stack.Values[len(stack.Values)-2].string_value == nil {
-					stack.Values = stack.Values[:len(stack.Values)-1]
-					stack.Values = stack.Values[:len(stack.Values)-1]
-					return false
+					bool_value = false
+				} else {
+					b := stack.Values[len(stack.Values)-2].string_value
+					if *a != *b {bool_value = false} else {bool_value = true}
 				}
-				b := stack.Values[len(stack.Values)-2].string_value
-				stack.Values = stack.Values[:len(stack.Values)-1]
-				stack.Values = stack.Values[:len(stack.Values)-1]
-				if *a != *b {return false} else {return true}
 			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
 				a := stack.Values[len(stack.Values)-1].bool_value
 				if stack.Values[len(stack.Values)-2].bool_value == nil {
-					stack.Values = stack.Values[:len(stack.Values)-1]
-					stack.Values = stack.Values[:len(stack.Values)-1]
-					return false
+					bool_value = false
+				} else {
+					b := stack.Values[len(stack.Values)-2].bool_value
+					if *a == *b {bool_value = true} else {bool_value = false}
+				}
+			}
+			stack.Values = stack.Values[:len(stack.Values)-1]
+			stack.Values = stack.Values[:len(stack.Values)-1]
+			return bool_value
+		case TOKEN_NOT_EQUALS:
+			if stack.Values[len(stack.Values)-1].int_value != nil {
+				a := stack.Values[len(stack.Values)-1].int_value
+				if stack.Values[len(stack.Values)-2].int_value == nil {
+					bool_value = true
+				} else {
+					b := stack.Values[len(stack.Values)-2].int_value
+					if *a != *b {bool_value = true} else {bool_value = false}
+				}
+			} else if stack.Values[len(stack.Values)-1].string_value != nil {
+				a := stack.Values[len(stack.Values)-1].string_value
+				if stack.Values[len(stack.Values)-2].string_value == nil {
+					bool_value = true
+				}
+				b := stack.Values[len(stack.Values)-2].string_value
+				if *a != *b {bool_value =  true} else {bool_value =  false}
+			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
+				a := stack.Values[len(stack.Values)-1].bool_value
+				if stack.Values[len(stack.Values)-2].bool_value == nil {
+					bool_value = true
 				}
 				b := stack.Values[len(stack.Values)-2].bool_value
-				stack.Values = stack.Values[:len(stack.Values)-1]
-				stack.Values = stack.Values[:len(stack.Values)-1]
-				if *a == *b {return true} else {return false}
+				if *a == *b {bool_value = false} else {bool_value = true}
 			}
+			stack.Values = stack.Values[:len(stack.Values)-1]
+			stack.Values = stack.Values[:len(stack.Values)-1]
+			return bool_value
 		default:
 			fmt.Println("Error: undifined type")
 			os.Exit(0)
 	}
 
-	return false
+	return true
 }
 
 func (stack *Stack) RetBool() (bool) {
