@@ -30,6 +30,7 @@ const (
 	TOKEN_ELSE
 	TOKEN_DIV
 	TOKEN_MUL
+	TOKEN_IS_EQUALS
 )
 
 var tokens = []string{
@@ -45,6 +46,8 @@ var tokens = []string{
 	TOKEN_BOOL: "TOKEN_BOOL",
 	TOKEN_ELSE: "TOKEN_ELSE",
 	TOKEN_DIV: "TOKEN_DIV",
+	TOKEN_MUL: "TOKEN_MUL",
+	TOKEN_IS_EQUALS: "TOKEN_IS_EQUALS",
 }
 
 func (token Token) String() string {
@@ -88,6 +91,14 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			default:
 				if unicode.IsSpace(r) {
 					continue
+				} else if r == '=' {
+					r, _, err := lexer.reader.ReadRune()
+					if r == '\n' {break}
+					if err != nil {panic(err)}
+					lexer.pos.column++
+					if r == '=' {
+						return lexer.pos, TOKEN_IS_EQUALS, "=="
+					}
 				} else if r == '#' {
 					for {
 						r, _, err := lexer.reader.ReadRune()
@@ -220,6 +231,7 @@ const (
 	ExprFor
 	ExprDIV
 	ExprMul
+	ExprCompare
 )
 
 type Expr struct {
@@ -232,6 +244,7 @@ type Expr struct {
 	AsBool bool
 	AsIf *If
 	AsFor *For
+	AsCompare int
 }
 
 type Push struct {
@@ -436,6 +449,11 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.Type = ExprMul
 			parser.ParserEat(TOKEN_MUL)
 			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_IS_EQUALS {
+			expr.Type = ExprCompare
+			expr.AsCompare = TOKEN_IS_EQUALS
+			parser.ParserEat(TOKEN_IS_EQUALS)
+			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END {
 			return exprs, *parser
 		} else if parser.current_token_type == TOKEN_ELSE {
@@ -545,6 +563,39 @@ func (stack *Stack) OpMul() {
 	theStack.OpPush(StackItem{int_value: &x})
 }
 
+func (stack *Stack) OpCompare(value int) (bool) {
+	switch (value) {
+		case TOKEN_IS_EQUALS:
+			if stack.Values[len(stack.Values)-1].int_value != nil {
+				a := stack.Values[len(stack.Values)-1].int_value
+				if stack.Values[len(stack.Values)-2].int_value == nil {
+					return false
+				}
+				b := stack.Values[len(stack.Values)-1].int_value
+				if a == b {return true} else {return false}
+			} else if stack.Values[len(stack.Values)-1].string_value != nil {
+				a := stack.Values[len(stack.Values)-1].string_value
+				if stack.Values[len(stack.Values)-2].string_value == nil {
+					return false
+				}
+				b := stack.Values[len(stack.Values)-1].string_value
+				if a == b {return true} else {return false}
+			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
+				a := stack.Values[len(stack.Values)-1].bool_value
+				if stack.Values[len(stack.Values)-2].bool_value == nil {
+					return false
+				}
+				b := stack.Values[len(stack.Values)-1].bool_value
+				if a == b {return true} else {return false}
+			}
+		default:
+			fmt.Println("Error: undifined type")
+			os.Exit(0)
+	}
+
+	return false
+}
+
 func (stack *Stack) RetBool() (bool) {
 	if len(stack.Values)-1 < 0 {
 		fmt.Println("IfStatementError: the stack is empty. couldn't find bool.")
@@ -626,6 +677,9 @@ func VisitExpr(exprs []Expr) {
 			theStack.OpDiv()
 		case ExprMul:
 			theStack.OpMul()
+		case ExprCompare:
+			bool_value := theStack.OpCompare(expr.AsCompare)
+			theStack.OpPush(StackItem{bool_value: &bool_value})
 		}
 	}
 	return
