@@ -52,7 +52,7 @@ for push true do
 end
 ```
 
-## Arith
+## Arithmetic
 ```pascal
 push 34 push 35 + print
 
