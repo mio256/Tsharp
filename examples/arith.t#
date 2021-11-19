@@ -4,3 +4,5 @@ push 34 push 35 + print
 
 push 100 push 40 - print
 
+push 200 push 5 / print
+
