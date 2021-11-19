@@ -579,7 +579,8 @@ func (stack *Stack) OpCompare(value int) (bool) {
 					return false
 				}
 				b := stack.Values[len(stack.Values)-2].int_value
-				stack.Values = stack.Values[:len(stack.Values)-1] stack.Values = stack.Values[:len(stack.Values)-1]
+				stack.Values = stack.Values[:len(stack.Values)-1]
+				stack.Values = stack.Values[:len(stack.Values)-1]
 				if *a != *b {return false} else {return true}
 			} else if stack.Values[len(stack.Values)-1].string_value != nil {
 				a := stack.Values[len(stack.Values)-1].string_value
