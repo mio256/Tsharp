@@ -21,6 +21,11 @@ push "Hello World" print
 'push' will push the value to the stack.
 'print' will print the top element of the stack, then remove it.
 
+## Comments
+```python
+# Sample comment
+```
+
 ## Block
 ```pascal
 block main do
