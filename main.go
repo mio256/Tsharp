@@ -88,6 +88,14 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			default:
 				if unicode.IsSpace(r) {
 					continue
+				} else if r == '#' {
+					for {
+						r, _, err := lexer.reader.ReadRune()
+						if r == '\n' {break}
+						if err != nil {panic(err)}
+						lexer.pos.column++
+					}
+					continue
 				} else if unicode.IsDigit(r) {
 					startPos := lexer.pos
 					lexer.backup()
