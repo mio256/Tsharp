@@ -29,6 +29,7 @@ const (
 	TOKEN_BOOL
 	TOKEN_ELSE
 	TOKEN_DIV
+	TOKEN_MUL
 )
 
 var tokens = []string{
@@ -83,6 +84,7 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			case '+': return lexer.pos, TOKEN_PLUS, "+"
 			case '-': return lexer.pos, TOKEN_MINUS, "-"
 			case '/': return lexer.pos, TOKEN_DIV, "/"
+			case '*': return lexer.pos, TOKEN_MUL, "*"
 			default:
 				if unicode.IsSpace(r) {
 					continue
@@ -209,6 +211,7 @@ const (
 	ExprExit
 	ExprFor
 	ExprDIV
+	ExprMul
 )
 
 type Expr struct {
@@ -421,6 +424,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.Type = ExprDIV
 			parser.ParserEat(TOKEN_DIV)
 			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_MUL {
+			expr.Type = ExprMul
+			parser.ParserEat(TOKEN_MUL)
+			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END {
 			return exprs, *parser
 		} else if parser.current_token_type == TOKEN_ELSE {
@@ -521,6 +528,15 @@ func (stack *Stack) OpDiv() {
 	theStack.OpPush(StackItem{int_value: &x})
 }
 
+func (stack *Stack) OpMul() {
+	a := stack.Values[len(stack.Values)-1].int_value
+	b := stack.Values[len(stack.Values)-2].int_value
+	x := *b * *a
+	stack.Values = stack.Values[:len(stack.Values)-1]
+	stack.Values = stack.Values[:len(stack.Values)-1]
+	theStack.OpPush(StackItem{int_value: &x})
+}
+
 func (stack *Stack) RetBool() (bool) {
 	if len(stack.Values)-1 < 0 {
 		fmt.Println("IfStatementError: the stack is empty. couldn't find bool.")
@@ -600,6 +616,8 @@ func VisitExpr(exprs []Expr) {
 			theStack.OpMinus()
 		case ExprDIV:
 			theStack.OpDiv()
+		case ExprMul:
+			theStack.OpMul()
 		}
 	}
 	return
