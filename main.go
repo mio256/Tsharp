@@ -569,24 +569,35 @@ func (stack *Stack) OpCompare(value int) (bool) {
 			if stack.Values[len(stack.Values)-1].int_value != nil {
 				a := stack.Values[len(stack.Values)-1].int_value
 				if stack.Values[len(stack.Values)-2].int_value == nil {
+					stack.Values = stack.Values[:len(stack.Values)-1]
+					stack.Values = stack.Values[:len(stack.Values)-1]
 					return false
 				}
-				b := stack.Values[len(stack.Values)-1].int_value
-				if a == b {return true} else {return false}
+				b := stack.Values[len(stack.Values)-2].int_value
+				stack.Values = stack.Values[:len(stack.Values)-1] stack.Values = stack.Values[:len(stack.Values)-1]
+				if *a != *b {return false} else {return true}
 			} else if stack.Values[len(stack.Values)-1].string_value != nil {
 				a := stack.Values[len(stack.Values)-1].string_value
 				if stack.Values[len(stack.Values)-2].string_value == nil {
+					stack.Values = stack.Values[:len(stack.Values)-1]
+					stack.Values = stack.Values[:len(stack.Values)-1]
 					return false
 				}
-				b := stack.Values[len(stack.Values)-1].string_value
-				if a == b {return true} else {return false}
+				b := stack.Values[len(stack.Values)-2].string_value
+				stack.Values = stack.Values[:len(stack.Values)-1]
+				stack.Values = stack.Values[:len(stack.Values)-1]
+				if *a != *b {return false} else {return true}
 			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
 				a := stack.Values[len(stack.Values)-1].bool_value
 				if stack.Values[len(stack.Values)-2].bool_value == nil {
+					stack.Values = stack.Values[:len(stack.Values)-1]
+					stack.Values = stack.Values[:len(stack.Values)-1]
 					return false
 				}
-				b := stack.Values[len(stack.Values)-1].bool_value
-				if a == b {return true} else {return false}
+				b := stack.Values[len(stack.Values)-2].bool_value
+				stack.Values = stack.Values[:len(stack.Values)-1]
+				stack.Values = stack.Values[:len(stack.Values)-1]
+				if *a == *b {return true} else {return false}
 			}
 		default:
 			fmt.Println("Error: undifined type")
