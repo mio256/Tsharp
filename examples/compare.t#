@@ -1,0 +1,6 @@
+
+push 10 push 20 == print
+
+push "Hello" push "Hello" == print
+
+push true push true == print
