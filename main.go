@@ -744,7 +744,6 @@ func VisitExpr(exprs []Expr) {
 			}
 		}
 	}
-	return
 }
 
 func Usage() {
@@ -780,6 +779,4 @@ func main() {
 	parser := ParserInit(lexer)
 	exprs, _ := ParserParse(parser)
 	VisitExpr(exprs)
-
-	return
 }
