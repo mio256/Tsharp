@@ -44,6 +44,11 @@ if push false do
 else
     push "Hello World else body!" print
 end
+
+push 10 push 10 == print
+push 20 push 10 != print
+push 2 push 10 < print
+push 10 push 2 > print
 ```
 
 ## Drop
