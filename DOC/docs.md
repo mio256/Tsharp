@@ -15,7 +15,7 @@ $ ./tsh exampes/main.t#
 
 ## Hello World
 ```pascal
-push "Hello World" print
+push "Hello World!" print
 ```
 
 'push' will push the value to the stack.
@@ -29,7 +29,7 @@ push "Hello World" print
 ## Block
 ```pascal
 block main do
-    push "Hello World" print
+    push "Hello World!" print
 end
 
 call main
