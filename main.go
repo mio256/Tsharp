@@ -298,25 +298,31 @@ type Parser struct {
 	current_token_type Token
 	current_token_value string
 	lexer Lexer
+	line int
+	column int
 }
 
 func ParserInit(lexer *Lexer) *Parser {
-	_, tok, val := lexer.Lex()
+	pos, tok, val := lexer.Lex()
 	return &Parser{
 		current_token_type: tok,
 		current_token_value: val,
 		lexer: *lexer,
+		line: pos.line,
+		column: pos.column,
 	}
 }
 
 func (parser *Parser) ParserEat(token Token) {
 	if token != parser.current_token_type {
-		fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
+		fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 		os.Exit(0)
 	}
-	_, tok, val := parser.lexer.Lex()
+	pos, tok, val := parser.lexer.Lex()
 	parser.current_token_type = tok
 	parser.current_token_value = val
+	parser.line = pos.line
+	parser.column = pos.column
 }
 
 func StrToInt(num string) int {
@@ -330,25 +336,25 @@ func StrToInt(num string) int {
 func ParserParseExpr(parser *Parser) (Expr) {
 	expr := Expr{}
 	switch parser.current_token_type {
-	case TOKEN_INT:
-		expr.Type = ExprInt
-		expr.AsInt = StrToInt(parser.current_token_value)
-		parser.ParserEat(TOKEN_INT)
-	case TOKEN_STRING:
-		expr.Type = ExprStr
-		expr.AsStr = parser.current_token_value
-		parser.ParserEat(TOKEN_STRING)
-	case TOKEN_BOOL:
-		expr.Type = ExprBool
-		if parser.current_token_value == "true" {
-			expr.AsBool = true
-		} else {
-			expr.AsBool = false
-		}
-		parser.ParserEat(TOKEN_BOOL)
-	default:
-		fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
-		os.Exit(0)
+		case TOKEN_INT:
+			expr.Type = ExprInt
+			expr.AsInt = StrToInt(parser.current_token_value)
+			parser.ParserEat(TOKEN_INT)
+		case TOKEN_STRING:
+			expr.Type = ExprStr
+			expr.AsStr = parser.current_token_value
+			parser.ParserEat(TOKEN_STRING)
+		case TOKEN_BOOL:
+			expr.Type = ExprBool
+			if parser.current_token_value == "true" {
+				expr.AsBool = true
+			} else {
+				expr.AsBool = false
+			}
+			parser.ParserEat(TOKEN_BOOL)
+		default:
+			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
+			os.Exit(0)
 	}
 	return expr
 }
@@ -386,7 +392,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprBlockdef
 				if parser.current_token_type != TOKEN_ID {
-					fmt.Println("SyntaxError: unexpected token value '" + parser.current_token_value + "'")
+					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 					os.Exit(0)
 				}
 				name := parser.current_token_value
@@ -438,7 +444,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "call" {
 				parser.ParserEat(TOKEN_ID)
 				if parser.current_token_type != TOKEN_ID {
-					fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
+					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 					os.Exit(0)
 				}
 				expr.Type = ExprCall
@@ -448,7 +454,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				parser.ParserEat(TOKEN_ID)
 				exprs = append(exprs, expr)
 			} else {
-				fmt.Println("Error: unexpected token value '" + parser.current_token_value + "'")
+				fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 				os.Exit(0)
 			}
 		} else if parser.current_token_type == TOKEN_PLUS {
@@ -505,7 +511,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 		} else if parser.current_token_type == TOKEN_EOF {
 			return exprs, *parser
 		} else {
-			fmt.Println("SyntaxError: unexpected token value '" + parser.current_token_value + "'")
+			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 			os.Exit(0)
 		}
 	}
