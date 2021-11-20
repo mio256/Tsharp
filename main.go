@@ -32,6 +32,7 @@ const (
 	TOKEN_MUL
 	TOKEN_IS_EQUALS
 	TOKEN_NOT_EQUALS
+	TOKEN_LESS_THAN
 )
 
 var tokens = []string{
@@ -50,6 +51,7 @@ var tokens = []string{
 	TOKEN_MUL: "TOKEN_MUL",
 	TOKEN_IS_EQUALS: "TOKEN_IS_EQUALS",
 	TOKEN_NOT_EQUALS: "TOKEN_NOT_EQUALS",
+	TOKEN_LESS_THAN: "TOKEN_LESS_THAN",
 }
 
 func (token Token) String() string {
@@ -90,6 +92,7 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			case '-': return lexer.pos, TOKEN_MINUS, "-"
 			case '/': return lexer.pos, TOKEN_DIV, "/"
 			case '*': return lexer.pos, TOKEN_MUL, "*"
+		    case '<': return lexer.pos, TOKEN_LESS_THAN, "<"
 			default:
 				if unicode.IsSpace(r) {
 					continue
@@ -471,6 +474,11 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.AsCompare = TOKEN_NOT_EQUALS
 			parser.ParserEat(TOKEN_NOT_EQUALS)
 			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_LESS_THAN {
+			expr.Type = ExprCompare
+			expr.AsCompare = TOKEN_LESS_THAN
+			parser.ParserEat(TOKEN_LESS_THAN)
+			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END {
 			return exprs, *parser
 		} else if parser.current_token_type == TOKEN_ELSE {
@@ -634,6 +642,12 @@ func (stack *Stack) OpCompare(value int) (bool) {
 			stack.Values = stack.Values[:len(stack.Values)-1]
 			stack.Values = stack.Values[:len(stack.Values)-1]
 			return bool_value
+		case TOKEN_LESS_THAN:
+			a := stack.Values[len(stack.Values)-1].int_value
+			b := stack.Values[len(stack.Values)-2].int_value
+			stack.Values = stack.Values[:len(stack.Values)-1]
+			stack.Values = stack.Values[:len(stack.Values)-1]
+			return *b < *a
 		default:
 			fmt.Println("Error: undifined type")
 			os.Exit(0)
