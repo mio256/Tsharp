@@ -9,3 +9,7 @@ push "Hello" push "Hello World" != print
 
 push 10 push 20 != print
 
+push 10 push 20 < print
+
+push 20 push 10 > print
+
