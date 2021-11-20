@@ -562,30 +562,21 @@ func (stack *Stack) OpDrop() {
 
 func (stack *Stack) OpBinop(value int) {
 	var x int
+	a := stack.Values[len(stack.Values)-1].int_value
+	b := stack.Values[len(stack.Values)-2].int_value
 	switch (value) {
 		case TOKEN_PLUS:
-			a := stack.Values[len(stack.Values)-1].int_value
-			b := stack.Values[len(stack.Values)-2].int_value
 			x = *a + *b
 		case TOKEN_MINUS:
-			a := stack.Values[len(stack.Values)-1].int_value
-			b := stack.Values[len(stack.Values)-2].int_value
 			x = *b - *a
 		case TOKEN_MUL:
-			a := stack.Values[len(stack.Values)-1].int_value
-			b := stack.Values[len(stack.Values)-2].int_value
 			x = *a * *b
 		case TOKEN_DIV:
-			a := stack.Values[len(stack.Values)-1].int_value
-			b := stack.Values[len(stack.Values)-2].int_value
 			x = *b / *a
 		case TOKEN_REM:
-			a := stack.Values[len(stack.Values)-1].int_value
-			b := stack.Values[len(stack.Values)-2].int_value
 			x = *b % *a
 	}
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	stack.Values = stack.Values[:len(stack.Values)-1]
+	stack.Values = stack.Values[:len(stack.Values)-2]
 	theStack.OpPush(StackItem{int_value: &x})
 }
 
