@@ -246,8 +246,8 @@ const (
 	ExprDrop
 	ExprExit
 	ExprFor	
-	ExprBinop
-	ExprCompare
+	ExprBinop // + - * / %
+	ExprCompare // < > == !=
 )
 
 type Expr struct {
