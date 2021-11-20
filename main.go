@@ -7,6 +7,7 @@ import (
 	"unicode"
 	"os"
 	"strconv"
+	"reflect"
 	"github.com/fatih/color"
 )
 
@@ -534,7 +535,7 @@ func (stack *Stack) OpPush(item StackItem) {
 }
 
 func (stack *Stack) OpPrint() {
-	if len(stack.Values)-1 == 0 {
+	if len(stack.Values) == 0 {
 		fmt.Println("PrintError: the stack is empty")
 		os.Exit(0)
 	}
@@ -552,7 +553,7 @@ func (stack *Stack) OpPrint() {
 }
 
 func (stack *Stack) OpDrop() {
-	if len(stack.Values)-1 == 0 {
+	if len(stack.Values) == 0 {
 		fmt.Println("DropError: the stack is empty")
 		os.Exit(0)
 	}
@@ -604,61 +605,43 @@ func (stack *Stack) OpDup() {
 
 // I will rewrite this function later
 func (stack *Stack) OpCompare(value int) (bool) {
-	if len(stack.Values)-1 < 1 {
+	if len(stack.Values) < 2 {
 		fmt.Println("Error: expected more than two args in stack.")
 		os.Exit(0)
 	}
     var bool_value bool
 	switch (value) {
 		case TOKEN_IS_EQUALS:
-			if stack.Values[len(stack.Values)-1].int_value != nil {
+			if reflect.TypeOf(stack.Values[len(stack.Values)-1]) != reflect.TypeOf(stack.Values[len(stack.Values)-2]) {
+				bool_value = false
+			} else if stack.Values[len(stack.Values)-1].int_value != nil {
 				a := stack.Values[len(stack.Values)-1].int_value
-				if stack.Values[len(stack.Values)-2].int_value == nil {
-					bool_value = false
-				} else {
-					b := stack.Values[len(stack.Values)-2].int_value
-					if *a != *b {bool_value = false} else {bool_value = true}
-				}
+				b := stack.Values[len(stack.Values)-2].int_value
+				if *a != *b {bool_value = false} else {bool_value = true}
 			} else if stack.Values[len(stack.Values)-1].string_value != nil {
 				a := stack.Values[len(stack.Values)-1].string_value
-				if stack.Values[len(stack.Values)-2].string_value == nil {
-					bool_value = false
-				} else {
-					b := stack.Values[len(stack.Values)-2].string_value
-					if *a != *b {bool_value = false} else {bool_value = true}
-				}
+				b := stack.Values[len(stack.Values)-2].string_value
+				if *a != *b {bool_value = false} else {bool_value = true}
 			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
 				a := stack.Values[len(stack.Values)-1].bool_value
-				if stack.Values[len(stack.Values)-2].bool_value == nil {
-					bool_value = false
-				} else {
-					b := stack.Values[len(stack.Values)-2].bool_value
-					if *a == *b {bool_value = true} else {bool_value = false}
-				}
+				b := stack.Values[len(stack.Values)-2].bool_value
+				if *a == *b {bool_value = true} else {bool_value = false}
 			}
 			stack.Values = stack.Values[:len(stack.Values)-2]
 			return bool_value
 		case TOKEN_NOT_EQUALS:
-			if stack.Values[len(stack.Values)-1].int_value != nil {
+			if reflect.TypeOf(stack.Values[len(stack.Values)-1]) != reflect.TypeOf(stack.Values[len(stack.Values)-2]) {
+				bool_value = true
+			} else if stack.Values[len(stack.Values)-1].int_value != nil {
 				a := stack.Values[len(stack.Values)-1].int_value
-				if stack.Values[len(stack.Values)-2].int_value == nil {
-					bool_value = true
-				} else {
-					b := stack.Values[len(stack.Values)-2].int_value
-					if *a != *b {bool_value = true} else {bool_value = false}
-				}
+				b := stack.Values[len(stack.Values)-2].int_value
+				if *a != *b {bool_value = true} else {bool_value = false}
 			} else if stack.Values[len(stack.Values)-1].string_value != nil {
 				a := stack.Values[len(stack.Values)-1].string_value
-				if stack.Values[len(stack.Values)-2].string_value == nil {
-					bool_value = true
-				}
 				b := stack.Values[len(stack.Values)-2].string_value
 				if *a != *b {bool_value =  true} else {bool_value =  false}
 			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
 				a := stack.Values[len(stack.Values)-1].bool_value
-				if stack.Values[len(stack.Values)-2].bool_value == nil {
-					bool_value = true
-				}
 				b := stack.Values[len(stack.Values)-2].bool_value
 				if *a == *b {bool_value = false} else {bool_value = true}
 			}
