@@ -34,6 +34,7 @@ const (
 	TOKEN_NOT_EQUALS
 	TOKEN_LESS_THAN
 	TOKEN_GREATER_THAN
+	TOKEN_REM
 )
 
 var tokens = []string{
@@ -54,6 +55,7 @@ var tokens = []string{
 	TOKEN_NOT_EQUALS: "TOKEN_NOT_EQUALS",
 	TOKEN_LESS_THAN: "TOKEN_LESS_THAN",
 	TOKEN_GREATER_THAN: "TOKEN_GREATER_THAN",
+	TOKEN_REM: "TOKEN_REM",
 }
 
 func (token Token) String() string {
@@ -96,6 +98,7 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			case '*': return lexer.pos, TOKEN_MUL, "*"
 		    case '<': return lexer.pos, TOKEN_LESS_THAN, "<"
 			case '>': return lexer.pos, TOKEN_GREATER_THAN, ">"
+			case '%': return lexer.pos, TOKEN_REM, "%"
 			default:
 				if unicode.IsSpace(r) {
 					continue
@@ -467,6 +470,11 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.AsBiniop = TOKEN_MUL
 			parser.ParserEat(TOKEN_MUL)
 			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_REM {
+			expr.Type = ExprBinop
+			expr.AsBiniop = TOKEN_REM
+			parser.ParserEat(TOKEN_REM)
+			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_IS_EQUALS {
 			expr.Type = ExprCompare
 			expr.AsCompare = TOKEN_IS_EQUALS
@@ -566,6 +574,10 @@ func (stack *Stack) OpBinop(value int) {
 			a := stack.Values[len(stack.Values)-1].int_value
 			b := stack.Values[len(stack.Values)-2].int_value
 			x = *b / *a
+		case TOKEN_REM:
+			a := stack.Values[len(stack.Values)-1].int_value
+			b := stack.Values[len(stack.Values)-2].int_value
+			x = *b % *a
 	}
 	stack.Values = stack.Values[:len(stack.Values)-1]
 	stack.Values = stack.Values[:len(stack.Values)-1]
