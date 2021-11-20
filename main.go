@@ -730,6 +730,11 @@ func VisitExpr(exprs []Expr) {
 			theStack.OpDrop()
 		case ExprExit:
 			os.Exit(0)
+		case ExprBinop:
+			theStack.OpBinop(expr.AsBiniop)
+		case ExprCompare:
+			bool_value := theStack.OpCompare(expr.AsCompare)
+			theStack.OpPush(StackItem{bool_value: &bool_value})
 		case ExprBlockdef:
 			if _, ok := BlockScope[expr.AsBlockdef.Name]; ok {
 				fmt.Println("Error: we can't define blocks that are the same name")
@@ -759,11 +764,6 @@ func VisitExpr(exprs []Expr) {
 				VisitExpr(expr.AsFor.Body)
 				VisitExpr(expr.AsFor.Op)
 			}
-		case ExprBinop:
-			theStack.OpBinop(expr.AsBiniop)
-		case ExprCompare:
-			bool_value := theStack.OpCompare(expr.AsCompare)
-			theStack.OpPush(StackItem{bool_value: &bool_value})
 		}
 	}
 	return
