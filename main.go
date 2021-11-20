@@ -632,8 +632,7 @@ func (stack *Stack) OpCompare(value int) (bool) {
 					if *a == *b {bool_value = true} else {bool_value = false}
 				}
 			}
-			stack.Values = stack.Values[:len(stack.Values)-1]
-			stack.Values = stack.Values[:len(stack.Values)-1]
+			stack.Values = stack.Values[:len(stack.Values)-2]
 			return bool_value
 		case TOKEN_NOT_EQUALS:
 			if stack.Values[len(stack.Values)-1].int_value != nil {
@@ -659,8 +658,7 @@ func (stack *Stack) OpCompare(value int) (bool) {
 				b := stack.Values[len(stack.Values)-2].bool_value
 				if *a == *b {bool_value = false} else {bool_value = true}
 			}
-			stack.Values = stack.Values[:len(stack.Values)-1]
-			stack.Values = stack.Values[:len(stack.Values)-1]
+			stack.Values = stack.Values[:len(stack.Values)-2]
 			return bool_value
 		case TOKEN_LESS_THAN:
 			if stack.Values[len(stack.Values)-1].int_value == nil || stack.Values[len(stack.Values)-2].int_value == nil {
@@ -669,8 +667,7 @@ func (stack *Stack) OpCompare(value int) (bool) {
 			}
 			a := stack.Values[len(stack.Values)-1].int_value
 			b := stack.Values[len(stack.Values)-2].int_value
-			stack.Values = stack.Values[:len(stack.Values)-1]
-			stack.Values = stack.Values[:len(stack.Values)-1]
+			stack.Values = stack.Values[:len(stack.Values)-2]
 			return *b < *a
 		case TOKEN_GREATER_THAN:
 			if stack.Values[len(stack.Values)-1].int_value == nil || stack.Values[len(stack.Values)-2].int_value == nil {
@@ -679,8 +676,7 @@ func (stack *Stack) OpCompare(value int) (bool) {
 			}
 			a := stack.Values[len(stack.Values)-1].int_value
 			b := stack.Values[len(stack.Values)-2].int_value
-			stack.Values = stack.Values[:len(stack.Values)-1]
-			stack.Values = stack.Values[:len(stack.Values)-1]
+			stack.Values = stack.Values[:len(stack.Values)-2]
 			return *b > *a
 		default:
 			fmt.Println("Error: undifined type")
