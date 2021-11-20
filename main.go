@@ -534,7 +534,7 @@ func (stack *Stack) OpPush(item StackItem) {
 }
 
 func (stack *Stack) OpPrint() {
-	if len(stack.Values)-1 < 0 {
+	if len(stack.Values)-1 == 0 {
 		fmt.Println("PrintError: the stack is empty")
 		os.Exit(0)
 	}
@@ -552,6 +552,10 @@ func (stack *Stack) OpPrint() {
 }
 
 func (stack *Stack) OpDrop() {
+	if len(stack.Values)-1 == 0 {
+		fmt.Println("DropError: the stack is empty")
+		os.Exit(0)
+	}
 	stack.Values = stack.Values[:len(stack.Values)-1]
 }
 
