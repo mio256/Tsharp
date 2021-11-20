@@ -31,6 +31,8 @@ push "Hello World" print
 block main do
     push "Hello World" print
 end
+
+call main
 ```
 
 'block' is like Function in other languages.
