@@ -74,3 +74,24 @@ push 200 push 5 / print
 
 push 10 push 2 * print
 ```
+
+## FizzBuzz
+```pascal
+push 1
+for dup push 101 < do
+    if dup push 3 % push 0 == do
+        if dup push 15 % push 0 == do
+            push "FizzBuzz" print
+        else
+            push "Fizz" print
+        end
+    else
+        if dup push 5 % push 0 == do
+            push "Buzz" print
+        else
+            dup print
+        end
+    end
+    push 1 +
+end drop
+```
