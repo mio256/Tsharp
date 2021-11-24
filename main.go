@@ -240,6 +240,7 @@ const (
 	ExprBlockdef
 	ExprPrint
 	ExprSwap
+	ExprImport
 	ExprCall
 	ExprBool
 	ExprIf
@@ -263,6 +264,7 @@ type Expr struct {
 	AsFor *For
 	AsBiniop int
 	AsCompare int
+	AsImport string
 }
 
 type Push struct {
@@ -379,6 +381,16 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "swap" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprSwap
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "import" {
+				parser.ParserEat(TOKEN_ID)
+				if parser.current_token_type != TOKEN_STRING {
+					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
+					os.Exit(0)
+				}
+				expr.Type = ExprImport
+				expr.AsImport = parser.current_token_value
+				parser.ParserEat(TOKEN_STRING)
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "dup" {
 				parser.ParserEat(TOKEN_ID)
@@ -761,6 +773,12 @@ func VisitExpr(exprs []Expr) {
 				OpPrint()
 			case ExprSwap:
 				OpSwap()
+			case ExprImport:
+				file, _ := os.Open(expr.AsImport)
+				lexer := LexerInit(file)
+				parser := ParserInit(lexer)
+				exprs, _ := ParserParse(parser)
+				VisitExpr(exprs)
 			case ExprDup:
 				OpDup()
 			case ExprDrop:
