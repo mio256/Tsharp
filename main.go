@@ -7,9 +7,9 @@ import (
 	"unicode"
 	"os"
 	"strconv"
-	"reflect"
 	"github.com/fatih/color"
 )
+
 
 
 // -----------------------------
@@ -502,13 +502,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.AsCompare = TOKEN_GREATER_THAN
 			parser.ParserEat(TOKEN_GREATER_THAN)
 			exprs = append(exprs, expr)
-		} else if parser.current_token_type == TOKEN_END {
-			return exprs, *parser
-		} else if parser.current_token_type == TOKEN_ELSE {
-			return exprs, *parser
-		} else if parser.current_token_type == TOKEN_DO {
-			return exprs, *parser
-		} else if parser.current_token_type == TOKEN_EOF {
+		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF {
 			return exprs, *parser
 		} else {
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
@@ -524,233 +518,254 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 // ----------- Stack -----------
 // -----------------------------
 
-type StackItem struct {
-	string_value *string
-	int_value *int
-	bool_value *bool
+var Stack = []Expr{}
+
+func OpPush(item Expr) {
+	Stack = append(Stack, item)
 }
 
-type Stack struct {
-	Values []StackItem
+func OpDrop() {
+	if len(Stack)-1 < 0 {
+		fmt.Println("DropError: the stack is empty.")
+		os.Exit(0)
+	}
+
+	Stack = Stack[:len(Stack)-1]
 }
 
-var theStack Stack = Stack{}
+func OpDup() {
+	if len(Stack)-1 < 0 {
+		fmt.Println("DupError: the stack is empty.")
+		os.Exit(0)
+	}
 
-func (stack *Stack) OpPush(item StackItem) {
-	stack.Values = append(stack.Values, item)
+	visitedExpr := Stack[len(Stack)-1]
+	Stack = append(Stack, visitedExpr)
 }
 
-func (stack *Stack) OpPrint() {
-	if len(stack.Values) == 0 {
+func OpPrint() {
+	if len(Stack) == 0 {
 		fmt.Println("PrintError: the stack is empty")
 		os.Exit(0)
 	}
 
-	if stack.Values[len(stack.Values)-1].bool_value != nil {
-		fmt.Println(*stack.Values[len(stack.Values)-1].bool_value)
-	} else if stack.Values[len(stack.Values)-1].string_value != nil {
-		fmt.Println(*stack.Values[len(stack.Values)-1].string_value)
-	} else if stack.Values[len(stack.Values)-1].int_value != nil {
-		fmt.Println(*stack.Values[len(stack.Values)-1].int_value)
+	visitedExpr := Stack[len(Stack)-1]
+	switch (visitedExpr.Type) {
+		case ExprInt: fmt.Println(visitedExpr.AsInt)
+		case ExprStr: fmt.Println(visitedExpr.AsStr)
+		case ExprBool: fmt.Println(visitedExpr.AsBool)
 	}
 
-	stack.Values = stack.Values[:len(stack.Values)-1]
-	return
+	OpDrop()
 }
 
-func (stack *Stack) OpDrop() {
-	if len(stack.Values) == 0 {
-		fmt.Println("DropError: the stack is empty")
-		os.Exit(0)
-	}
-	stack.Values = stack.Values[:len(stack.Values)-1]
-}
-
-func (stack *Stack) OpBinop(value int) {
-	var x int
-	a := stack.Values[len(stack.Values)-1].int_value
-	b := stack.Values[len(stack.Values)-2].int_value
-	switch (value) {
-		case TOKEN_PLUS:
-			x = *a + *b
-		case TOKEN_MINUS:
-			x = *b - *a
-		case TOKEN_MUL:
-			x = *a * *b
-		case TOKEN_DIV:
-			x = *b / *a
-		case TOKEN_REM:
-			x = *b % *a
-	}
-	stack.Values = stack.Values[:len(stack.Values)-2]
-	theStack.OpPush(StackItem{int_value: &x})
-}
-
-func (stack *Stack) OpDup() {
-	if stack.Values[len(stack.Values)-1].int_value != nil {
-		a := stack.Values[len(stack.Values)-1].int_value
-		theStack.OpPush(StackItem{int_value: a})
-	} else if stack.Values[len(stack.Values)-1].string_value != nil {
-		a := stack.Values[len(stack.Values)-1].string_value
-		theStack.OpPush(StackItem{string_value: a})
-	} else if stack.Values[len(stack.Values)-1].bool_value != nil {
-		a := stack.Values[len(stack.Values)-1].bool_value
-		theStack.OpPush(StackItem{bool_value: a})
-	}
-}
-
-
-// I will rewrite this function later
-func (stack *Stack) OpCompare(value int) (bool) {
-	if len(stack.Values) < 2 {
+func OpCompare(value int) (bool) {
+	if len(Stack) < 2 {
 		fmt.Println("Error: expected more than two args in stack.")
 		os.Exit(0)
 	}
-    var bool_value bool
-	switch (value) {
-		case TOKEN_IS_EQUALS:
-			if reflect.TypeOf(stack.Values[len(stack.Values)-1]) != reflect.TypeOf(stack.Values[len(stack.Values)-2]) {
-				bool_value = false
-			} else if stack.Values[len(stack.Values)-1].int_value != nil {
-				a := stack.Values[len(stack.Values)-1].int_value
-				b := stack.Values[len(stack.Values)-2].int_value
-				if *a != *b {bool_value = false} else {bool_value = true}
-			} else if stack.Values[len(stack.Values)-1].string_value != nil {
-				a := stack.Values[len(stack.Values)-1].string_value
-				b := stack.Values[len(stack.Values)-2].string_value
-				if *a != *b {bool_value = false} else {bool_value = true}
-			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
-				a := stack.Values[len(stack.Values)-1].bool_value
-				b := stack.Values[len(stack.Values)-2].bool_value
-				if *a == *b {bool_value = true} else {bool_value = false}
-			}
-			stack.Values = stack.Values[:len(stack.Values)-2]
-			return bool_value
-		case TOKEN_NOT_EQUALS:
-			if reflect.TypeOf(stack.Values[len(stack.Values)-1]) != reflect.TypeOf(stack.Values[len(stack.Values)-2]) {
-				bool_value = true
-			} else if stack.Values[len(stack.Values)-1].int_value != nil {
-				a := stack.Values[len(stack.Values)-1].int_value
-				b := stack.Values[len(stack.Values)-2].int_value
-				if *a != *b {bool_value = true} else {bool_value = false}
-			} else if stack.Values[len(stack.Values)-1].string_value != nil {
-				a := stack.Values[len(stack.Values)-1].string_value
-				b := stack.Values[len(stack.Values)-2].string_value
-				if *a != *b {bool_value =  true} else {bool_value =  false}
-			} else if stack.Values[len(stack.Values)-1].bool_value != nil {
-				a := stack.Values[len(stack.Values)-1].bool_value
-				b := stack.Values[len(stack.Values)-2].bool_value
-				if *a == *b {bool_value = false} else {bool_value = true}
-			}
-			stack.Values = stack.Values[:len(stack.Values)-2]
-			return bool_value
-		case TOKEN_LESS_THAN:
-			if stack.Values[len(stack.Values)-1].int_value == nil || stack.Values[len(stack.Values)-2].int_value == nil {
-				fmt.Println("Error: type must be int")
-				os.Exit(0)
-			}
-			a := stack.Values[len(stack.Values)-1].int_value
-			b := stack.Values[len(stack.Values)-2].int_value
-			stack.Values = stack.Values[:len(stack.Values)-2]
-			return *b < *a
-		case TOKEN_GREATER_THAN:
-			if stack.Values[len(stack.Values)-1].int_value == nil || stack.Values[len(stack.Values)-2].int_value == nil {
-				fmt.Println("Error: type must be int")
-				os.Exit(0)
-			}
-			a := stack.Values[len(stack.Values)-1].int_value
-			b := stack.Values[len(stack.Values)-2].int_value
-			stack.Values = stack.Values[:len(stack.Values)-2]
-			return *b > *a
-		default:
-			fmt.Println("Error: undifined type")
-			os.Exit(0)
+
+	visitedExpr := Stack[len(Stack)-1]
+	visitedExprSecond := Stack[len(Stack)-2]
+
+	OpDrop()
+	OpDrop()
+
+	if value == TOKEN_IS_EQUALS {
+		if visitedExpr.Type != visitedExprSecond.Type {
+			return false
+		}
+
+		if visitedExpr.Type == ExprInt {
+			return visitedExpr.AsInt == visitedExprSecond.AsInt
+		}
+
+		if visitedExpr.Type == ExprStr {
+			return visitedExpr.AsStr == visitedExprSecond.AsStr
+		}
+
+		if visitedExpr.Type == ExprBool {
+			return visitedExpr.AsBool == visitedExprSecond.AsBool
+		}
 	}
 
-	return true
-}
+	if value == TOKEN_NOT_EQUALS {
+		if visitedExpr.Type != visitedExprSecond.Type {
+			return true
+		}
 
-func (stack *Stack) RetBool() (bool) {
-	if len(stack.Values)-1 < 0 {
-		fmt.Println("IfStatementError: the stack is empty. couldn't find bool.")
+		if visitedExpr.Type == ExprInt {
+			return visitedExpr.AsInt != visitedExprSecond.AsInt
+		}
+
+		if visitedExpr.Type == ExprStr {
+			return visitedExpr.AsStr != visitedExprSecond.AsStr
+		}
+
+		if visitedExpr.Type == ExprBool {
+			return visitedExpr.AsBool != visitedExprSecond.AsBool
+		}
+	}
+    
+	if visitedExpr.Type != ExprInt || visitedExprSecond.Type != ExprInt {
+		fmt.Println("TypeError: '<' expected type int")
 		os.Exit(0)
 	}
 
-	if stack.Values[len(stack.Values)-1].bool_value == nil {
+	if value == TOKEN_LESS_THAN {
+		return visitedExprSecond.AsInt < visitedExpr.AsInt
+	}
+
+	if value == TOKEN_GREATER_THAN {
+		return visitedExprSecond.AsInt > visitedExpr.AsInt
+	}
+
+	return false
+}
+
+func RetBool() (bool) {
+	if len(Stack)-1 < 0 {
+		fmt.Println("Error: the stack is empty. couldn't find bool.")
+		os.Exit(0)
+	}
+
+	visitedExpr := Stack[len(Stack)-1]
+	if visitedExpr.Type != ExprBool {
 		fmt.Println("Error: if op should be bool")
 		os.Exit(0)
 	}
-
-	bool_value := *stack.Values[len(stack.Values)-1].bool_value
-	stack.Values = stack.Values[:len(stack.Values)-1]
+	bool_value := visitedExpr.AsBool
+	OpDrop()
 	return bool_value
+}
+
+func OpIf(expr Expr) {
+	VisitExpr(expr.AsIf.Op)
+	bool_value := RetBool()
+	if bool_value {
+		VisitExpr(expr.AsIf.Body)
+	} else {
+		if expr.AsIf.ElseBody != nil {
+			VisitExpr(expr.AsIf.ElseBody)
+		}
+	}
+}
+
+func OpCondition(expr Expr) {
+	bool_value := OpCompare(expr.AsCompare)
+	BoolExpr := Expr{}
+	BoolExpr.Type = ExprBool
+	BoolExpr.AsBool = bool_value
+	PushExpr := Expr{}
+	PushExpr.Type = ExprPush
+	PushExpr.AsPush = &Push{
+		Arg: BoolExpr,
+	}
+	OpPush(PushExpr.AsPush.Arg)
+}
+
+func OpBinop(value int) {
+	var finalInt int
+	visitedExpr := Stack[len(Stack)-1]
+	visitedExprSecond := Stack[len(Stack)-2]
+	OpDrop()
+	OpDrop()
+
+	if visitedExpr.Type != ExprInt || visitedExprSecond.Type != ExprInt {
+		fmt.Println("TypeError: binary operation expected type int")
+		os.Exit(0)
+	}
+
+	switch (value) {
+		case TOKEN_PLUS:
+			finalInt = visitedExpr.AsInt + visitedExprSecond.AsInt
+		case TOKEN_MINUS:
+			finalInt = visitedExprSecond.AsInt - visitedExpr.AsInt
+		case TOKEN_MUL:
+			finalInt = visitedExpr.AsInt * visitedExprSecond.AsInt
+		case TOKEN_DIV:
+			finalInt = visitedExprSecond.AsInt / visitedExpr.AsInt
+		case TOKEN_REM:
+			finalInt = visitedExprSecond.AsInt % visitedExpr.AsInt
+	}
+
+	IntExpr := Expr{}
+	IntExpr.Type = ExprInt
+	IntExpr.AsInt = finalInt
+	PushExpr := Expr{}
+	PushExpr.Type = ExprPush
+	PushExpr.AsPush = &Push{
+		Arg: IntExpr,
+	}
+	OpPush(PushExpr.AsPush.Arg)
 }
 
 
 // -----------------------------
-// ------ Visitor / Scope ------
+// ----------- Block -----------
 // -----------------------------
 
-//BlockScope := make(map[string][]Expr)
+var BlockScope = map[string][]Expr{}
 
-var BlockScope = map[string][]Expr{} // Block Scope
+func OpBlockdef(expr Expr) {
+	if _, ok := BlockScope[expr.AsBlockdef.Name]; ok {
+		fmt.Println("Error: can't define blocks that has the same name")
+		os.Exit(0)
+	}
+	BlockScope[expr.AsBlockdef.Name] = expr.AsBlockdef.Body
+}
+
+func OpCallBlock(expr Expr) {
+	if _, ok := BlockScope[expr.AsCall.Value]; ok {
+		BlockBody := BlockScope[expr.AsCall.Value]
+		VisitExpr(BlockBody)
+	} else {
+		fmt.Println("Error: undefined block '" + expr.AsCall.Value + "'")	
+	}
+}
+
+
+// -----------------------------
+// ----------- Visit -----------
+// -----------------------------
 
 func VisitExpr(exprs []Expr) {
 	for _, expr := range exprs {
 		switch expr.Type {
-		case ExprPush:
-			if expr.AsPush.Arg.Type == ExprInt {
-				theStack.OpPush(StackItem{int_value: &expr.AsPush.Arg.AsInt})
-			} else if expr.AsPush.Arg.Type == ExprStr {
-				theStack.OpPush(StackItem{string_value: &expr.AsPush.Arg.AsStr})
-			} else if expr.AsPush.Arg.Type == ExprBool {
-				theStack.OpPush(StackItem{bool_value: &expr.AsPush.Arg.AsBool})
-			}
-		case ExprPrint:
-			theStack.OpPrint()
-		case ExprDup:
-			theStack.OpDup()
-		case ExprDrop:
-			theStack.OpDrop()
-		case ExprExit:
-			os.Exit(0)
-		case ExprBinop:
-			theStack.OpBinop(expr.AsBiniop)
-		case ExprCompare:
-			bool_value := theStack.OpCompare(expr.AsCompare)
-			theStack.OpPush(StackItem{bool_value: &bool_value})
-		case ExprBlockdef:
-			if _, ok := BlockScope[expr.AsBlockdef.Name]; ok {
-				fmt.Println("Error: we can't define blocks that are the same name")
+			case ExprPush:
+				OpPush(expr.AsPush.Arg)
+			case ExprPrint:
+				OpPrint()
+			case ExprDup:
+				OpDup()
+			case ExprDrop:
+				OpDrop()
+			case ExprExit:
 				os.Exit(0)
-			}
-			BlockScope[expr.AsBlockdef.Name] = expr.AsBlockdef.Body
-		case ExprCall:
-			if _, ok := BlockScope[expr.AsCall.Value]; ok {
-				BlockBody := BlockScope[expr.AsCall.Value]
-				VisitExpr(BlockBody)
-			} else {
-				fmt.Println("Error: undefined block '" + expr.AsCall.Value + "'")	
-			}
-		case ExprIf:
-			VisitExpr(expr.AsIf.Op)
-			bool_value := theStack.RetBool()
-			if bool_value {
-				VisitExpr(expr.AsIf.Body)
-			} else {
-				if expr.AsIf.ElseBody != nil {
-					VisitExpr(expr.AsIf.ElseBody)
-				}
-			}
-		case ExprFor:
-			VisitExpr(expr.AsFor.Op)
-			for theStack.RetBool() {
-				VisitExpr(expr.AsFor.Body)
+			case ExprBinop:
+				OpBinop(expr.AsBiniop)
+			case ExprCompare:
+				OpCondition(expr)
+			case ExprBlockdef:
+				OpBlockdef(expr)
+			case ExprCall:
+				OpCallBlock(expr)
+			case ExprIf:
+				OpIf(expr)
+			case ExprFor:
 				VisitExpr(expr.AsFor.Op)
-			}
+				for RetBool() {
+					VisitExpr(expr.AsFor.Body)
+					VisitExpr(expr.AsFor.Op)
+				}
 		}
 	}
 }
+
+
+// -----------------------------
+// ----------- Main -----------
+// -----------------------------
 
 func Usage() {
 	fmt.Println("Usage:")
@@ -758,9 +773,6 @@ func Usage() {
 	os.Exit(0)
 }
 
-// -----------------------------
-// ------------ Main -----------
-// -----------------------------
 
 func main() {
 	if len(os.Args) != 2 || os.Args[1] == "help" {
