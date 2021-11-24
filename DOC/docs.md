@@ -26,6 +26,11 @@ push "Hello World!" print
 # Sample comment
 ```
 
+## Import
+```python
+import "main.t#"
+```
+
 ## Block
 ```pascal
 block main do
