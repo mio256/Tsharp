@@ -1,5 +1,3 @@
-// TODO: clean code
-
 package main
 
 import (
