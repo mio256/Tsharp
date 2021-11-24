@@ -735,6 +735,17 @@ func OpBinop(value int) {
 	OpPush(PushExpr.AsPush.Arg)
 }
 
+func OpImport(expr Expr) {
+	file, err := os.Open(expr.AsImport)
+	if err != nil {
+		panic(err)
+	}
+	lexer := LexerInit(file)
+	parser := ParserInit(lexer)
+	exprs, _ := ParserParse(parser)
+	VisitExpr(exprs)
+}
+
 
 // -----------------------------
 // ----------- Block -----------
@@ -774,11 +785,7 @@ func VisitExpr(exprs []Expr) {
 			case ExprSwap:
 				OpSwap()
 			case ExprImport:
-				file, _ := os.Open(expr.AsImport)
-				lexer := LexerInit(file)
-				parser := ParserInit(lexer)
-				exprs, _ := ParserParse(parser)
-				VisitExpr(exprs)
+				OpImport(expr)
 			case ExprDup:
 				OpDup()
 			case ExprDrop:
