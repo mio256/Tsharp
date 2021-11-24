@@ -239,6 +239,7 @@ const (
 	ExprPush
 	ExprBlockdef
 	ExprPrint
+	ExprSwap
 	ExprCall
 	ExprBool
 	ExprIf
@@ -374,6 +375,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "print" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrint
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "swap" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprSwap
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "dup" {
 				parser.ParserEat(TOKEN_ID)
@@ -542,6 +547,20 @@ func OpDup() {
 	Stack = append(Stack, visitedExpr)
 }
 
+func OpSwap() {
+	if len(Stack) < 2 {
+		fmt.Println("SwapError: expected more than two args in stack.")
+		os.Exit(0)
+	}
+
+	visitedExpr := Stack[len(Stack)-1]
+	visitedExprSecond := Stack[len(Stack)-2]
+	OpDrop()
+	OpDrop()
+	OpPush(visitedExpr)
+	OpPush(visitedExprSecond)
+}
+
 func OpPrint() {
 	if len(Stack) == 0 {
 		fmt.Println("PrintError: the stack is empty")
@@ -668,7 +687,7 @@ func OpBinop(value int) {
 		fmt.Println("Error: expected more than two args in stack.")
 		os.Exit(0)
 	}
-	
+
 	var finalInt int
 	visitedExpr := Stack[len(Stack)-1]
 	visitedExprSecond := Stack[len(Stack)-2]
@@ -740,6 +759,8 @@ func VisitExpr(exprs []Expr) {
 				OpPush(expr.AsPush.Arg)
 			case ExprPrint:
 				OpPrint()
+			case ExprSwap:
+				OpSwap()
 			case ExprDup:
 				OpDup()
 			case ExprDrop:
