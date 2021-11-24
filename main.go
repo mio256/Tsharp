@@ -664,6 +664,11 @@ func OpCondition(expr Expr) {
 }
 
 func OpBinop(value int) {
+	if len(Stack) < 2 {
+		fmt.Println("Error: expected more than two args in stack.")
+		os.Exit(0)
+	}
+	
 	var finalInt int
 	visitedExpr := Stack[len(Stack)-1]
 	visitedExprSecond := Stack[len(Stack)-2]
