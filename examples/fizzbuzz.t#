@@ -1,6 +1,6 @@
 
 push 1
-for dup push 101 < do
+for dup push 100 <= do
     if dup push 3 % push 0 == do
         if dup push 15 % push 0 == do
             push "FizzBuzz" print
