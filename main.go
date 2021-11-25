@@ -34,6 +34,8 @@ const (
 	TOKEN_NOT_EQUALS
 	TOKEN_LESS_THAN
 	TOKEN_GREATER_THAN
+	TOKEN_LESS_EQUALS
+	TOKEN_GREATER_EQUALS
 	TOKEN_REM
 )
 
@@ -55,6 +57,8 @@ var tokens = []string{
 	TOKEN_NOT_EQUALS: "TOKEN_NOT_EQUALS",
 	TOKEN_LESS_THAN: "TOKEN_LESS_THAN",
 	TOKEN_GREATER_THAN: "TOKEN_GREATER_THAN",
+	TOKEN_LESS_EQUALS: "TOKEN_LESS_EQUALS",
+	TOKEN_GREATER_EQUALS: "TOKEN_GREATER_EQUALS",
 	TOKEN_REM: "TOKEN_REM",
 }
 
@@ -96,8 +100,6 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			case '-': return lexer.pos, TOKEN_MINUS, "-"
 			case '/': return lexer.pos, TOKEN_DIV, "/"
 			case '*': return lexer.pos, TOKEN_MUL, "*"
-		    case '<': return lexer.pos, TOKEN_LESS_THAN, "<"
-			case '>': return lexer.pos, TOKEN_GREATER_THAN, ">"
 			case '%': return lexer.pos, TOKEN_REM, "%"
 			default:
 				if unicode.IsSpace(r) {
@@ -109,6 +111,22 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 					lexer.pos.column++
 					if r == '=' {
 						return lexer.pos, TOKEN_IS_EQUALS, "=="
+					}
+				} else if r == '<' {
+					r, _, err := lexer.reader.ReadRune()
+					if err != nil {panic(err)}
+					if r == '=' {
+						return lexer.pos, TOKEN_LESS_EQUALS, "<="
+					} else {
+						return lexer.pos, TOKEN_LESS_THAN, "<"
+					}
+				} else if r == '>' {
+					r, _, err := lexer.reader.ReadRune()
+					if err != nil {panic(err)}
+					if r == '=' {
+						return lexer.pos, TOKEN_GREATER_EQUALS, ">="
+					} else {
+						return lexer.pos, TOKEN_GREATER_THAN, ">"
 					}
 				} else if r == '!' {
 					r, _, err := lexer.reader.ReadRune()
@@ -518,6 +536,16 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.AsCompare = TOKEN_GREATER_THAN
 			parser.ParserEat(TOKEN_GREATER_THAN)
 			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_GREATER_EQUALS {
+			expr.Type = ExprCompare
+			expr.AsCompare = TOKEN_GREATER_EQUALS
+			parser.ParserEat(TOKEN_GREATER_EQUALS)
+			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_LESS_EQUALS {
+			expr.Type = ExprCompare
+			expr.AsCompare = TOKEN_LESS_EQUALS
+			parser.ParserEat(TOKEN_LESS_EQUALS)
+			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF {
 			return exprs, *parser
 		} else {
@@ -648,6 +676,14 @@ func OpCompare(value int) (bool) {
 
 	if value == TOKEN_GREATER_THAN {
 		return visitedExprSecond.AsInt > visitedExpr.AsInt
+	}
+
+	if value == TOKEN_GREATER_EQUALS {
+		return visitedExprSecond.AsInt >= visitedExpr.AsInt
+	}
+
+	if value == TOKEN_LESS_EQUALS {
+		return visitedExprSecond.AsInt <= visitedExpr.AsInt
 	}
 
 	return false
