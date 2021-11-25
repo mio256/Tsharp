@@ -784,6 +784,14 @@ func OpImport(expr Expr) {
 	VisitExpr(exprs)
 }
 
+func OpFor(expr Expr) {
+	VisitExpr(expr.AsFor.Op)
+	for RetBool() {
+		VisitExpr(expr.AsFor.Body)
+		VisitExpr(expr.AsFor.Op)
+	}
+}
+
 
 // -----------------------------
 // ----------- Block -----------
@@ -841,11 +849,7 @@ func VisitExpr(exprs []Expr) {
 			case ExprIf:
 				OpIf(expr)
 			case ExprFor:
-				VisitExpr(expr.AsFor.Op)
-				for RetBool() {
-					VisitExpr(expr.AsFor.Body)
-					VisitExpr(expr.AsFor.Op)
-				}
+				OpFor(expr)
 		}
 	}
 }
