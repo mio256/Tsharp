@@ -1,4 +1,5 @@
-<div align="center">
+<div align="center">    
+    <img width="100px" src="https://user-images.githubusercontent.com/81926489/143374038-059715ef-a83d-479d-a8c3-56ea57b8cc8e.PNG">
     <h1> The T# Programming Language</h1>
     <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/DOC/docs.md">Docs</a>
     |
