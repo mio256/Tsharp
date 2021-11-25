@@ -19,14 +19,18 @@ Something like Forth and Porth, but written in Go.
 
 > Install
 ```
-go build -o tsh main.go
+go build main.go
 ```
 
 ### Run
 
 > Run
 ```
-$ ./tsh <filename>.t#
+$ ./main <filename>.t#
+
+or
+
+$ ./main.exe <filename>.t#
 ```
 
 > Hello World
