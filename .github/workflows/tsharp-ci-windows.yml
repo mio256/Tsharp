@@ -14,6 +14,6 @@ jobs:
     - name: sh build.sh
       run: sh build.sh
     - name: run
-      run: .\tsh test\ci-test.t#
+      run: .\main.exe test\ci-test.t#
     - name: clean
-      run: Del "tsh"
+      run: Del "main.exe"

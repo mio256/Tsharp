@@ -14,6 +14,6 @@ jobs:
     - name: sh build.sh
       run: sh build.sh
     - name: run
-      run: ./tsh test/ci-test.t#
+      run: ./main test/ci-test.t#
     - name: clean
-      run: rm tsh;
+      run: rm main;
