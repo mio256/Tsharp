@@ -1,4 +1,4 @@
 #!/bin/sh
 
-go build -o tsh main.go
+go build main.go
 

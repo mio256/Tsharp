@@ -9,8 +9,10 @@ It's similar to Porth and Forth.
 ```bash
 $ git clone https://github.com/Tsharp-lang/Tsharp
 $ cd tsharp
-$ go build -o tsh main.go
-$ ./tsh exampes/main.t#
+$ go build main.go
+$ ./main exampes/main.t#
+or
+$ ./main.exe exampes/main.t#
 ```
 
 ## Hello World
