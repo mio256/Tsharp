@@ -2,3 +2,8 @@
 for push true do
     push "Hello World" print
 end
+
+for push true do
+    push "break examples"
+    break
+end
