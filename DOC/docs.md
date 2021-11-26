@@ -58,6 +58,12 @@ push 2 push 10 < print
 push 10 push 2 > print
 ```
 
+## Dup
+```pascal
+push "Hello World" dup print print
+```
+'dup' duplicate element on top of the stack.
+
 ## Drop
 ```pascal
 push "Hello World" push "T# Programming Language" drop print
