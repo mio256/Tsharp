@@ -1,0 +1,11 @@
+
+x = "Hello World"
+
+push x print
+
+y = "New variable 'y'"
+
+x = y
+
+push x print
+
