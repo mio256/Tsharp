@@ -260,6 +260,7 @@ const (
 	ExprVoid ExprType = iota
 	ExprInt
 	ExprStr
+	ExprId
 	ExprPush
 	ExprBlockdef
 	ExprPrint
@@ -281,6 +282,7 @@ type Expr struct {
 	Type ExprType
 	AsInt int
 	AsStr string
+	AsId string
 	AsPush *Push
 	AsBlockdef *Blockdef
 	AsCall *Call
@@ -385,6 +387,10 @@ func ParserParseExpr(parser *Parser) (Expr) {
 				expr.AsBool = false
 			}
 			parser.ParserEat(TOKEN_BOOL)
+		case TOKEN_ID:
+			expr.Type = ExprId
+			expr.AsId = parser.current_token_value
+			parser.ParserEat(TOKEN_ID)
 		default:
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 			os.Exit(0)
@@ -589,6 +595,14 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 var Stack = []Expr{}
 
 func OpPush(item Expr) {
+	if item.Type == ExprId {
+		if _, ok := VariableScope[item.AsId]; ok {
+			item = VariableScope[item.AsId]
+		} else {
+			fmt.Println("Error: undefined variable '" + item.AsId + "'")
+			os.Exit(0)
+		}
+	}
 	Stack = append(Stack, item)
 }
 
@@ -822,11 +836,6 @@ func OpFor(expr Expr) {
 var VariableScope = map[string]Expr{}
 
 func OpVardef(expr Expr) {
-	if _, ok := VariableScope[expr.AsVardef.Name]; ok {
-		fmt.Println("same variable definition")
-		os.Exit(0)
-	}
-	
 	VariableScope[expr.AsVardef.Name] = expr.AsVardef.Arg
 }
 
