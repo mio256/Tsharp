@@ -836,7 +836,17 @@ func OpFor(expr Expr) {
 var VariableScope = map[string]Expr{}
 
 func OpVardef(expr Expr) {
-	VariableScope[expr.AsVardef.Name] = expr.AsVardef.Arg
+	if expr.AsVardef.Arg.Type == ExprId {
+		if _, ok := VariableScope[expr.AsVardef.Arg.AsId]; ok {
+			value := VariableScope[expr.AsVardef.Arg.AsId]
+			VariableScope[expr.AsVardef.Name] = value
+		} else {
+			fmt.Println("Error: undefined variable '" + expr.AsVardef.Arg.AsId + "'")
+			os.Exit(0)
+		}
+	} else {
+		VariableScope[expr.AsVardef.Name] = expr.AsVardef.Arg
+	}
 }
 
 
