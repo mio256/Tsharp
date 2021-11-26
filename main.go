@@ -264,6 +264,7 @@ const (
 	ExprPush
 	ExprBlockdef
 	ExprPrint
+	ExprBreak
 	ExprSwap
 	ExprImport
 	ExprCall
@@ -505,6 +506,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					Value: parser.current_token_value,
 				}
 				parser.ParserEat(TOKEN_ID)
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "break" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprBreak
 				exprs = append(exprs, expr)
 			} else {
 				vname := parser.current_token_value
@@ -823,7 +828,8 @@ func OpImport(expr Expr) {
 func OpFor(expr Expr) {
 	VisitExpr(expr.AsFor.Op)
 	for RetBool() {
-		VisitExpr(expr.AsFor.Body)
+		BreakValue := VisitExpr(expr.AsFor.Body)
+		if BreakValue == true {break}
 		VisitExpr(expr.AsFor.Op)
 	}
 }
@@ -879,7 +885,8 @@ func OpCallBlock(expr Expr) {
 // ----------- Visit -----------
 // -----------------------------
 
-func VisitExpr(exprs []Expr) {
+func VisitExpr(exprs []Expr) (bool) {
+	BreakValue := false
 	for _, expr := range exprs {
 		switch expr.Type {
 			case ExprPush:
@@ -910,8 +917,11 @@ func VisitExpr(exprs []Expr) {
 				OpFor(expr)
 			case ExprVardef:
 				OpVardef(expr)
+			case ExprBreak:
+				BreakValue = true
 		}
 	}
+	return BreakValue
 }
 
 
