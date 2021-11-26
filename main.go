@@ -30,6 +30,7 @@ const (
 	TOKEN_ELSE
 	TOKEN_DIV
 	TOKEN_MUL
+	TOKEN_EQUALS
 	TOKEN_IS_EQUALS
 	TOKEN_NOT_EQUALS
 	TOKEN_LESS_THAN
@@ -53,6 +54,7 @@ var tokens = []string{
 	TOKEN_ELSE: "TOKEN_ELSE",
 	TOKEN_DIV: "TOKEN_DIV",
 	TOKEN_MUL: "TOKEN_MUL",
+	TOKEN_EQUALS: "TOKEN_EQUALS",
 	TOKEN_IS_EQUALS: "TOKEN_IS_EQUALS",
 	TOKEN_NOT_EQUALS: "TOKEN_NOT_EQUALS",
 	TOKEN_LESS_THAN: "TOKEN_LESS_THAN",
@@ -111,6 +113,8 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 					lexer.pos.column++
 					if r == '=' {
 						return lexer.pos, TOKEN_IS_EQUALS, "=="
+					} else {
+						return lexer.pos, TOKEN_EQUALS, "="
 					}
 				} else if r == '<' {
 					r, _, err := lexer.reader.ReadRune()
@@ -270,6 +274,7 @@ const (
 	ExprFor	
 	ExprBinop // + - * / %
 	ExprCompare // < > == !=
+	ExprVardef
 )
 
 type Expr struct {
@@ -285,6 +290,7 @@ type Expr struct {
 	AsBiniop int
 	AsCompare int
 	AsImport string
+	AsVardef *Vardef
 }
 
 type Push struct {
@@ -309,6 +315,11 @@ type If struct {
 type For struct {
 	Op []Expr
 	Body []Expr
+}
+
+type Vardef struct {
+	Name string
+	Arg Expr
 }
 
 
@@ -490,8 +501,19 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				parser.ParserEat(TOKEN_ID)
 				exprs = append(exprs, expr)
 			} else {
-				fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
-				os.Exit(0)
+				vname := parser.current_token_value
+				parser.ParserEat(TOKEN_ID)
+				if parser.current_token_type != TOKEN_EQUALS {
+					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
+					os.Exit(0)
+				}
+				parser.ParserEat(TOKEN_EQUALS)
+				expr.Type = ExprVardef
+				expr.AsVardef = &Vardef{
+					Name: vname,
+					Arg: ParserParseExpr(parser),
+				}
+				exprs = append(exprs, expr)
 			}
 		} else if parser.current_token_type == TOKEN_PLUS {
 			expr.Type = ExprBinop
@@ -794,6 +816,22 @@ func OpFor(expr Expr) {
 
 
 // -----------------------------
+// ---------- Variable ---------
+// -----------------------------
+
+var VariableScope = map[string]Expr{}
+
+func OpVardef(expr Expr) {
+	if _, ok := VariableScope[expr.AsVardef.Name]; ok {
+		fmt.Println("same variable definition")
+		os.Exit(0)
+	}
+	
+	VariableScope[expr.AsVardef.Name] = expr.AsVardef.Arg
+}
+
+
+// -----------------------------
 // ----------- Block -----------
 // -----------------------------
 
@@ -850,6 +888,8 @@ func VisitExpr(exprs []Expr) {
 				OpIf(expr)
 			case ExprFor:
 				OpFor(expr)
+			case ExprVardef:
+				OpVardef(expr)
 		}
 	}
 }
