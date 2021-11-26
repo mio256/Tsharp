@@ -68,6 +68,7 @@ push "Hello World" push "T# Programming Language" drop print
 ```pascal
 for push true do
     push "Hello World!" print
+    break
 end
 ```
 
