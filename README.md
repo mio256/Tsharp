@@ -91,6 +91,19 @@ push 200 push 5 / print
 push 10 push 2 * print
 ```
 
+> Variable
+```python
+x = "Hello World 'x'"
+
+push x print
+
+y = "New variable 'y'"
+
+x = y
+
+push x print
+```
+
 > FizzBuzz
 ```pascal
 push 1
