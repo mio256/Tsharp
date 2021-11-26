@@ -848,7 +848,7 @@ var BlockScope = map[string][]Expr{}
 
 func OpBlockdef(expr Expr) {
 	if _, ok := BlockScope[expr.AsBlockdef.Name]; ok {
-		fmt.Println("Error: can't define blocks that has the same name")
+		fmt.Println("Error: block '%s' is already defined", expr.AsBlockdef.Name)
 		os.Exit(0)
 	}
 	BlockScope[expr.AsBlockdef.Name] = expr.AsBlockdef.Body
@@ -859,7 +859,8 @@ func OpCallBlock(expr Expr) {
 		BlockBody := BlockScope[expr.AsCall.Value]
 		VisitExpr(BlockBody)
 	} else {
-		fmt.Println("Error: undefined block '" + expr.AsCall.Value + "'")	
+		fmt.Println("Error: undefined block '" + expr.AsCall.Value + "'")
+		os.Exit(0)
 	}
 }
 
