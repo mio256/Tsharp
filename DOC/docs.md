@@ -10,9 +10,9 @@ It's similar to Porth and Forth.
 $ git clone https://github.com/Tsharp-lang/Tsharp
 $ cd tsharp
 $ go build main.go
-$ ./main exampes/main.t#
+$ ./main examples/main.t#
 or
-$ ./main.exe exampes/main.t#
+$ ./main.exe examples/main.t#
 ```
 
 ## Hello World
