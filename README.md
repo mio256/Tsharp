@@ -6,6 +6,8 @@
     <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/DOC/ドキュメント.md">Docs(日本語)</a>
     |
     <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/editor/tsharp.vim">Vim</a>
+    |
+    <a href="https://github.com/poyuaki/tsharplanguage-color">VSCode</a>
 </div>
 
 [![Ubuntu](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml/badge.svg)](https://github.com/Tsharp-lang/Tsharp/actions/workflows/tsharp-ci-ubuntu.yml)
