@@ -23,3 +23,7 @@ push 20 push 10 > print
 push 1 push 1 <= print
 
 push 10 push 10 >= print
+
+push int push int == print
+
+push string push int == print
