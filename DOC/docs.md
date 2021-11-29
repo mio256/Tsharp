@@ -103,7 +103,7 @@ push x print
 ```
 
 ## Type
-```go
+```golang
 push int
 push string
 push bool
