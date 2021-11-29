@@ -102,6 +102,13 @@ x = y
 push x print
 ```
 
+## Type
+```go
+push int
+push string
+push bool
+```
+
 ## FizzBuzz
 ```pascal
 push 1
