@@ -714,6 +714,10 @@ func OpCompare(value int) (bool) {
 		if visitedExpr.Type == ExprBool {
 			return visitedExpr.AsBool == visitedExprSecond.AsBool
 		}
+
+		if visitedExpr.Type == ExprTypeType {
+			return visitedExpr.AsType == visitedExprSecond.AsType
+		}
 	}
 
 	if value == TOKEN_NOT_EQUALS {
@@ -731,6 +735,10 @@ func OpCompare(value int) (bool) {
 
 		if visitedExpr.Type == ExprBool {
 			return visitedExpr.AsBool != visitedExprSecond.AsBool
+		}
+
+		if visitedExpr.Type == ExprTypeType {
+			return visitedExpr.AsType != visitedExprSecond.AsType
 		}
 	}
     
