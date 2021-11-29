@@ -268,6 +268,7 @@ const (
 	ExprPush
 	ExprBlockdef
 	ExprPrint
+	ExprTypeOf
 	ExprBreak
 	ExprSwap
 	ExprImport
@@ -424,6 +425,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "print" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrint
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "typeof" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprTypeOf
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "swap" {
 				parser.ParserEat(TOKEN_ID)
@@ -686,6 +691,35 @@ func OpPrint() {
 	OpDrop()
 }
 
+func OpTypeOf() {
+	if len(Stack) == 0 {
+		fmt.Println("TypeOfError: the stack is empty")
+		os.Exit(0)
+	}
+
+	visitedExpr := Stack[len(Stack)-1]
+	OpDrop()
+	TypeExpr := Expr{}
+	TypeExpr.Type = ExprTypeType
+	var type_value string
+	if visitedExpr.Type == ExprStr {
+		type_value = "string"
+	} else if visitedExpr.Type == ExprInt {
+		type_value = "int"
+	} else if visitedExpr.Type == ExprBool {
+		type_value = "bool"
+	} else if visitedExpr.Type == ExprTypeType {
+		type_value = "type"
+	}
+	TypeExpr.AsType = type_value
+	PushExpr := Expr{}
+	PushExpr.Type = ExprPush
+	PushExpr.AsPush = &Push{
+		Arg: TypeExpr,
+	}
+	OpPush(PushExpr.AsPush.Arg)
+}
+
 func OpCompare(value int) (bool) {
 	if len(Stack) < 2 {
 		fmt.Println("Error: expected more than two args in stack.")
@@ -927,6 +961,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpPush(expr.AsPush.Arg)
 			case ExprPrint:
 				OpPrint()
+			case ExprTypeOf:
+				OpTypeOf()
 			case ExprSwap:
 				OpSwap()
 			case ExprImport:
