@@ -452,6 +452,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				name := parser.current_token_value
 				parser.ParserEat(TOKEN_ID)
 				parser.ParserEat(TOKEN_DO)
+				if parser.current_token_type == TOKEN_END {
+					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: block '%s' body is empty", parser.line, parser.column, name))
+					os.Exit(0)
+				}
 				body, _ := ParserParse(parser)
 				expr.AsBlockdef = &Blockdef{
 					Name: name,
@@ -464,6 +468,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				expr.Type = ExprFor
 				op, _ := ParserParse(parser)
 				parser.ParserEat(TOKEN_DO)
+				if parser.current_token_type == TOKEN_END {
+					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: for loop body is empty", parser.line, parser.column))
+					os.Exit(0)
+				}
 				body, _ := ParserParse(parser)
 				parser.ParserEat(TOKEN_END)
 				expr.AsFor = &For{
@@ -476,9 +484,17 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				expr.Type = ExprIf
 				op, _ := ParserParse(parser)
 				parser.ParserEat(TOKEN_DO)
+				if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
+					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement body is empty", parser.line, parser.column))
+					os.Exit(0)
+				}
 				body, _ := ParserParse(parser)
 				if parser.current_token_type == TOKEN_ELSE {
 					parser.ParserEat(TOKEN_ELSE)
+					if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
+						fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement body is empty", parser.line, parser.column))
+						os.Exit(0)
+					}
 					ElseBody, _ := ParserParse(parser)
 					parser.ParserEat(TOKEN_END)
 					expr.AsIf = &If{
