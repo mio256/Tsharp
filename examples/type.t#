@@ -1,0 +1,14 @@
+
+push string
+
+push int
+
+push bool
+
+push 0
+
+for dup push 3 < do
+    swap print
+    push 1 +
+end
+
