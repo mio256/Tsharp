@@ -12,3 +12,5 @@ for dup push 3 < do
     push 1 +
 end
 
+push "Hello World!" typeof print
+
