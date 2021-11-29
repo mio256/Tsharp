@@ -22,6 +22,7 @@ const (
 	TOKEN_ID
 	TOKEN_STRING
 	TOKEN_INT
+	TOKEN_TYPE
 	TOKEN_PLUS
 	TOKEN_MINUS
 	TOKEN_END
@@ -165,6 +166,8 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 						return startPos, TOKEN_DO, val
 					} else if val == "true" || val == "false" {
 						return startPos, TOKEN_BOOL, val
+					} else if val == "string" || val == "int" || val == "bool" {
+						return startPos, TOKEN_TYPE, val
 					} else if val == "else" {
 						return startPos, TOKEN_ELSE, val
 					}
@@ -261,6 +264,7 @@ const (
 	ExprInt
 	ExprStr
 	ExprId
+	ExprTypeType
 	ExprPush
 	ExprBlockdef
 	ExprPrint
@@ -284,6 +288,7 @@ type Expr struct {
 	AsInt int
 	AsStr string
 	AsId string
+	AsType string
 	AsPush *Push
 	AsBlockdef *Blockdef
 	AsCall *Call
@@ -388,6 +393,10 @@ func ParserParseExpr(parser *Parser) (Expr) {
 				expr.AsBool = false
 			}
 			parser.ParserEat(TOKEN_BOOL)
+		case TOKEN_TYPE:
+			expr.Type = ExprTypeType
+			expr.AsType = parser.current_token_value
+			parser.ParserEat(TOKEN_TYPE)
 		case TOKEN_ID:
 			expr.Type = ExprId
 			expr.AsId = parser.current_token_value
@@ -671,6 +680,7 @@ func OpPrint() {
 		case ExprInt: fmt.Println(visitedExpr.AsInt)
 		case ExprStr: fmt.Println(visitedExpr.AsStr)
 		case ExprBool: fmt.Println(visitedExpr.AsBool)
+		case ExprTypeType: fmt.Println(fmt.Sprintf("<%s>",visitedExpr.AsType))
 	}
 
 	OpDrop()
