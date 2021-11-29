@@ -166,7 +166,7 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 						return startPos, TOKEN_DO, val
 					} else if val == "true" || val == "false" {
 						return startPos, TOKEN_BOOL, val
-					} else if val == "string" || val == "int" || val == "bool" {
+					} else if val == "string" || val == "int" || val == "bool" || val == "type" {
 						return startPos, TOKEN_TYPE, val
 					} else if val == "else" {
 						return startPos, TOKEN_ELSE, val
