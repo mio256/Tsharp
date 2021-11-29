@@ -103,10 +103,16 @@ push x print
 ```
 
 ## Type
-```golang
-push int
-push string
-push bool
+```python
+push int # 12345
+push string # "Hello World!"
+push bool # true false
+push type # int string bool type
+```
+
+## Typeof
+```python
+push "Hello World" dup typeof print
 ```
 
 ## FizzBuzz
