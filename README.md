@@ -18,6 +18,9 @@ WARNING! THIS LANGUAGE IS A WORK IN PROGRESS! ANYTHING CAN CHANGE AT ANY MOMENT 
 Something like Forth and Porth, but written in Go.
 <a href="https://en.wikipedia.org/wiki/Stack-oriented_programming">Stack-oriented programming</a>
 
+### TODO
+- [ ] Self-hosted
+
 ### Install
 
 > Install
