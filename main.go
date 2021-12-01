@@ -268,6 +268,7 @@ const (
 	ExprPush
 	ExprBlockdef
 	ExprPrint
+	ExprOver
 	ExprTypeOf
 	ExprBreak
 	ExprSwap
@@ -433,6 +434,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "swap" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprSwap
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "over" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprOver
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "import" {
 				parser.ParserEat(TOKEN_ID)
@@ -670,6 +675,20 @@ func OpSwap() {
 	visitedExprSecond := Stack[len(Stack)-2]
 	OpDrop()
 	OpDrop()
+	OpPush(visitedExpr)
+	OpPush(visitedExprSecond)
+}
+
+func OpOver() {
+	if len(Stack) < 2 {
+		fmt.Println("OverError: expected more than two args in stack.")
+		os.Exit(0)
+	}
+	visitedExpr := Stack[len(Stack)-1]
+	visitedExprSecond := Stack[len(Stack)-2]
+	OpDrop()
+	OpDrop()
+	OpPush(visitedExprSecond)
 	OpPush(visitedExpr)
 	OpPush(visitedExprSecond)
 }
@@ -965,6 +984,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpTypeOf()
 			case ExprSwap:
 				OpSwap()
+			case ExprOver:
+				OpOver()
 			case ExprImport:
 				OpImport(expr)
 			case ExprDup:
