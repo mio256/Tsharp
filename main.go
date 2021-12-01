@@ -860,43 +860,50 @@ func OpCondition(expr Expr) {
 	OpPush(PushExpr.AsPush.Arg)
 }
 
+// TODO: rewrite this function
 func OpBinop(value int) {
 	if len(Stack) < 2 {
 		fmt.Println("Error: expected more than two args in stack.")
 		os.Exit(0)
 	}
 
-	var finalInt int
 	visitedExpr := Stack[len(Stack)-1]
 	visitedExprSecond := Stack[len(Stack)-2]
 	OpDrop()
 	OpDrop()
 
-	if visitedExpr.Type != ExprInt || visitedExprSecond.Type != ExprInt {
+	ValueExpr := Expr{}
+	if value == TOKEN_PLUS {
+		if visitedExpr.Type == ExprStr || visitedExprSecond.Type == ExprStr {
+			ValueExpr.Type = ExprStr
+			ValueExpr.AsStr = visitedExpr.AsStr + visitedExprSecond.AsStr
+		} else if visitedExpr.Type == ExprInt || visitedExprSecond.Type == ExprInt {
+			ValueExpr.Type = ExprInt
+			ValueExpr.AsInt = visitedExpr.AsInt + visitedExprSecond.AsInt
+		} else {
+			fmt.Println("TypeError: binary operation expected type int")
+			os.Exit(0)
+		}
+	} else if visitedExpr.Type != ExprInt || visitedExprSecond.Type != ExprInt {
 		fmt.Println("TypeError: binary operation expected type int")
 		os.Exit(0)
+	} else {
+		ValueExpr.Type = ExprInt
+		if value == TOKEN_MINUS {
+			ValueExpr.AsInt = visitedExprSecond.AsInt - visitedExpr.AsInt
+		} else if value == TOKEN_MUL {
+			ValueExpr.AsInt = visitedExpr.AsInt * visitedExprSecond.AsInt
+		} else if value == TOKEN_DIV {
+			ValueExpr.AsInt = visitedExprSecond.AsInt / visitedExpr.AsInt
+		} else if value == TOKEN_REM {
+			ValueExpr.AsInt = visitedExprSecond.AsInt % visitedExpr.AsInt
+		}
 	}
 
-	switch (value) {
-		case TOKEN_PLUS:
-			finalInt = visitedExpr.AsInt + visitedExprSecond.AsInt
-		case TOKEN_MINUS:
-			finalInt = visitedExprSecond.AsInt - visitedExpr.AsInt
-		case TOKEN_MUL:
-			finalInt = visitedExpr.AsInt * visitedExprSecond.AsInt
-		case TOKEN_DIV:
-			finalInt = visitedExprSecond.AsInt / visitedExpr.AsInt
-		case TOKEN_REM:
-			finalInt = visitedExprSecond.AsInt % visitedExpr.AsInt
-	}
-
-	IntExpr := Expr{}
-	IntExpr.Type = ExprInt
-	IntExpr.AsInt = finalInt
 	PushExpr := Expr{}
 	PushExpr.Type = ExprPush
 	PushExpr.AsPush = &Push{
-		Arg: IntExpr,
+		Arg: ValueExpr,
 	}
 	OpPush(PushExpr.AsPush.Arg)
 }
