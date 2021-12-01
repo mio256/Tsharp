@@ -115,6 +115,11 @@ push type # int string bool type
 push "Hello World" dup typeof print
 ```
 
+## append string
+```python
+push "Hello " push "World!" swap + print 
+```
+
 ## FizzBuzz
 ```pascal
 push 1
