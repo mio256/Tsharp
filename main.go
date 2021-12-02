@@ -269,6 +269,7 @@ const (
 	ExprBlockdef
 	ExprPrint
 	ExprOver
+	ExprRot
 	ExprTypeOf
 	ExprBreak
 	ExprSwap
@@ -438,6 +439,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "over" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprOver
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "rot" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprRot
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "import" {
 				parser.ParserEat(TOKEN_ID)
@@ -691,6 +696,22 @@ func OpOver() {
 	OpPush(visitedExprSecond)
 	OpPush(visitedExpr)
 	OpPush(visitedExprSecond)
+}
+
+func OpRot() {
+	if len(Stack) < 3 {
+		fmt.Println("RotError: expected more than three args in stack.")
+		os.Exit(0)
+	}
+	visitedExpr := Stack[len(Stack)-1]
+	visitedExprSecond := Stack[len(Stack)-2]
+	visitedExprThird := Stack[len(Stack)-3]
+	OpDrop()
+	OpDrop()
+	OpDrop()
+	OpPush(visitedExprSecond)
+	OpPush(visitedExpr)
+	OpPush(visitedExprThird)
 }
 
 func OpPrint() {
@@ -993,6 +1014,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpSwap()
 			case ExprOver:
 				OpOver()
+			case ExprRot:
+				OpRot()
 			case ExprImport:
 				OpImport(expr)
 			case ExprDup:
