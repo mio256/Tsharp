@@ -116,12 +116,12 @@ push "Hello World" dup typeof print
 ```
 
 ## Rot
-```factor
+```python
 push 1 push 2 push 3 rot print print print
 ```
 
 ## Over
-```factor
+```python
 push 1 push 2 over print print print
 ```
 
