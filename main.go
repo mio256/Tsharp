@@ -672,7 +672,7 @@ func OpDup() {
 
 func OpSwap() {
 	if len(Stack) < 2 {
-		fmt.Println("SwapError: expected more than two args in stack.")
+		fmt.Println("SwapError: expected more than two elements in stack.")
 		os.Exit(0)
 	}
 
@@ -686,7 +686,7 @@ func OpSwap() {
 
 func OpOver() {
 	if len(Stack) < 2 {
-		fmt.Println("OverError: expected more than two args in stack.")
+		fmt.Println("OverError: expected more than two elements in stack.")
 		os.Exit(0)
 	}
 	visitedExpr := Stack[len(Stack)-1]
@@ -700,7 +700,7 @@ func OpOver() {
 
 func OpRot() {
 	if len(Stack) < 3 {
-		fmt.Println("RotError: expected more than three args in stack.")
+		fmt.Println("RotError: expected more than three elements in stack.")
 		os.Exit(0)
 	}
 	visitedExpr := Stack[len(Stack)-1]
@@ -762,7 +762,7 @@ func OpTypeOf() {
 
 func OpCompare(value int) (bool) {
 	if len(Stack) < 2 {
-		fmt.Println("Error: expected more than two args in stack.")
+		fmt.Println("Error: expected more than two elements in stack.")
 		os.Exit(0)
 	}
 
@@ -884,7 +884,7 @@ func OpCondition(expr Expr) {
 // TODO: rewrite this function
 func OpBinop(value int) {
 	if len(Stack) < 2 {
-		fmt.Println("Error: expected more than two args in stack.")
+		fmt.Println("Error: expected more than two elements in stack.")
 		os.Exit(0)
 	}
 
