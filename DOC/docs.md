@@ -115,6 +115,16 @@ push type # int string bool type
 push "Hello World" dup typeof print
 ```
 
+## Rot
+```factor
+push 1 push 2 push 3 rot print print print
+```
+
+## Over
+```factor
+push 1 push 2 over print print print
+```
+
 ## append string
 ```python
 push "Hello " push "World!" swap + print 
