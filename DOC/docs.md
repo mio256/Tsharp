@@ -132,6 +132,12 @@ push 1 inc print
 ```
 'inc' increment the top element of the stack
 
+## dec
+```python
+push 10 dec print
+```
+'dec' decrement the top element of the stack
+
 ## FizzBuzz
 ```pascal
 push 1
