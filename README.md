@@ -123,7 +123,7 @@ for dup push 101 < do
             dup print
         end
     end
-    push 1 +
+    inc
 end drop
 ```
 
