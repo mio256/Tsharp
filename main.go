@@ -278,6 +278,7 @@ const (
 	ExprOver
 	ExprRot
 	ExprInc
+	ExprDec
 	ExprTypeOf
 	ExprBreak
 	ExprSwap
@@ -454,6 +455,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "inc" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprInc
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "dec" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprDec
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "import" {
 				parser.ParserEat(TOKEN_ID)
@@ -724,15 +729,30 @@ func OpRot() {
 
 func OpInc() {
 	if len(Stack) < 1 {
-		fmt.Println("Error: inc expected more than one element in stack.")
+		fmt.Println("Error: 'inc' expected more than one element in stack.")
 		os.Exit(0)
 	}
 	visitedExpr := Stack[len(Stack)-1]
 	if visitedExpr.Type != ExprInt {
-		fmt.Println("TypeError: inc expected type int")
+		fmt.Println("TypeError: 'inc' expected type int")
 		os.Exit(0)
 	}
 	visitedExpr.AsInt++
+	OpDrop()
+	OpPush(visitedExpr)
+}
+
+func OpDec() {
+	if len(Stack) < 1 {
+		fmt.Println("Error: 'dec' expected more than one element in stack.")
+		os.Exit(0)
+	}
+	visitedExpr := Stack[len(Stack)-1]
+	if visitedExpr.Type != ExprInt {
+		fmt.Println("TypeError: 'dec' expected type int")
+		os.Exit(0)
+	}
+	visitedExpr.AsInt--
 	OpDrop()
 	OpPush(visitedExpr)
 }
@@ -1036,6 +1056,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpRot()
 			case ExprInc:
 				OpInc()
+			case ExprDec:
+				OpDec()
 			case ExprImport:
 				OpImport(expr)
 			case ExprDup:
