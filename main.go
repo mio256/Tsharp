@@ -100,7 +100,6 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 		switch r {
 			case '\n': lexer.resetPosition()
 			case '+': return lexer.pos, TOKEN_PLUS, "+"
-			case '-': return lexer.pos, TOKEN_MINUS, "-"
 			case '/': return lexer.pos, TOKEN_DIV, "/"
 			case '*': return lexer.pos, TOKEN_MUL, "*"
 			case '%': return lexer.pos, TOKEN_REM, "%"
@@ -114,8 +113,16 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 					lexer.pos.column++
 					if r == '=' {
 						return lexer.pos, TOKEN_IS_EQUALS, "=="
+					}
+				} else if r == '-' {
+					r, _, err := lexer.reader.ReadRune()
+					if r == '\n' {break}
+					if err != nil {panic(err)}
+					lexer.pos.column++
+					if r == '>' {
+						return lexer.pos, TOKEN_EQUALS, "->"
 					} else {
-						return lexer.pos, TOKEN_EQUALS, "="
+						return lexer.pos, TOKEN_MINUS, "-"
 					}
 				} else if r == '<' {
 					r, _, err := lexer.reader.ReadRune()
@@ -330,7 +337,6 @@ type For struct {
 
 type Vardef struct {
 	Name string
-	Arg Expr
 }
 
 
@@ -552,19 +558,8 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				expr.Type = ExprBreak
 				exprs = append(exprs, expr)
 			} else {
-				vname := parser.current_token_value
-				parser.ParserEat(TOKEN_ID)
-				if parser.current_token_type != TOKEN_EQUALS {
-					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
-					os.Exit(0)
-				}
-				parser.ParserEat(TOKEN_EQUALS)
-				expr.Type = ExprVardef
-				expr.AsVardef = &Vardef{
-					Name: vname,
-					Arg: ParserParseExpr(parser),
-				}
-				exprs = append(exprs, expr)
+				fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
+				os.Exit(0)
 			}
 		} else if parser.current_token_type == TOKEN_PLUS {
 			expr.Type = ExprBinop
@@ -620,6 +615,14 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			expr.Type = ExprCompare
 			expr.AsCompare = TOKEN_LESS_EQUALS
 			parser.ParserEat(TOKEN_LESS_EQUALS)
+			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_EQUALS {
+			parser.ParserEat(TOKEN_EQUALS)
+			expr.Type = ExprVardef
+			expr.AsVardef = &Vardef {
+				Name: parser.current_token_value,
+			}
+			parser.ParserEat(TOKEN_ID)
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF {
 			return exprs, *parser
@@ -957,17 +960,12 @@ func OpFor(expr Expr) {
 var VariableScope = map[string]Expr{}
 
 func OpVardef(expr Expr) {
-	if expr.AsVardef.Arg.Type == ExprId {
-		if _, ok := VariableScope[expr.AsVardef.Arg.AsId]; ok {
-			value := VariableScope[expr.AsVardef.Arg.AsId]
-			VariableScope[expr.AsVardef.Name] = value
-		} else {
-			fmt.Println("Error: undefined variable '" + expr.AsVardef.Arg.AsId + "'")
-			os.Exit(0)
-		}
-	} else {
-		VariableScope[expr.AsVardef.Name] = expr.AsVardef.Arg
+	if len(Stack) < 1 {
+		fmt.Println("Error: variable definition expected more than one element in stack.")
+		os.Exit(0)
 	}
+	exprValue := Stack[len(Stack)-1]
+	VariableScope[expr.AsVardef.Name] = exprValue
 }
 
 
