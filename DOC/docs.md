@@ -126,6 +126,12 @@ push 1 push 2 over print print print
 push "Hello " push "World!" + print 
 ```
 
+## inc
+```assembly
+push 1 inc print
+```
+'inc' increment the top element of the stack
+
 ## FizzBuzz
 ```pascal
 push 1
