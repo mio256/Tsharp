@@ -123,7 +123,7 @@ push 1 push 2 over print print print
 
 ## append string
 ```python
-push "Hello " push "World!" swap + print 
+push "Hello " push "World!" + print 
 ```
 
 ## FizzBuzz
