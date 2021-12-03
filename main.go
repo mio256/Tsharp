@@ -900,7 +900,7 @@ func OpBinop(value int) {
 	if value == TOKEN_PLUS {
 		if visitedExpr.Type == ExprStr || visitedExprSecond.Type == ExprStr {
 			ValueExpr.Type = ExprStr
-			ValueExpr.AsStr = visitedExpr.AsStr + visitedExprSecond.AsStr
+			ValueExpr.AsStr =  visitedExprSecond.AsStr + visitedExpr.AsStr
 		} else if visitedExpr.Type == ExprInt || visitedExprSecond.Type == ExprInt {
 			ValueExpr.Type = ExprInt
 			ValueExpr.AsInt = visitedExpr.AsInt + visitedExprSecond.AsInt
