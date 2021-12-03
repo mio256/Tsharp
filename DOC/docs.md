@@ -127,7 +127,7 @@ push "Hello " push "World!" + print
 ```
 
 ## inc
-```assembly
+```python
 push 1 inc print
 ```
 'inc' increment the top element of the stack
