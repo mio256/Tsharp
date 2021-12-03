@@ -98,16 +98,12 @@ push 10 push 2 * print
 ```
 
 > Variable
-```python
-x = "Hello World 'x'"
+```pascal
+push 10 -> x drop
 
-push x print
+push x -> y drop
 
-y = "New variable 'y'"
-
-x = y
-
-push x print
+push y print
 ```
 
 > FizzBuzz
