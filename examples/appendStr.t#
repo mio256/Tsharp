@@ -1,2 +1,2 @@
 
-push "Hello " push "World" swap + print
+push "Hello " push "World!" + print
