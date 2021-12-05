@@ -433,12 +433,16 @@ func ParserParseExpr(parser *Parser) (Expr) {
 			parser.ParserEat(TOKEN_L_BRACKET)
 			expr.Type = ExprArr
 			var arrExprs = []Expr{}
-			for {
-				arrExpr := ParserParseExpr(parser)
-				arrExprs = append(arrExprs, arrExpr)
+			if parser.current_token_type == TOKEN_R_BRACKET {
 				expr.AsArr = arrExprs
-				if parser.current_token_type == TOKEN_R_BRACKET || parser.current_token_type != TOKEN_COMMA { break }
-				parser.ParserEat(TOKEN_COMMA)
+			} else {
+				for {
+					arrExpr := ParserParseExpr(parser)
+					arrExprs = append(arrExprs, arrExpr)
+					expr.AsArr = arrExprs
+					if parser.current_token_type == TOKEN_R_BRACKET || parser.current_token_type != TOKEN_COMMA { break }
+					parser.ParserEat(TOKEN_COMMA)
+				}
 			}
 			parser.ParserEat(TOKEN_R_BRACKET)
 		default:
