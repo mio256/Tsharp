@@ -115,11 +115,13 @@ push "Hello World" dup typeof print
 ```python
 push 1 push 2 push 3 rot print print print
 ```
+'rot' rotate top three stack elements.
 
 ## Over
 ```python
 push 1 push 2 over print print print
 ```
+'over' copy the element below the top of the stack
 
 ## append string
 ```python
