@@ -41,7 +41,7 @@ const (
 	TOKEN_REM
 )
 
-var tokens = []string{
+const tokens = []string{
 	TOKEN_EOF:  "TOKEN_EOF",
 	TOKEN_ILLEGAL: "TOKEN_ILLEGAL",
 	TOKEN_ID:   "TOKEN_ID",
