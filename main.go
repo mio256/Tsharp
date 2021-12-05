@@ -1108,9 +1108,17 @@ func OpFor(expr Expr) {
 }
 
 func OpAppend(expr Expr) {
+	if len(Stack)-1 < 0 {
+		fmt.Println("AppendError: the stack is empty, couldn't find list")
+		os.Exit(0)
+	}
 	visitedExpr := Stack[len(Stack)-1]
+	if visitedExpr.Type != ExprArr {
+		fmt.Println("TypeError: 'append' expected couldn't find list")
+		os.Exit(0)
+	}
+
 	OpDrop()
-	
 	visitedExpr.AsArr = append(visitedExpr.AsArr, expr.AsAppend.Arg)
 	OpPush(visitedExpr)
 }
