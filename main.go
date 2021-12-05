@@ -39,6 +39,9 @@ const (
 	TOKEN_LESS_EQUALS
 	TOKEN_GREATER_EQUALS
 	TOKEN_REM
+	TOKEN_L_BRACKET
+	TOKEN_R_BRACKET
+	TOKEN_COMMA
 )
 
 var tokens = []string{
@@ -63,6 +66,9 @@ var tokens = []string{
 	TOKEN_LESS_EQUALS: "TOKEN_LESS_EQUALS",
 	TOKEN_GREATER_EQUALS: "TOKEN_GREATER_EQUALS",
 	TOKEN_REM: "TOKEN_REM",
+	TOKEN_L_BRACKET: "TOKEN_L_BRACKET",
+	TOKEN_R_BRACKET: "TOKEN_R_BRACKET",
+	TOKEN_COMMA: "TOKEN_COMMA",
 }
 
 func (token Token) String() string {
@@ -103,6 +109,9 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			case '/': return lexer.pos, TOKEN_DIV, "/"
 			case '*': return lexer.pos, TOKEN_MUL, "*"
 			case '%': return lexer.pos, TOKEN_REM, "%"
+			case '[': return lexer.pos, TOKEN_L_BRACKET, "["
+			case ']': return lexer.pos, TOKEN_R_BRACKET, "]"
+			case ',': return lexer.pos, TOKEN_COMMA, ","
 			default:
 				if unicode.IsSpace(r) {
 					continue
@@ -271,6 +280,8 @@ const (
 	ExprInt
 	ExprStr
 	ExprId
+	ExprArr
+	ExprAppend
 	ExprTypeType
 	ExprPush
 	ExprBlockdef
@@ -300,6 +311,8 @@ type Expr struct {
 	AsInt int
 	AsStr string
 	AsId string
+	AsArr []Expr
+	AsAppend *Append
 	AsType string
 	AsPush *Push
 	AsBlockdef *Blockdef
@@ -311,6 +324,10 @@ type Expr struct {
 	AsCompare int
 	AsImport string
 	AsVardef *Vardef
+}
+
+type Append struct {
+	Arg Expr
 }
 
 type Push struct {
@@ -412,6 +429,18 @@ func ParserParseExpr(parser *Parser) (Expr) {
 			expr.Type = ExprId
 			expr.AsId = parser.current_token_value
 			parser.ParserEat(TOKEN_ID)
+		case TOKEN_L_BRACKET:
+			parser.ParserEat(TOKEN_L_BRACKET)
+			expr.Type = ExprArr
+			var arrExprs = []Expr{}
+			for {
+				arrExpr := ParserParseExpr(parser)
+				arrExprs = append(arrExprs, arrExpr)
+				expr.AsArr = arrExprs
+				if parser.current_token_type == TOKEN_R_BRACKET || parser.current_token_type != TOKEN_COMMA { break }
+				parser.ParserEat(TOKEN_COMMA)
+			}
+			parser.ParserEat(TOKEN_R_BRACKET)
 		default:
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 			os.Exit(0)
@@ -567,6 +596,13 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprBreak
 				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "append" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprAppend
+				expr.AsAppend = &Append {
+					Arg: ParserParseExpr(parser),
+				}
+				exprs = append(exprs, expr)
 			} else {
 				fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 				os.Exit(0)
@@ -652,6 +688,25 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 
 var Stack = []Expr{}
 
+func OpBuildArr(exprs []Expr)Expr {
+	expr := Expr{}
+	expr.Type = ExprArr
+	var arrExprs = []Expr{}
+	for i := 0; i < len(exprs); i++ {
+		if exprs[i].Type == ExprId {
+			exprVar := VariableScope[exprs[i].AsId]
+			arrExprs = append(arrExprs, exprVar)
+		} else if exprs[i].Type == ExprArr {
+			exprArr := OpBuildArr(exprs[i].AsArr)
+			arrExprs = append(arrExprs, exprArr)
+		} else {
+			arrExprs = append(arrExprs, exprs[i])
+		}
+	}
+	expr.AsArr = arrExprs
+	return expr
+}
+
 func OpPush(item Expr) {
 	if item.Type == ExprId {
 		if _, ok := VariableScope[item.AsId]; ok {
@@ -660,6 +715,24 @@ func OpPush(item Expr) {
 			fmt.Println("Error: undefined variable '" + item.AsId + "'")
 			os.Exit(0)
 		}
+	} else if  item.Type == ExprArr {
+		expr := Expr{}
+		expr.Type = ExprArr
+		var arrExprs = []Expr{}
+		for i := 0; i < len(item.AsArr); i++ {
+			if item.AsArr[i].Type == ExprId {
+				exprVar := VariableScope[item.AsArr[i].AsId]
+				arrExprs = append(arrExprs, exprVar)
+			} else if item.AsArr[i].Type == ExprArr {
+				exprArr := OpBuildArr(item.AsArr[i].AsArr)
+				arrExprs = append(arrExprs, exprArr)
+			} else {
+				arrExprs = append(arrExprs, item.AsArr[i])
+			}
+		}
+		expr.AsArr = arrExprs
+		Stack = append(Stack, expr)
+		return
 	}
 	Stack = append(Stack, item)
 }
@@ -757,6 +830,26 @@ func OpDec() {
 	OpPush(visitedExpr)
 }
 
+func PrintArray(visitedExpr Expr) {
+	fmt.Print("[")
+	for i:=0; i < len(visitedExpr.AsArr); i++ {
+		if i != 0 {
+			fmt.Print(", ")
+		}
+		switch (visitedExpr.AsArr[i].Type) {
+			case ExprInt: fmt.Print(visitedExpr.AsArr[i].AsInt)
+			case ExprStr:
+				fmt.Print("'")
+				fmt.Print(visitedExpr.AsArr[i].AsStr)
+				fmt.Print("'")
+			case ExprTypeType: fmt.Print(visitedExpr.AsArr[i].AsType)
+			case ExprBool: fmt.Print(visitedExpr.AsArr[i].AsBool)
+			case ExprArr: PrintArray(visitedExpr.AsArr[i])
+		}
+	}
+	fmt.Print("]")
+}
+
 func OpPrint() {
 	if len(Stack) == 0 {
 		fmt.Println("PrintError: the stack is empty")
@@ -769,6 +862,24 @@ func OpPrint() {
 		case ExprStr: fmt.Println(visitedExpr.AsStr)
 		case ExprBool: fmt.Println(visitedExpr.AsBool)
 		case ExprTypeType: fmt.Println(fmt.Sprintf("<%s>",visitedExpr.AsType))
+		case ExprArr:
+			fmt.Print("[")
+			for i:=0; i < len(visitedExpr.AsArr); i++ {
+				if i != 0 {
+					fmt.Print(", ")
+				}
+				switch (visitedExpr.AsArr[i].Type) {
+					case ExprInt: fmt.Print(visitedExpr.AsArr[i].AsInt)
+					case ExprStr:
+						fmt.Print("'")
+						fmt.Print(visitedExpr.AsArr[i].AsStr)
+						fmt.Print("'")
+					case ExprTypeType: fmt.Print(visitedExpr.AsArr[i].AsType)
+					case ExprBool: fmt.Print(visitedExpr.AsArr[i].AsBool)
+					case ExprArr: PrintArray(visitedExpr.AsArr[i])
+				}
+			}
+			fmt.Println("]")
 	}
 
 	OpDrop()
@@ -992,6 +1103,14 @@ func OpFor(expr Expr) {
 	}
 }
 
+func OpAppend(expr Expr) {
+	visitedExpr := Stack[len(Stack)-1]
+	OpDrop()
+	
+	visitedExpr.AsArr = append(visitedExpr.AsArr, expr.AsAppend.Arg)
+	OpPush(visitedExpr)
+}
+
 
 // -----------------------------
 // ---------- Variable ---------
@@ -1046,6 +1165,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpPush(expr.AsPush.Arg)
 			case ExprPrint:
 				OpPrint()
+			case ExprAppend:
+				OpAppend(expr)
 			case ExprTypeOf:
 				OpTypeOf()
 			case ExprSwap:
