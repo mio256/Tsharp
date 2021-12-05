@@ -751,8 +751,8 @@ func OpDrop() {
 }
 
 func OpDup() {
-	if len(Stack)-1 < 0 {
-		fmt.Println("DupError: the stack is empty.")
+	if len(Stack) < 1 {
+		fmt.Println("Error: 'dup' expected more than one element in stack")
 		os.Exit(0)
 	}
 
@@ -762,7 +762,7 @@ func OpDup() {
 
 func OpSwap() {
 	if len(Stack) < 2 {
-		fmt.Println("SwapError: expected more than two elements in stack.")
+		fmt.Println("SwapError: expected more than two elements in stack")
 		os.Exit(0)
 	}
 
@@ -790,7 +790,7 @@ func OpOver() {
 
 func OpRot() {
 	if len(Stack) < 3 {
-		fmt.Println("RotError: expected more than three elements in stack.")
+		fmt.Println("Error: 'rot' expected more than three elements in stack.")
 		os.Exit(0)
 	}
 	visitedExpr := Stack[len(Stack)-1]
@@ -836,7 +836,7 @@ func OpDec() {
 
 func PrintArray(visitedExpr Expr) {
 	fmt.Print("[")
-	for i:=0; i < len(visitedExpr.AsArr); i++ {
+	for i := 0; i < len(visitedExpr.AsArr); i++ {
 		if i != 0 {
 			fmt.Print(", ")
 		}
@@ -855,8 +855,8 @@ func PrintArray(visitedExpr Expr) {
 }
 
 func OpPrint() {
-	if len(Stack) == 0 {
-		fmt.Println("PrintError: the stack is empty")
+	if len(Stack) < 1 {
+		fmt.Println("Error: 'print' expected more than one element in stack.")
 		os.Exit(0)
 	}
 
@@ -891,7 +891,7 @@ func OpPrint() {
 
 func OpTypeOf() {
 	if len(Stack) == 0 {
-		fmt.Println("TypeOfError: the stack is empty")
+		fmt.Println("Error: 'typeof' expected more than one element in stack")
 		os.Exit(0)
 	}
 
@@ -1000,7 +1000,7 @@ func OpCompare(value int) (bool) {
 
 func RetBool() (bool) {
 	if len(Stack)-1 < 0 {
-		fmt.Println("Error: the stack is empty. couldn't find bool.")
+		fmt.Println("Error: the stack is empty, couldn't find bool")
 		os.Exit(0)
 	}
 
@@ -1042,7 +1042,16 @@ func OpCondition(expr Expr) {
 // TODO: rewrite this function
 func OpBinop(value int) {
 	if len(Stack) < 2 {
-		fmt.Println("Error: expected more than two elements in stack.")
+		fmt.Print("Error: ")
+		switch (value) {
+			case TOKEN_PLUS: fmt.Print("'+'")
+			case TOKEN_MINUS: fmt.Print("'-'")
+			case TOKEN_DIV: fmt.Print("'/'")
+			case TOKEN_REM: fmt.Print("'%'")
+			case TOKEN_MUL: fmt.Print("'*'")
+
+		}
+		fmt.Println(" expected more than two elements in stack")
 		os.Exit(0)
 	}
 
@@ -1108,8 +1117,8 @@ func OpFor(expr Expr) {
 }
 
 func OpAppend(expr Expr) {
-	if len(Stack)-1 < 0 {
-		fmt.Println("AppendError: the stack is empty, couldn't find list")
+	if len(Stack) < 1 {
+		fmt.Println("Error: 'append' expected more than one element in stack.")
 		os.Exit(0)
 	}
 	visitedExpr := Stack[len(Stack)-1]
