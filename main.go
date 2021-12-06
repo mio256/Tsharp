@@ -329,7 +329,6 @@ type Expr struct {
 	AsStr string
 	AsId string
 	AsArr []Expr
-	AsAppend *Append
 	AsType string
 	AsPush *Push
 	AsBlockdef *Blockdef
@@ -341,10 +340,6 @@ type Expr struct {
 	AsCompare int
 	AsImport string
 	AsVardef *Vardef
-}
-
-type Append struct {
-	Arg Expr
 }
 
 type Push struct {
@@ -620,9 +615,6 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "append" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprAppend
-				expr.AsAppend = &Append {
-					Arg: ParserParseExpr(parser),
-				}
 				exprs = append(exprs, expr)
 			} else {
 				fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
@@ -1136,19 +1128,21 @@ func OpFor(expr Expr) {
 }
 
 func OpAppend(expr Expr) {
-	if len(Stack) < 1 {
-		fmt.Println("Error: 'append' expected more than one element in stack.")
+	if len(Stack) < 2 {
+		fmt.Println("Error: 'append' expected more than two element in stack.")
 		os.Exit(0)
 	}
+	visitedList := Stack[len(Stack)-2]
 	visitedExpr := Stack[len(Stack)-1]
-	if visitedExpr.Type != ExprArr {
+	if visitedList.Type != ExprArr {
 		fmt.Println("TypeError: 'append' expected couldn't find list")
 		os.Exit(0)
 	}
 
 	OpDrop()
-	visitedExpr.AsArr = append(visitedExpr.AsArr, expr.AsAppend.Arg)
-	OpPush(visitedExpr)
+	OpDrop()
+	visitedList.AsArr = append(visitedList.AsArr, visitedExpr)
+	OpPush(visitedList)
 }
 
 
