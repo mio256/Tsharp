@@ -199,7 +199,7 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 						return startPos, TOKEN_DO, val
 					} else if val == "true" || val == "false" {
 						return startPos, TOKEN_BOOL, val
-					} else if val == "string" || val == "int" || val == "bool" || val == "type" {
+					} else if val == "string" || val == "int" || val == "bool" || val == "type" || val == "list" {
 						return startPos, TOKEN_TYPE, val
 					} else if val == "else" {
 						return startPos, TOKEN_ELSE, val
@@ -925,6 +925,8 @@ func OpTypeOf() {
 		type_value = "bool"
 	} else if visitedExpr.Type == ExprTypeType {
 		type_value = "type"
+	} else if  visitedExpr.Type == ExprArr {
+		type_value = "list"
 	}
 	TypeExpr.AsType = type_value
 	PushExpr := Expr{}
