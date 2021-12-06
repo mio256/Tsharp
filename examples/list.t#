@@ -1,4 +1,3 @@
-# Array is a work in progress
 
 push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
 
