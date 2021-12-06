@@ -1,0 +1,10 @@
+# Array is a work in progress
+
+push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
+
+push "V" append dup print 
+
+# we can also append a list to list
+
+push ["HTML", "CSS", "Sass"] append dup print
+
