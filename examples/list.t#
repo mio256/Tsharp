@@ -3,5 +3,8 @@ push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
 
 push "V" append dup print
 
-push ["HTML", "CSS", "Sass"] append print
+push ["HTML"] append dup print
 
+push "CSS" append[7]
+
+print
