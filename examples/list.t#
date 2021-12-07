@@ -1,9 +1,7 @@
 
 push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
 
-push "V" append dup print 
-
-# we can also append a list to list
+push "V" append dup print
 
 push ["HTML", "CSS", "Sass"] append print
 
