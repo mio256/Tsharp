@@ -41,6 +41,7 @@ const (
 	TOKEN_REM
 	TOKEN_L_BRACKET
 	TOKEN_R_BRACKET
+	TOKEN_DOT
 	TOKEN_COMMA
 )
 
@@ -68,6 +69,7 @@ var tokens = []string{
 	TOKEN_REM:            "TOKEN_REM",
 	TOKEN_L_BRACKET:      "TOKEN_L_BRACKET",
 	TOKEN_R_BRACKET:      "TOKEN_R_BRACKET",
+	TOKEN_DOT:            "TOKEN_DOT",
 	TOKEN_COMMA:          "TOKEN_COMMA",
 }
 
@@ -112,6 +114,7 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 			case '[': return lexer.pos, TOKEN_L_BRACKET, "["
 			case ']': return lexer.pos, TOKEN_R_BRACKET, "]"
 			case ',': return lexer.pos, TOKEN_COMMA, ","
+			case '.': return lexer.pos, TOKEN_DOT, "."
 			default:
 				if unicode.IsSpace(r) {
 					continue
