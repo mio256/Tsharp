@@ -332,6 +332,7 @@ type Expr struct {
 	AsStr string
 	AsId string
 	AsArr []Expr
+	AsAppend *Append
 	AsType string
 	AsPush *Push
 	AsBlockdef *Blockdef
@@ -371,6 +372,10 @@ type For struct {
 
 type Vardef struct {
 	Name string
+}
+
+type Append struct {
+	Index []Expr
 }
 
 
@@ -618,6 +623,23 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "append" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprAppend
+				var indexArr []Expr
+				if parser.current_token_type != TOKEN_L_BRACKET {
+					indexArr = nil
+				} else {
+					for {
+						if parser.current_token_type != TOKEN_L_BRACKET {
+							break
+						}
+						parser.ParserEat(TOKEN_L_BRACKET)
+						index := ParserParseExpr(parser)
+						indexArr = append(indexArr, index)
+						parser.ParserEat(TOKEN_R_BRACKET)
+					}
+				}
+				expr.AsAppend = &Append {
+					Index: indexArr,
+				}
 				exprs = append(exprs, expr)
 			} else {
 				fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
@@ -1138,14 +1160,40 @@ func OpAppend(expr Expr) {
 	visitedList := Stack[len(Stack)-2]
 	visitedExpr := Stack[len(Stack)-1]
 	if visitedList.Type != ExprArr {
-		fmt.Println("TypeError: 'append' expected couldn't find list")
+		fmt.Println("TypeError: 'append' expected type list")
 		os.Exit(0)
 	}
 
 	OpDrop()
 	OpDrop()
-	visitedList.AsArr = append(visitedList.AsArr, visitedExpr)
-	OpPush(visitedList)
+	if expr.AsAppend.Index != nil {
+		var arr *Expr
+		if len(visitedList.AsArr) <= expr.AsAppend.Index[0].AsInt {
+			fmt.Println("Error: 'append' list index out of range")
+			os.Exit(0)
+		}
+		arr = &visitedList.AsArr[expr.AsAppend.Index[0].AsInt]
+		if arr.Type != ExprArr {
+			fmt.Println("Error: 'append' list index out of range")
+			os.Exit(0)
+		}
+		for i := 1; i < len(expr.AsAppend.Index); i++ {
+			if len(arr.AsArr) < expr.AsAppend.Index[i].AsInt {
+				fmt.Println("Error: 'append' list index out of range")
+				os.Exit(0)
+			}
+			arr = &arr.AsArr[expr.AsAppend.Index[i].AsInt]
+			if arr.Type != ExprArr {
+				fmt.Println("Error: 'append' list index out of range")
+				os.Exit(0)
+			}
+		}
+		arr.AsArr = append(arr.AsArr, visitedExpr)
+		OpPush(visitedList)
+	} else {
+		visitedList.AsArr = append(visitedList.AsArr, visitedExpr)
+		OpPush(visitedList)
+	}
 }
 
 
