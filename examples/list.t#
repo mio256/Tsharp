@@ -5,5 +5,5 @@ push "V" append dup print
 
 # we can also append a list to list
 
-push ["HTML", "CSS", "Sass"] append dup print
+push ["HTML", "CSS", "Sass"] append print
 
