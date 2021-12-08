@@ -726,6 +726,16 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 
 var Stack = []Expr{}
 
+func VisitVar(VarName string) (Expr) {
+	var VarExpr Expr
+	if _, ok := VariableScope[VarName]; ok {
+		VarExpr = VariableScope[VarName]
+	} else {
+		fmt.Println("Error: undefined variable '" + VarName + "'"); os.Exit(0);
+	}
+	return VarExpr
+}
+
 func OpBuildArr(exprs []Expr)Expr {
 	expr := Expr{}
 	expr.Type = ExprArr
@@ -747,12 +757,7 @@ func OpBuildArr(exprs []Expr)Expr {
 
 func OpPush(item Expr) {
 	if item.Type == ExprId {
-		if _, ok := VariableScope[item.AsId]; ok {
-			item = VariableScope[item.AsId]
-		} else {
-			fmt.Println("Error: undefined variable '" + item.AsId + "'")
-			os.Exit(0)
-		}
+		item = VisitVar(item.AsId)
 	} else if  item.Type == ExprArr {
 		expr := Expr{}
 		expr.Type = ExprArr
@@ -1149,16 +1154,6 @@ func OpFor(expr Expr) {
 		if BreakValue == true {break}
 		VisitExpr(expr.AsFor.Op)
 	}
-}
-
-func VisitVar(VarName string) (Expr) {
-	var VarExpr Expr
-	if _, ok := VariableScope[VarName]; ok {
-		VarExpr = VariableScope[VarName]
-	} else {
-		fmt.Println("Error: undefined variable '" + VarName + "'"); os.Exit(0);
-	}
-	return VarExpr
 }
 
 func OpAppend(expr Expr) {
