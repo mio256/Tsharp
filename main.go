@@ -951,12 +951,7 @@ func OpTypeOf() {
 		type_value = "list"
 	}
 	TypeExpr.AsType = type_value
-	PushExpr := Expr{}
-	PushExpr.Type = ExprPush
-	PushExpr.AsPush = &Push{
-		Arg: TypeExpr,
-	}
-	OpPush(PushExpr.AsPush.Arg)
+	OpPush(TypeExpr)
 }
 
 func OpCompare(value int) (bool) {
