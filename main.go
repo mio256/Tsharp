@@ -742,7 +742,7 @@ func OpBuildArr(exprs []Expr)Expr {
 	var arrExprs = []Expr{}
 	for i := 0; i < len(exprs); i++ {
 		if exprs[i].Type == ExprId {
-			exprVar := VariableScope[exprs[i].AsId]
+			exprVar := VisitVar(exprs[i].AsId)
 			arrExprs = append(arrExprs, exprVar)
 		} else if exprs[i].Type == ExprArr {
 			exprArr := OpBuildArr(exprs[i].AsArr)
@@ -764,7 +764,7 @@ func OpPush(item Expr) {
 		var arrExprs = []Expr{}
 		for i := 0; i < len(item.AsArr); i++ {
 			if item.AsArr[i].Type == ExprId {
-				exprVar := VariableScope[item.AsArr[i].AsId]
+				exprVar := VisitVar(item.AsArr[i].AsId)
 				arrExprs = append(arrExprs, exprVar)
 			} else if item.AsArr[i].Type == ExprArr {
 				exprArr := OpBuildArr(item.AsArr[i].AsArr)
