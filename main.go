@@ -7,6 +7,7 @@ import (
 	"unicode"
 	"os"
 	"strconv"
+	"reflect"
 	"github.com/fatih/color"
 )
 
@@ -986,6 +987,10 @@ func OpCompare(value int) (bool) {
 		if visitedExpr.Type == ExprTypeType {
 			return visitedExpr.AsType == visitedExprSecond.AsType
 		}
+
+		if visitedExpr.Type == ExprArr {
+			return reflect.DeepEqual(visitedExpr.AsArr, visitedExprSecond.AsArr)
+		}
 	}
 
 	if value == TOKEN_NOT_EQUALS {
@@ -1007,6 +1012,10 @@ func OpCompare(value int) (bool) {
 
 		if visitedExpr.Type == ExprTypeType {
 			return visitedExpr.AsType != visitedExprSecond.AsType
+		}
+
+		if visitedExpr.Type == ExprArr {
+			return !reflect.DeepEqual(visitedExpr.AsArr, visitedExprSecond.AsArr)
 		}
 	}
     
