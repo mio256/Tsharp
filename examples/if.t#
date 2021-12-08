@@ -3,7 +3,7 @@
 if push false do
     push "Hello World!" print
 else
-    push "Hello World! this is from else body" print
+    push "Hello World!" print
 end
 
 push 10 push 20 == print
