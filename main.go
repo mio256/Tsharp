@@ -1166,14 +1166,25 @@ func OpAppend(expr Expr) {
 	if expr.AsAppend.Index != nil {
 		var arr *Expr
 		arr = &visitedList
+		var IntValue int
 		for i := 0; i < len(expr.AsAppend.Index); i++ {
-			if expr.AsAppend.Index[0].Type != ExprInt {
+			if expr.AsAppend.Index[i].Type == ExprId {
+				var VarExpr Expr
+				if _, ok := VariableScope[expr.AsAppend.Index[i].AsId]; ok {
+					VarExpr = VariableScope[expr.AsAppend.Index[i].AsId]
+				} else {
+					fmt.Println("Error: undefined variable '" + expr.AsAppend.Index[i].AsId + "'"); os.Exit(0);
+				}
+				IntValue = VarExpr.AsInt
+			} else if expr.AsAppend.Index[i].Type != ExprInt {
 				fmt.Println("TypeError: 'append' index must be type int"); os.Exit(0);
+			} else {
+				IntValue = expr.AsAppend.Index[i].AsInt
 			}
-			if len(arr.AsArr) < expr.AsAppend.Index[i].AsInt {
+			if len(arr.AsArr) < IntValue {
 				fmt.Println("Error: 'append' list index out of range"); os.Exit(0);
 			}
-			arr = &arr.AsArr[expr.AsAppend.Index[i].AsInt]
+			arr = &arr.AsArr[IntValue]
 			if arr.Type != ExprArr {
 				fmt.Println("Error: 'append' list index out of range"); os.Exit(0);
 			}
