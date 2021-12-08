@@ -1128,12 +1128,7 @@ func OpBinop(value int) {
 		}
 	}
 
-	PushExpr := Expr{}
-	PushExpr.Type = ExprPush
-	PushExpr.AsPush = &Push{
-		Arg: ValueExpr,
-	}
-	OpPush(PushExpr.AsPush.Arg)
+	OpPush(ValueExpr)
 }
 
 func OpImport(expr Expr) {
