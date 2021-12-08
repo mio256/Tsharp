@@ -1181,7 +1181,7 @@ func OpAppend(expr Expr) {
 			} else {
 				IntValue = expr.AsAppend.Index[i].AsInt
 			}
-			if len(arr.AsArr) < IntValue {
+			if len(arr.AsArr) <= IntValue {
 				fmt.Println("Error: 'append' list index out of range"); os.Exit(0);
 			}
 			arr = &arr.AsArr[IntValue]
