@@ -128,17 +128,32 @@ push 1 push 2 over print print print
 push "Hello " push "World!" + print 
 ```
 
-## inc
+## Inc
 ```python
 push 1 inc print
 ```
 'inc' increment the top element of the stack
 
-## dec
+## Dec
 ```python
 push 10 dec print
 ```
 'dec' decrement the top element of the stack
+
+## List
+```python
+push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
+
+push "V" append dup print
+
+push ["HTML"] append dup print
+
+push [1, 2, 3] append[7]
+
+push "Hello World!" append[7][1]
+
+print
+```
 
 ## FizzBuzz
 ```pascal
