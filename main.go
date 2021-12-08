@@ -1154,46 +1154,35 @@ func OpFor(expr Expr) {
 
 func OpAppend(expr Expr) {
 	if len(Stack) < 2 {
-		fmt.Println("Error: 'append' expected more than two element in stack.")
-		os.Exit(0)
+		fmt.Println("Error: 'append' expected more than two element in stack."); os.Exit(0);
 	}
 	visitedList := Stack[len(Stack)-2]
 	visitedExpr := Stack[len(Stack)-1]
 	if visitedList.Type != ExprArr {
-		fmt.Println("TypeError: 'append' expected type list")
-		os.Exit(0)
+		fmt.Println("TypeError: 'append' expected type list"); os.Exit(0);
 	}
-
 	OpDrop()
 	OpDrop()
 	if expr.AsAppend.Index != nil {
 		var arr *Expr
-		if len(visitedList.AsArr) <= expr.AsAppend.Index[0].AsInt {
-			fmt.Println("Error: 'append' list index out of range")
-			os.Exit(0)
-		}
-		arr = &visitedList.AsArr[expr.AsAppend.Index[0].AsInt]
-		if arr.Type != ExprArr {
-			fmt.Println("Error: 'append' list index out of range")
-			os.Exit(0)
-		}
-		for i := 1; i < len(expr.AsAppend.Index); i++ {
+		arr = &visitedList
+		for i := 0; i < len(expr.AsAppend.Index); i++ {
+			if expr.AsAppend.Index[0].Type != ExprInt {
+				fmt.Println("TypeError: 'append' index must be type int"); os.Exit(0);
+			}
 			if len(arr.AsArr) < expr.AsAppend.Index[i].AsInt {
-				fmt.Println("Error: 'append' list index out of range")
-				os.Exit(0)
+				fmt.Println("Error: 'append' list index out of range"); os.Exit(0);
 			}
 			arr = &arr.AsArr[expr.AsAppend.Index[i].AsInt]
 			if arr.Type != ExprArr {
-				fmt.Println("Error: 'append' list index out of range")
-				os.Exit(0)
+				fmt.Println("Error: 'append' list index out of range"); os.Exit(0);
 			}
 		}
 		arr.AsArr = append(arr.AsArr, visitedExpr)
-		OpPush(visitedList)
 	} else {
 		visitedList.AsArr = append(visitedList.AsArr, visitedExpr)
-		OpPush(visitedList)
 	}
+	OpPush(visitedList)
 }
 
 
