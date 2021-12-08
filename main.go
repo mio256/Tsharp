@@ -1072,12 +1072,7 @@ func OpCondition(expr Expr) {
 	BoolExpr := Expr{}
 	BoolExpr.Type = ExprBool
 	BoolExpr.AsBool = bool_value
-	PushExpr := Expr{}
-	PushExpr.Type = ExprPush
-	PushExpr.AsPush = &Push{
-		Arg: BoolExpr,
-	}
-	OpPush(PushExpr.AsPush.Arg)
+	OpPush(BoolExpr)
 }
 
 func OpBinop(value int) {
