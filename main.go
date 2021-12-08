@@ -1151,6 +1151,16 @@ func OpFor(expr Expr) {
 	}
 }
 
+func VisitVar(VarName string) (Expr) {
+	var VarExpr Expr
+	if _, ok := VariableScope[VarName]; ok {
+		VarExpr = VariableScope[VarName]
+	} else {
+		fmt.Println("Error: undefined variable '" + VarName + "'"); os.Exit(0);
+	}
+	return VarExpr
+}
+
 func OpAppend(expr Expr) {
 	if len(Stack) < 2 {
 		fmt.Println("Error: 'append' expected more than two element in stack."); os.Exit(0);
@@ -1169,11 +1179,7 @@ func OpAppend(expr Expr) {
 		for i := 0; i < len(expr.AsAppend.Index); i++ {
 			if expr.AsAppend.Index[i].Type == ExprId {
 				var VarExpr Expr
-				if _, ok := VariableScope[expr.AsAppend.Index[i].AsId]; ok {
-					VarExpr = VariableScope[expr.AsAppend.Index[i].AsId]
-				} else {
-					fmt.Println("Error: undefined variable '" + expr.AsAppend.Index[i].AsId + "'"); os.Exit(0);
-				}
+				VarExpr = VisitVar(expr.AsAppend.Index[i].AsId)
 				IntValue = VarExpr.AsInt
 			} else if expr.AsAppend.Index[i].Type != ExprInt {
 				fmt.Println("TypeError: 'append' index must be type int"); os.Exit(0);
@@ -1238,7 +1244,7 @@ func OpCallBlock(expr Expr) {
 
 
 // -----------------------------
-// ----------- Visit -----------
+// -------- Visit Exprs --------
 // -----------------------------
 
 func VisitExpr(exprs []Expr) (bool) {
