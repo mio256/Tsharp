@@ -1075,7 +1075,6 @@ func OpCondition(expr Expr) {
 	OpPush(PushExpr.AsPush.Arg)
 }
 
-// TODO: rewrite this function
 func OpBinop(value int) {
 	if len(Stack) < 2 {
 		fmt.Print("Error: ")
