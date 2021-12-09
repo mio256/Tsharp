@@ -307,6 +307,8 @@ const (
 	ExprPush
 	ExprBlockdef
 	ExprPrint
+	ExprPuts
+	ExprInput
 	ExprOver
 	ExprRot
 	ExprInc
@@ -415,9 +417,22 @@ func (parser *Parser) ParserEat(token Token) {
 	parser.column = pos.column
 }
 
+// just so you can call it later 
+// like in a type cast or input
+func isInt(num string) bool {
+	_, err := strconv.Atoi(num)
+	return err == nil
+}
+
+// for use later when floats are added
+func isFloat(num string) bool {
+	_, err := strconv.ParseFloat(num, 64)
+	return err == nil
+}
+
 func StrToInt(num string) int {
 	i, err := strconv.Atoi(num)
-	if err != nil {
+	if err != nil{
 		panic(err)
 	}
 	return i
@@ -489,6 +504,14 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "print" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrint
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "input" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprInput
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "puts" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprPuts
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "typeof" {
 				parser.ParserEat(TOKEN_ID)
@@ -805,7 +828,6 @@ func OpSwap() {
 		fmt.Println("SwapError: expected more than two elements in stack")
 		os.Exit(0)
 	}
-
 	visitedExpr := Stack[len(Stack)-1]
 	visitedExprSecond := Stack[len(Stack)-2]
 	OpDrop()
@@ -894,7 +916,8 @@ func PrintArray(visitedExpr Expr) {
 	fmt.Print("]")
 }
 
-func OpPrint() {
+// it prints without the newline
+func OpPuts() {
 	if len(Stack) < 1 {
 		fmt.Println("Error: 'print' expected more than one element in stack.")
 		os.Exit(0)
@@ -902,32 +925,40 @@ func OpPrint() {
 
 	visitedExpr := Stack[len(Stack)-1]
 	switch (visitedExpr.Type) {
-		case ExprInt: fmt.Println(visitedExpr.AsInt)
-		case ExprStr: fmt.Println(visitedExpr.AsStr)
-		case ExprBool: fmt.Println(visitedExpr.AsBool)
-		case ExprTypeType: fmt.Println(fmt.Sprintf("<%s>",visitedExpr.AsType))
-		case ExprArr:
-			fmt.Print("[")
-			for i:=0; i < len(visitedExpr.AsArr); i++ {
-				if i != 0 {
-					fmt.Print(", ")
-				}
-				switch (visitedExpr.AsArr[i].Type) {
-					case ExprInt: fmt.Print(visitedExpr.AsArr[i].AsInt)
-					case ExprStr:
-						fmt.Print("'")
-						fmt.Print(visitedExpr.AsArr[i].AsStr)
-						fmt.Print("'")
-					case ExprTypeType: fmt.Print(visitedExpr.AsArr[i].AsType)
-					case ExprBool: fmt.Print(visitedExpr.AsArr[i].AsBool)
-					case ExprArr: PrintArray(visitedExpr.AsArr[i])
-				}
-			}
-			fmt.Println("]")
+		case ExprInt: fmt.Print(visitedExpr.AsInt)
+		case ExprStr: fmt.Print(visitedExpr.AsStr)
+		case ExprBool: fmt.Print(visitedExpr.AsBool)
+		case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
+		case ExprArr: PrintArray(visitedExpr) // prints the array no need to rewrite
 	}
+
 
 	OpDrop()
 }
+
+// prints with a newline
+func OpPrint() {
+	OpPuts() // prints the object
+	fmt.Println() // print the newline
+}
+
+// takes commandline input
+func OpInput() {
+	OpPuts() // print the prompt
+	var input string
+	fmt.Scanln(&input)
+	inpExpr := Expr{}
+	// check if it's an int or float
+	if (isInt(input)) {
+		inpExpr.Type = ExprInt
+		inpExpr.AsInt, _ = strconv.Atoi(input)
+	} else {
+		inpExpr.Type = ExprStr
+		inpExpr.AsStr = input
+	}
+	OpPush(inpExpr)
+}
+
 
 func OpTypeOf() {
 	if len(Stack) == 0 {
@@ -1244,6 +1275,10 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpPush(expr.AsPush.Arg)
 			case ExprPrint:
 				OpPrint()
+			case ExprInput:
+				OpInput()
+			case ExprPuts:
+				OpPuts()
 			case ExprAppend:
 				OpAppend(expr)
 			case ExprTypeOf:

@@ -1,0 +1,7 @@
+push "What is your name? "
+input
+push "Hello " puts print
+push "How old are you? "
+input
+dup push 3 + 
+push "I am " puts puts push " and you are " puts print
