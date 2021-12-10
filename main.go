@@ -790,12 +790,12 @@ func VisitVar(VarName string, expr Expr) (Expr) {
 				VarExpr = VisitVar(expr.AsId.Index[i].AsId.Name, expr.AsId.Index[i])
 				IntValue = VarExpr.AsInt
 			} else if expr.AsId.Index[i].Type != ExprInt {
-				fmt.Println("TypeError:"); os.Exit(0);
+				fmt.Println("TypeError: list index must be type <int>"); os.Exit(0);
 			} else {
 				IntValue = expr.AsId.Index[i].AsInt
 			}
 			if len(arr.AsArr) <= IntValue {
-				fmt.Println("Error:"); os.Exit(0);
+				fmt.Println("Error: index out of range"); os.Exit(0);
 			}
 			arr = &arr.AsArr[IntValue]
 		}
