@@ -127,8 +127,3 @@ for dup push 101 < do
 end drop
 ```
 
-### Contributors
-
-<a href="https://github.com/ibukiyoshidaa/Tsharp/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ibukiyoshidaa/Tsharp" />
-</a>
