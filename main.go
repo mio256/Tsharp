@@ -781,8 +781,8 @@ func VisitVar(VarName string, expr Expr) (Expr) {
 		fmt.Println("Error: undefined variable '" + VarName + "'"); os.Exit(0);
 	}
 	if expr.AsId.Index != nil {
-		var arr *Expr
-		arr = &VisitedVar
+		var VisitedListValue *Expr
+		VisitedListValue = &VisitedVar
 		var IntValue int
 		for i := 0; i < len(expr.AsId.Index); i++ {
 			if expr.AsId.Index[i].Type == ExprId {
@@ -794,12 +794,12 @@ func VisitVar(VarName string, expr Expr) (Expr) {
 			} else {
 				IntValue = expr.AsId.Index[i].AsInt
 			}
-			if len(arr.AsArr) <= IntValue {
+			if len(VisitedListValue.AsArr) <= IntValue {
 				fmt.Println("Error: index out of range"); os.Exit(0);
 			}
-			arr = &arr.AsArr[IntValue]
+			VisitedListValue = &VisitedListValue.AsArr[IntValue]
 		}
-		return *arr
+		VisitedVar = *VisitedListValue
 	}
 	return VisitedVar
 }
@@ -974,8 +974,6 @@ func OpPuts() {
 		case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
 		case ExprArr: PrintArray(visitedExpr)
 	}
-
-
 	OpDrop()
 }
 
