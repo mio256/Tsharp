@@ -1,4 +1,18 @@
 
+# List example 1
+push ["T#", "Ruby", "Python", "C", "Go", "Julia", "V", ["HTML", "CSS"]]
+
+push 0
+for dup push 7 <= do
+    dup -> i drop
+    swap -> x
+    push x[i] print
+    swap
+    inc
+end drop drop
+
+
+# List example 2
 push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
 
 push "V" append dup print
