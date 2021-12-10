@@ -944,7 +944,6 @@ func OpPrint() {
 
 // takes commandline input
 func OpInput() {
-	OpPuts() // print the prompt
 	var input string
 	fmt.Scanln(&input)
 	inpExpr := Expr{}
