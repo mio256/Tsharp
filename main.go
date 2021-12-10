@@ -333,7 +333,7 @@ type Expr struct {
 	Type ExprType
 	AsInt int
 	AsStr string
-	AsId string
+	AsId *Id
 	AsArr []Expr
 	AsAppend *Append
 	AsType string
@@ -378,6 +378,11 @@ type Vardef struct {
 }
 
 type Append struct {
+	Index []Expr
+}
+
+type Id struct {
+	Name string
 	Index []Expr
 }
 
@@ -463,8 +468,26 @@ func ParserParseExpr(parser *Parser) (Expr) {
 			parser.ParserEat(TOKEN_TYPE)
 		case TOKEN_ID:
 			expr.Type = ExprId
-			expr.AsId = parser.current_token_value
+			vname := parser.current_token_value
 			parser.ParserEat(TOKEN_ID)
+			var IndexArr []Expr
+			if parser.current_token_type != TOKEN_L_BRACKET {
+				IndexArr = nil
+			} else {
+				for {
+					if parser.current_token_type != TOKEN_L_BRACKET {
+						break
+					}
+					parser.ParserEat(TOKEN_L_BRACKET)
+					index := ParserParseExpr(parser)
+					IndexArr = append(IndexArr, index)
+					parser.ParserEat(TOKEN_R_BRACKET)
+				}
+			}
+			expr.AsId = &Id {
+				Name: vname,
+				Index: IndexArr,
+			}
 		case TOKEN_L_BRACKET:
 			parser.ParserEat(TOKEN_L_BRACKET)
 			expr.Type = ExprArr
@@ -750,14 +773,35 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 
 var Stack = []Expr{}
 
-func VisitVar(VarName string) (Expr) {
-	var VarExpr Expr
+func VisitVar(VarName string, expr Expr) (Expr) {
+	var VisitedVar Expr
 	if _, ok := VariableScope[VarName]; ok {
-		VarExpr = VariableScope[VarName]
+		VisitedVar = VariableScope[VarName]
 	} else {
 		fmt.Println("Error: undefined variable '" + VarName + "'"); os.Exit(0);
 	}
-	return VarExpr
+	if expr.AsId.Index != nil {
+		var arr *Expr
+		arr = &VisitedVar
+		var IntValue int
+		for i := 0; i < len(expr.AsId.Index); i++ {
+			if expr.AsId.Index[i].Type == ExprId {
+				var VarExpr Expr
+				VarExpr = VisitVar(expr.AsId.Index[i].AsId.Name, expr.AsId.Index[i])
+				IntValue = VarExpr.AsInt
+			} else if expr.AsId.Index[i].Type != ExprInt {
+				fmt.Println("TypeError:"); os.Exit(0);
+			} else {
+				IntValue = expr.AsId.Index[i].AsInt
+			}
+			if len(arr.AsArr) <= IntValue {
+				fmt.Println("Error:"); os.Exit(0);
+			}
+			arr = &arr.AsArr[IntValue]
+		}
+		return *arr
+	}
+	return VisitedVar
 }
 
 func OpBuildArr(exprs []Expr)Expr {
@@ -766,7 +810,7 @@ func OpBuildArr(exprs []Expr)Expr {
 	var arrExprs = []Expr{}
 	for i := 0; i < len(exprs); i++ {
 		if exprs[i].Type == ExprId {
-			exprVar := VisitVar(exprs[i].AsId)
+			exprVar := VisitVar(exprs[i].AsId.Name, exprs[i])
 			arrExprs = append(arrExprs, exprVar)
 		} else if exprs[i].Type == ExprArr {
 			exprArr := OpBuildArr(exprs[i].AsArr)
@@ -781,14 +825,14 @@ func OpBuildArr(exprs []Expr)Expr {
 
 func OpPush(item Expr) {
 	if item.Type == ExprId {
-		item = VisitVar(item.AsId)
+		item = VisitVar(item.AsId.Name, item)
 	} else if  item.Type == ExprArr {
 		expr := Expr{}
 		expr.Type = ExprArr
 		var arrExprs = []Expr{}
 		for i := 0; i < len(item.AsArr); i++ {
 			if item.AsArr[i].Type == ExprId {
-				exprVar := VisitVar(item.AsArr[i].AsId)
+				exprVar := VisitVar(item.AsArr[i].AsId.Name, item.AsArr[i])
 				arrExprs = append(arrExprs, exprVar)
 			} else if item.AsArr[i].Type == ExprArr {
 				exprArr := OpBuildArr(item.AsArr[i].AsArr)
@@ -1198,7 +1242,7 @@ func OpAppend(expr Expr) {
 		for i := 0; i < len(expr.AsAppend.Index); i++ {
 			if expr.AsAppend.Index[i].Type == ExprId {
 				var VarExpr Expr
-				VarExpr = VisitVar(expr.AsAppend.Index[i].AsId)
+				VarExpr = VisitVar(expr.AsAppend.Index[i].AsId.Name, expr.AsAppend.Index[i])
 				IntValue = VarExpr.AsInt
 			} else if expr.AsAppend.Index[i].Type != ExprInt {
 				fmt.Println("TypeError: 'append' index must be type int"); os.Exit(0);
