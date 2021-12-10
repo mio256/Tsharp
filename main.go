@@ -960,7 +960,6 @@ func PrintArray(visitedExpr Expr) {
 	fmt.Print("]")
 }
 
-// it prints without the newline
 func OpPuts() {
 	if len(Stack) < 1 {
 		fmt.Println("Error: 'print' expected more than one element in stack.")
@@ -973,32 +972,24 @@ func OpPuts() {
 		case ExprStr: fmt.Print(visitedExpr.AsStr)
 		case ExprBool: fmt.Print(visitedExpr.AsBool)
 		case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
-		case ExprArr: PrintArray(visitedExpr) // prints the array no need to rewrite
+		case ExprArr: PrintArray(visitedExpr)
 	}
 
 
 	OpDrop()
 }
 
-// prints with a newline
 func OpPrint() {
-	OpPuts() // prints the object
-	fmt.Println() // print the newline
+	OpPuts()
+	fmt.Println()
 }
 
-// takes commandline input
 func OpInput() {
 	var input string
 	fmt.Scanln(&input)
 	inpExpr := Expr{}
-	// check if it's an int or float
-	if (isInt(input)) {
-		inpExpr.Type = ExprInt
-		inpExpr.AsInt, _ = strconv.Atoi(input)
-	} else {
-		inpExpr.Type = ExprStr
-		inpExpr.AsStr = input
-	}
+	inpExpr.Type = ExprStr
+	inpExpr.AsStr = input
 	OpPush(inpExpr)
 }
 
