@@ -788,6 +788,9 @@ func VisitVar(VarName string, expr Expr) (Expr) {
 			if expr.AsId.Index[i].Type == ExprId {
 				var VarExpr Expr
 				VarExpr = VisitVar(expr.AsId.Index[i].AsId.Name, expr.AsId.Index[i])
+				if VarExpr.Type != ExprInt {
+					fmt.Println("TypeError: list index must be type <int>"); os.Exit(0);
+				}
 				IntValue = VarExpr.AsInt
 			} else if expr.AsId.Index[i].Type != ExprInt {
 				fmt.Println("TypeError: list index must be type <int>"); os.Exit(0);
