@@ -1,7 +1,14 @@
-push "What is your name? "
+
+push "What is your name? " puts
+
 input
-push "Hello " puts print
-push "How old are you? "
+
+push "Hello " puts dup puts push "👋" print
+
+push "How old are you? " puts
+
 input
-dup push 3 + 
-push "I am " puts puts push " and you are " puts print
+
+swap
+
+puts push " is " puts puts push " years old " print
