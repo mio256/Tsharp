@@ -11,7 +11,7 @@ if exists("b:current_syntax")
 endif
 
 " Language keywords
-syntax keyword tsharpKeywords import block do end if else for 
+syntax keyword tsharpKeywords import block do end if else for int string bool type list
 
 " Comments
 syntax region tsharpCommentLine start="//" end="$"   contains=tsharpTodos
