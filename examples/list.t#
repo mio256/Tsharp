@@ -6,7 +6,12 @@ push 0
 for dup push 7 <= do
     dup -> i drop
     swap -> x
-    push x[i] print
+    if push x[i] typeof push list == do
+        push x[i][0] print
+        push x[i][1] print
+    else
+        push x[i] print
+    end
     swap
     inc
 end drop drop
