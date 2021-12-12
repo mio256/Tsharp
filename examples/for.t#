@@ -1,9 +1,13 @@
 
-for push true do
-    push "Hello World" print
+# Print "Hello World!" 10 times
+push 0
+for dup push 10 < do
+    push "Hello World!" print
+    inc
 end
 
+# break examples
 for push true do
-    push "break examples"
+    push "break example" print
     break
 end
