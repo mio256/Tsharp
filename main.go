@@ -951,10 +951,7 @@ func PrintArray(visitedExpr Expr) {
 		}
 		switch (visitedExpr.AsArr[i].Type) {
 			case ExprInt: fmt.Print(visitedExpr.AsArr[i].AsInt)
-			case ExprStr:
-				fmt.Print("'")
-				fmt.Print(visitedExpr.AsArr[i].AsStr)
-				fmt.Print("'")
+			case ExprStr: fmt.Print(fmt.Sprintf("'%s'", visitedExpr.AsArr[i].AsStr))
 			case ExprTypeType: fmt.Print(visitedExpr.AsArr[i].AsType)
 			case ExprBool: fmt.Print(visitedExpr.AsArr[i].AsBool)
 			case ExprArr: PrintArray(visitedExpr.AsArr[i])
