@@ -148,6 +148,14 @@ push 10 dec print
 ```
 'dec' decrement the top element of the stack
 
+## Exit
+```python
+push "Hello World"
+exit
+print
+```
+'exit' will exit the program.
+
 ## List
 ```python
 push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
