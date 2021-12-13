@@ -70,6 +70,14 @@ push "Hello World" push "T# Programming Language" drop print
 ```
 'drop' drops the top element of the stack.
 
+## PrintS
+```pascal
+push 1 push 2 push [1,2,3,4,["a","b","c"]]
+
+printS
+```
+'printS' print all stack values. 'printS' won't drop stack value after print.
+
 ## For loop
 ```pascal
 for push true do
