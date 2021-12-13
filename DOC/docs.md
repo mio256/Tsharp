@@ -71,10 +71,14 @@ push "Hello World" push "T# Programming Language" drop print
 'drop' drops the top element of the stack.
 
 ## PrintS
-```pascal
+```python
 push 1 push 2 push [1,2,3,4,["a","b","c"]]
 
 printS
+
+# stack length  
+#     ↓ 
+#    <3>  1 2 [1, 2, 3, 4, ["a", "b", "c"]] <- top
 ```
 'printS' print all stack values. 'printS' won't drop stack value after print.
 
