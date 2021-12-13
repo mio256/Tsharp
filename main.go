@@ -307,6 +307,7 @@ const (
 	ExprPush
 	ExprBlockdef
 	ExprPrint
+	ExprPrintS
 	ExprPuts
 	ExprInput
 	ExprOver
@@ -527,6 +528,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "print" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrint
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "printS" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprPrintS
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "input" {
 				parser.ParserEat(TOKEN_ID)
@@ -982,6 +987,22 @@ func OpPrint() {
 	fmt.Println()
 }
 
+func OpPrintS() {
+	fmt.Print(fmt.Sprintf("<%d> ", len(Stack)))
+	for i:=len(Stack); i > 0; i-- {
+		visitedExpr := Stack[len(Stack)-i]
+		switch (visitedExpr.Type) {
+			case ExprInt: fmt.Print(visitedExpr.AsInt)
+			case ExprStr: fmt.Print(visitedExpr.AsStr)
+			case ExprBool: fmt.Print(visitedExpr.AsBool)
+			case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
+			case ExprArr: PrintArray(visitedExpr)
+		}
+		fmt.Print(" ")
+	}
+	fmt.Println("← top")
+}
+
 func OpInput() {
 	var input string
 	fmt.Scanln(&input)
@@ -1311,6 +1332,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpInput()
 			case ExprPuts:
 				OpPuts()
+			case ExprPrintS:
+				OpPrintS()
 			case ExprAppend:
 				OpAppend(expr)
 			case ExprTypeOf:
