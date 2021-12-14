@@ -42,13 +42,13 @@ $ ./main.exe <filename>.t#
 
 > Hello World
 ```pascal
-push "Hello World" print
+"Hello World" print
 ```
 
 > Block
 ```pascal
 block Main do
-    push "Hello World" print
+    "Hello World" print
 end
 
 call Main
@@ -56,69 +56,69 @@ call Main
 
 > If Statement
 ```pascal
-if push true do
-    push "Hello World!" print
+if true do
+    "Hello World!" print
 end
 ```
 
 ```pascal
-if push false do
-    push "Hello World" print
+if false do
+    "Hello World" print
 else
-    push "Hello World else body" print
+    "Hello World else body" print
 end
 ```
 
 > For loop
 ```pascal
-for push true do
-    push "Hello World!" print
+for true do
+    "Hello World!" print
 end
 ```
 
 > Dup
 ```pascal
-push "Hello World!" dup print print
+"Hello World!" dup print print
 ```
 
 > Drop
 ```pascal
-push "Hello World" push "T# Programming Language" drop print
+"Hello World" "T# Programming Language" drop print
 ```
 
 > Arithmetic
 ```pascal
-push 34 push 35 + print
+34 35 + print
 
-push 100 push 40 - print
+100 40 - print
 
-push 200 push 5 / print
+200 5 / print
 
-push 10 push 2 * print
+10 2 * print
 ```
 
 > Variable
 ```pascal
-push 10 -> x drop
+10 -> x drop
 
-push x -> y drop
+x -> y drop
 
-push y print
+y print
 ```
 
 > FizzBuzz
 ```pascal
-push 1
-for dup push 101 < do
-    if dup push 3 % push 0 == do
-        if dup push 15 % push 0 == do
-            push "FizzBuzz" print
+1
+for dup 101 < do
+    if dup 3 % 0 == do
+        if dup 15 % 0 == do
+            "FizzBuzz" print
         else
-            push "Fizz" print
+            "Fizz" print
         end
     else
-        if dup push 5 % push 0 == do
-            push "Buzz" print
+        if dup 5 % 0 == do
+            "Buzz" print
         else
             dup print
         end
