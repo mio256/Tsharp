@@ -756,7 +756,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			}
 			parser.ParserEat(TOKEN_ID)
 			exprs = append(exprs, expr)
-		} else if parser.current_token_type == TOKEN_INT || parser.current_token_type == TOKEN_STRING || parser.current_token_type == TOKEN_L_BRACKET || parser.current_token_type == TOKEN_TYPE {
+		} else if parser.current_token_type == TOKEN_INT || parser.current_token_type == TOKEN_STRING || parser.current_token_type == TOKEN_L_BRACKET || parser.current_token_type == TOKEN_TYPE || parser.current_token_type == TOKEN_BOOL {
 			expr.Type = ExprPush
 			expr.AsPush = &Push{
 				Arg: ParserParseExpr(parser),
