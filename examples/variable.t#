@@ -1,7 +1,7 @@
 
-push 10 -> x drop
+10 -> x drop
 
-push x -> y drop
+x -> y drop
 
-push y print
+y print
 

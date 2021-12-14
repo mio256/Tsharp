@@ -1,16 +1,16 @@
 
 # List example 1
-push ["T#", "Ruby", "Python", "C", "Go", "Julia", "V", ["HTML", "CSS"]]
+["T#", "Ruby", "Python", "C", "Go", "Julia", "V", ["HTML", "CSS"]]
 
-push 0
-for dup push 7 <= do
+0
+for dup 7 <= do
     dup -> i drop
     swap -> x
-    if push x[i] typeof push list == do
-        push x[i][0] print
-        push x[i][1] print
+    if x[i] typeof list == do
+        x[i][0] print
+        x[i][1] print
     else
-        push x[i] print
+        x[i] print
     end
     swap
     inc
@@ -18,12 +18,12 @@ end drop drop
 
 
 # List example 2
-push ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
+["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
 
-push "V" append dup print
+"V" append dup print
 
-push ["HTML"] append dup print
+["HTML"] append dup print
 
-push "CSS" append[7]
+"CSS" append[7]
 
 print

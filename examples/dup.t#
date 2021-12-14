@@ -1,2 +1,2 @@
 
-push "Hello World!" dup print print
+"Hello World!" dup print print

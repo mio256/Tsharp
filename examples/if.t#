@@ -1,33 +1,33 @@
 
 
-if push false do
-    push "Hello World!" print
+if false do
+    "Hello World!" print
 else
-    push "Hello World!" print
+    "Hello World!" print
 end
 
-push 10 push 20 == print
+10 20 == print
 
-push "Hello" push "Hello" == print
+"Hello" "Hello" == print
 
-push true push true == print
+true true == print
 
-push "Hello" push "Hello World" != print
+"Hello" "Hello World" != print
 
-push 10 push 20 != print
+10 20 != print
 
-push 10 push 20 < print
+10 20 < print
 
-push 20 push 10 > print
+20 10 > print
 
-push 1 push 1 <= print
+1 1 <= print
 
-push 10 push 10 >= print
+10 10 >= print
 
-push int push int == print
+int int == print
 
-push string push int == print
+string int == print
 
-push [1, 2, 3, 4, [2]] push [1, 2, 3, 4, [2]] == print
+[1, 2, 3, 4, [2]] [1, 2, 3, 4, [2]] == print
 
-push [1, 2, 3, 4, [2]] push [1, 2, 3, 4] != print
+[1, 2, 3, 4, [2]] [1, 2, 3, 4] != print

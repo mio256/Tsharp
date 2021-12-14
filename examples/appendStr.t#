@@ -1,2 +1,2 @@
 
-push "Hello " push "World!" + print
+"Hello " "World!" + print

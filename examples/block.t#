@@ -1,6 +1,6 @@
 
 block Main do
-	push "Hello World from block main" print
+	"Hello World from block main" print
 end
 
 call Main

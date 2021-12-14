@@ -1,15 +1,15 @@
 
-push 1
-for dup push 100 <= do
-    if dup push 3 % push 0 == do
-        if dup push 15 % push 0 == do
-            push "FizzBuzz" print
+1
+for dup 100 <= do
+    if dup 3 % 0 == do
+        if dup 15 % 0 == do
+            "FizzBuzz" print
         else
-            push "Fizz" print
+            "Fizz" print
         end
     else
-        if dup push 5 % push 0 == do
-            push "Buzz" print
+        if dup 5 % 0 == do
+            "Buzz" print
         else
             dup print
         end

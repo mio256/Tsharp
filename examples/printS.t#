@@ -1,6 +1,6 @@
 
 # print all stack values
 
-push 1 push 2 push [1,2,3,4,["a","b","c"]]
+1 2 [1,2,3,4,["a","b","c"]]
 
 printS

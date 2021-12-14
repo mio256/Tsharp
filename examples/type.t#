@@ -1,15 +1,15 @@
 
-push string
+string
 
-push int
+int
 
-push bool
+bool
 
-push 0
+0
 
-for dup push 3 < do
+for dup 3 < do
     swap print
-    push 1 +
+    1 +
 end
 
-push "Hello World!" typeof print
+"Hello World!" typeof print

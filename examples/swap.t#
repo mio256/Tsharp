@@ -1,2 +1,2 @@
 
-push 34 push 100 swap print
+34 100 swap print
