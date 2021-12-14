@@ -518,14 +518,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 	for {
 		expr := Expr{}
 		if parser.current_token_type == TOKEN_ID {
-			if parser.current_token_value == "push" {
-				parser.ParserEat(TOKEN_ID)
-				expr.Type = ExprPush
-				expr.AsPush = &Push{
-					Arg: ParserParseExpr(parser),
-				}
-				exprs = append(exprs, expr)
-			} else if parser.current_token_value == "print" {
+			if parser.current_token_value == "print" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrint
 				exprs = append(exprs, expr)
@@ -694,8 +687,11 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				}
 				exprs = append(exprs, expr)
 			} else {
-				fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
-				os.Exit(0)
+				expr.Type = ExprPush
+				expr.AsPush = &Push{
+					Arg: ParserParseExpr(parser),
+				}
+				exprs = append(exprs, expr)
 			}
 		} else if parser.current_token_type == TOKEN_PLUS {
 			expr.Type = ExprBinop
@@ -759,6 +755,12 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				Name: parser.current_token_value,
 			}
 			parser.ParserEat(TOKEN_ID)
+			exprs = append(exprs, expr)
+		} else if parser.current_token_type == TOKEN_INT || parser.current_token_type == TOKEN_STRING || parser.current_token_type == TOKEN_L_BRACKET || parser.current_token_type == TOKEN_TYPE {
+			expr.Type = ExprPush
+			expr.AsPush = &Push{
+				Arg: ParserParseExpr(parser),
+			}
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF {
 			return exprs, *parser
