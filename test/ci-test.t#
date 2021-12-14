@@ -1,14 +1,14 @@
 
-push "Hello World" print
+"Hello World" print
 
-push 1234 print
+1234 print
 
 block MainBlock do
-	push "Hello World from block main" print
+	"Hello World from block main" print
 end
 
 call MainBlock
 
-push 300 push 100 + print
+300 100 + print
 
-push 400 push 34 - print
+400 34 - print
