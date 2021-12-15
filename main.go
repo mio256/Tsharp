@@ -314,6 +314,7 @@ const (
 	ExprRot
 	ExprInc
 	ExprDec
+	ExprLen
 	ExprTypeOf
 	ExprBreak
 	ExprSwap
@@ -529,6 +530,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "input" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprInput
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "len" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprLen
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "puts" {
 				parser.ParserEat(TOKEN_ID)
@@ -1129,6 +1134,25 @@ func OpCompare(value int) (bool) {
 	return false
 }
 
+func OpLen() {
+	if len(Stack) < 1 {
+		fmt.Println("Error: 'len' expected more than one elements in stack.")
+		os.Exit(0)
+	}
+
+	visitedExpr := Stack[len(Stack)-1]
+
+	if visitedExpr.Type != ExprArr {
+		fmt.Println("TypeError: 'len' expected type <list>")
+		os.Exit(0)
+	}
+	
+	IntExpr := Expr{}
+	IntExpr.Type = ExprInt
+	IntExpr.AsInt = len(visitedExpr.AsArr)
+	OpPush(IntExpr)
+}
+
 func RetBool() (bool) {
 	if len(Stack)-1 < 0 {
 		fmt.Println("Error: the stack is empty, couldn't find bool")
@@ -1358,6 +1382,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpDup()
 			case ExprDrop:
 				OpDrop()
+			case ExprLen:
+				OpLen()
 			case ExprExit:
 				os.Exit(0)
 			case ExprBinop:
