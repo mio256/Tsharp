@@ -1145,16 +1145,18 @@ func RetBool() (bool) {
 	return bool_value
 }
 
-func OpIf(expr Expr) {
+func OpIf(expr Expr) (bool) {
 	VisitExpr(expr.AsIf.Op)
 	bool_value := RetBool()
+	var breakValue bool
 	if bool_value {
-		VisitExpr(expr.AsIf.Body)
+		breakValue = VisitExpr(expr.AsIf.Body)
 	} else {
 		if expr.AsIf.ElseBody != nil {
-			VisitExpr(expr.AsIf.ElseBody)
+			breakValue = VisitExpr(expr.AsIf.ElseBody)
 		}
 	}
+	return breakValue
 }
 
 func OpCondition(expr Expr) {
@@ -1367,13 +1369,16 @@ func VisitExpr(exprs []Expr) (bool) {
 			case ExprCall:
 				OpCallBlock(expr)
 			case ExprIf:
-				OpIf(expr)
+				BreakValue = OpIf(expr)
 			case ExprFor:
 				OpFor(expr)
 			case ExprVardef:
 				OpVardef(expr)
 			case ExprBreak:
 				BreakValue = true
+		}
+		if BreakValue {
+			break
 		}
 	}
 	return BreakValue
