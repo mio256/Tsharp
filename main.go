@@ -1187,17 +1187,17 @@ func OpBinop(value int) {
 
 	ValueExpr := Expr{}
 	if value == TOKEN_PLUS {
-		if visitedExpr.Type == ExprStr || visitedExprSecond.Type == ExprStr {
+		if visitedExpr.Type == ExprStr && visitedExprSecond.Type == ExprStr {
 			ValueExpr.Type = ExprStr
 			ValueExpr.AsStr =  visitedExprSecond.AsStr + visitedExpr.AsStr
-		} else if visitedExpr.Type == ExprInt || visitedExprSecond.Type == ExprInt {
+		} else if visitedExpr.Type == ExprInt && visitedExprSecond.Type == ExprInt {
 			ValueExpr.Type = ExprInt
 			ValueExpr.AsInt = visitedExpr.AsInt + visitedExprSecond.AsInt
 		} else {
 			fmt.Println("TypeError: binary operation expected type int")
 			os.Exit(0)
 		}
-	} else if visitedExpr.Type != ExprInt || visitedExprSecond.Type != ExprInt {
+	} else if visitedExpr.Type != ExprInt && visitedExprSecond.Type != ExprInt {
 		fmt.Println("TypeError: binary operation expected type int")
 		os.Exit(0)
 	} else {
