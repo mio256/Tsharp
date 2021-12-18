@@ -337,7 +337,7 @@ type Expr struct {
 	AsStr string
 	AsId *Id
 	AsArr []Expr
-	AsAppend *Append
+	//AsAppend *Append
 	AsType string
 	AsPush *Push
 	AsBlockdef *Blockdef
@@ -473,8 +473,9 @@ func ParserParseExpr(parser *Parser) (Expr) {
 			vname := parser.current_token_value
 			parser.ParserEat(TOKEN_ID)
 			var IndexArr []Expr
-			if parser.current_token_type != TOKEN_L_BRACKET {
+			//if parser.current_token_type != TOKEN_L_BRACKET {
 				IndexArr = nil
+			/*
 			} else {
 				for {
 					if parser.current_token_type != TOKEN_L_BRACKET {
@@ -486,10 +487,12 @@ func ParserParseExpr(parser *Parser) (Expr) {
 					parser.ParserEat(TOKEN_R_BRACKET)
 				}
 			}
+			*/
 			expr.AsId = &Id {
 				Name: vname,
 				Index: IndexArr,
 			}
+		/*
 		case TOKEN_L_BRACKET:
 			parser.ParserEat(TOKEN_L_BRACKET)
 			expr.Type = ExprArr
@@ -506,6 +509,7 @@ func ParserParseExpr(parser *Parser) (Expr) {
 				}
 			}
 			parser.ParserEat(TOKEN_R_BRACKET)
+		*/
 		default:
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 			os.Exit(0)
@@ -670,6 +674,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprBreak
 				exprs = append(exprs, expr)
+			/*
 			} else if parser.current_token_value == "append" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprAppend
@@ -691,6 +696,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					Index: indexArr,
 				}
 				exprs = append(exprs, expr)
+			*/
 			} else {
 				expr.Type = ExprPush
 				expr.AsPush = &Push{
@@ -792,6 +798,7 @@ func VisitVar(VarName string, expr Expr) (Expr) {
 	} else {
 		fmt.Println("Error: undefined variable '" + VarName + "'"); os.Exit(0);
 	}
+	/*
 	if expr.AsId.Index != nil {
 		var VisitedListValue *Expr
 		VisitedListValue = &VisitedVar
@@ -816,10 +823,12 @@ func VisitVar(VarName string, expr Expr) (Expr) {
 		}
 		VisitedVar = *VisitedListValue
 	}
+	*/
 	return VisitedVar
 }
 
-func OpBuildArr(exprs []Expr)Expr {
+func OpBuildArr(exprs []Expr)/*Expr*/ {
+	/*
 	expr := Expr{}
 	expr.Type = ExprArr
 	var arrExprs = []Expr{}
@@ -836,12 +845,15 @@ func OpBuildArr(exprs []Expr)Expr {
 	}
 	expr.AsArr = arrExprs
 	return expr
+	*/
+	fmt.Println("Error: not implmented")
+    os.Exit(0)
 }
 
 func OpPush(item Expr) {
 	if item.Type == ExprId {
 		item = VisitVar(item.AsId.Name, item)
-	} else if  item.Type == ExprArr {
+	}/* else if  item.Type == ExprArr {
 		expr := Expr{}
 		expr.Type = ExprArr
 		var arrExprs = []Expr{}
@@ -859,7 +871,7 @@ func OpPush(item Expr) {
 		expr.AsArr = arrExprs
 		Stack = append(Stack, expr)
 		return
-	}
+	}*/
 	Stack = append(Stack, item)
 }
 
@@ -984,7 +996,7 @@ func OpPuts() {
 		case ExprStr: fmt.Print(visitedExpr.AsStr)
 		case ExprBool: fmt.Print(visitedExpr.AsBool)
 		case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
-		case ExprArr: PrintArray(visitedExpr)
+		// case ExprArr: PrintArray(visitedExpr)
 	}
 	OpDrop()
 }
@@ -1003,7 +1015,7 @@ func OpPrintS() {
 			case ExprStr: fmt.Print(visitedExpr.AsStr)
 			case ExprBool: fmt.Print(visitedExpr.AsBool)
 			case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
-			case ExprArr: PrintArray(visitedExpr)
+			// case ExprArr: PrintArray(visitedExpr)
 		}
 		fmt.Print(" ")
 	}
@@ -1263,6 +1275,7 @@ func OpFor(expr Expr) {
 }
 
 func OpAppend(expr Expr) {
+	/*
 	if len(Stack) < 2 {
 		fmt.Println("Error: 'append' expected more than two element in stack."); os.Exit(0);
 	}
@@ -1300,6 +1313,9 @@ func OpAppend(expr Expr) {
 		visitedList.AsArr = append(visitedList.AsArr, visitedExpr)
 	}
 	OpPush(visitedList)
+	*/
+	fmt.Println("Error: 'append' not implmented")
+	os.Exit(0)
 }
 
 
