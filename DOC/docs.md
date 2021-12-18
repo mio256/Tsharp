@@ -70,13 +70,13 @@ end
 
 ## PrintS
 ```python
-1 2 [1,2,3,4,["a","b","c"]]
+1 2 "Hello World!"
 
 printS
 
 # stack length  
 #     ↓ 
-#    <3>  1 2 [1, 2, 3, 4, ["a", "b", "c"]] <- top
+#    <3>  1 2 'Hello World' <- top
 ```
 'printS' print all stack values. 'printS' won't drop stack value after print.
 
@@ -158,6 +158,7 @@ print
 ```
 'exit' will exit the program.
 
+<!------
 ## List
 ```python
 ["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
@@ -172,6 +173,7 @@ print
 
 print
 ```
+------->
 
 ## FizzBuzz
 ```pascal
