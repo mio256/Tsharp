@@ -385,7 +385,6 @@ type Append struct {
 
 type Id struct {
 	Name string
-	Index []Expr
 }
 
 
@@ -472,25 +471,8 @@ func ParserParseExpr(parser *Parser) (Expr) {
 			expr.Type = ExprId
 			vname := parser.current_token_value
 			parser.ParserEat(TOKEN_ID)
-			var IndexArr []Expr
-			//if parser.current_token_type != TOKEN_L_BRACKET {
-				IndexArr = nil
-			/*
-			} else {
-				for {
-					if parser.current_token_type != TOKEN_L_BRACKET {
-						break
-					}
-					parser.ParserEat(TOKEN_L_BRACKET)
-					index := ParserParseExpr(parser)
-					IndexArr = append(IndexArr, index)
-					parser.ParserEat(TOKEN_R_BRACKET)
-				}
-			}
-			*/
 			expr.AsId = &Id {
 				Name: vname,
-				Index: IndexArr,
 			}
 		/*
 		case TOKEN_L_BRACKET:
