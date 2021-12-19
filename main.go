@@ -912,12 +912,7 @@ func OpOver() {
 		fmt.Println("OverError: expected more than two elements in stack.")
 		os.Exit(0)
 	}
-	visitedExpr := Stack[len(Stack)-1]
 	visitedExprSecond := Stack[len(Stack)-2]
-	OpDrop()
-	OpDrop()
-	OpPush(visitedExprSecond)
-	OpPush(visitedExpr)
 	OpPush(visitedExprSecond)
 }
 
