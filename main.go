@@ -1255,6 +1255,10 @@ func OpBinop(value int) {
 }
 
 func OpImport(expr Expr) {
+	if _, err := os.Stat(expr.AsImport); os.IsNotExist(err) {
+		fmt.Println(fmt.Sprintf("ImportError: file path '%s' does not exist.",expr.AsImport))
+		os.Exit(0)
+	}
 	file, err := os.Open(expr.AsImport)
 	if err != nil {
 		panic(err)
