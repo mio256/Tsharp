@@ -92,7 +92,7 @@ end drop
 ```
 
 > Multiplication table
-```factor
+```pascal
 block dclone do
     -> tmpa
     swap
