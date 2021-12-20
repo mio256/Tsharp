@@ -41,8 +41,82 @@ $ ./main.exe <filename>.t#
 ```
 
 > Hello World
-```pascal
+```factor
 "Hello World" print
+```
+
+> Fibonacci Sequence
+```factor
+block fb do
+    1 -> a drop
+    0 -> b drop
+    
+    for dup 0 > do
+        a -> x drop
+        a b + -> a drop
+        x -> b drop
+        dec
+    end drop
+    b
+end
+
+0
+for dup 15 <= do
+    dup call fb puts
+    " " puts
+    inc
+end
+
+" " print
+```
+
+> FizzBuzz
+```factor
+1
+for dup 100 <= do
+    if dup 3 % 0 == do
+        if dup 15 % 0 == do
+            "FizzBuzz" print
+        else
+            "Fizz" print
+        end
+    else
+        if dup 5 % 0 == do
+            "Buzz" print
+        else
+            dup print
+        end
+    end
+    inc
+end drop
+```
+
+> Multiplication table
+```factor
+block dclone do
+    -> tmpa
+    swap
+    -> tmpb
+    swap
+    tmpb
+    tmpa
+end
+
+1 for dup 10 < do
+    1 for dup 10 < do
+        call dclone
+        *
+        if dup 10 < do
+            " " puts
+        end
+        puts
+        " " puts
+        inc
+    end
+    " " print
+    drop
+    inc
+end
 ```
 
 <a href="https://github.com/Tsharp-lang/Tsharp/blob/main/DOC/docs.md">Doc</a>
