@@ -41,12 +41,12 @@ $ ./main.exe <filename>.t#
 ```
 
 > Hello World
-```factor
+```pascal
 "Hello World" print
 ```
 
 > Fibonacci Sequence
-```factor
+```pascal
 block fb do
     1 -> a drop
     0 -> b drop
@@ -71,7 +71,7 @@ end
 ```
 
 > FizzBuzz
-```factor
+```pascal
 1
 for dup 100 <= do
     if dup 3 % 0 == do
