@@ -3,10 +3,10 @@ block BubbleSort do
     for dup length <= do
         0
         for dup length 1 - < do
-            -> j
+            dup -> j
             if arr j read swap drop arr j 1 + read swap drop > do
-                arr j read swap drop -> x drop
-                arr j 1 + read swap drop -> y drop
+                arr j read swap drop -> x
+                arr j 1 + read swap drop -> y
                 arr y j replace
                 arr x j 1 + replace
                 drop
@@ -19,9 +19,9 @@ block BubbleSort do
 end
 
 block Main do
-    [] 19 append 13 append 6  append 2  append 18 append 8 append 1 append -> arr
+    [] 19 append 13 append 6  append 2  append 18 append 8 append 1 append dup -> arr
 
-    len -> length drop
+    len -> length
 
     "before:      " puts
     arr print
