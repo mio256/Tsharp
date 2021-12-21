@@ -303,6 +303,8 @@ const (
 	ExprId
 	ExprArr
 	ExprAppend
+	ExprReplace
+	ExprRead
 	ExprTypeType
 	ExprPush
 	ExprBlockdef
@@ -337,7 +339,6 @@ type Expr struct {
 	AsStr string
 	AsId *Id
 	AsArr []Expr
-	//AsAppend *Append
 	AsType string
 	AsPush *Push
 	AsBlockdef *Blockdef
@@ -377,10 +378,6 @@ type For struct {
 
 type Vardef struct {
 	Name string
-}
-
-type Append struct {
-	Index []Expr
 }
 
 type Id struct {
@@ -474,24 +471,10 @@ func ParserParseExpr(parser *Parser) (Expr) {
 			expr.AsId = &Id {
 				Name: vname,
 			}
-		/*
 		case TOKEN_L_BRACKET:
 			parser.ParserEat(TOKEN_L_BRACKET)
 			expr.Type = ExprArr
-			var arrExprs = []Expr{}
-			if parser.current_token_type == TOKEN_R_BRACKET {
-				expr.AsArr = arrExprs
-			} else {
-				for {
-					arrExpr := ParserParseExpr(parser)
-					arrExprs = append(arrExprs, arrExpr)
-					expr.AsArr = arrExprs
-					if parser.current_token_type == TOKEN_R_BRACKET || parser.current_token_type != TOKEN_COMMA { break }
-					parser.ParserEat(TOKEN_COMMA)
-				}
-			}
 			parser.ParserEat(TOKEN_R_BRACKET)
-		*/
 		default:
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 			os.Exit(0)
@@ -656,29 +639,18 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprBreak
 				exprs = append(exprs, expr)
-			/*
 			} else if parser.current_token_value == "append" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprAppend
-				var indexArr []Expr
-				if parser.current_token_type != TOKEN_L_BRACKET {
-					indexArr = nil
-				} else {
-					for {
-						if parser.current_token_type != TOKEN_L_BRACKET {
-							break
-						}
-						parser.ParserEat(TOKEN_L_BRACKET)
-						index := ParserParseExpr(parser)
-						indexArr = append(indexArr, index)
-						parser.ParserEat(TOKEN_R_BRACKET)
-					}
-				}
-				expr.AsAppend = &Append {
-					Index: indexArr,
-				}
 				exprs = append(exprs, expr)
-			*/
+			} else if parser.current_token_value == "replace" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprReplace
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "read" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprRead
+				exprs = append(exprs, expr)
 			} else {
 				expr.Type = ExprPush
 				expr.AsPush = &Push{
@@ -780,80 +752,13 @@ func VisitVar(VarName string, expr Expr) (Expr) {
 	} else {
 		fmt.Println("Error: undefined variable '" + VarName + "'"); os.Exit(0);
 	}
-	/*
-	if expr.AsId.Index != nil {
-		var VisitedListValue *Expr
-		VisitedListValue = &VisitedVar
-		var IntValue int
-		for i := 0; i < len(expr.AsId.Index); i++ {
-			if expr.AsId.Index[i].Type == ExprId {
-				var VarExpr Expr
-				VarExpr = VisitVar(expr.AsId.Index[i].AsId.Name, expr.AsId.Index[i])
-				if VarExpr.Type != ExprInt {
-					fmt.Println("TypeError: list index must be type <int>"); os.Exit(0);
-				}
-				IntValue = VarExpr.AsInt
-			} else if expr.AsId.Index[i].Type != ExprInt {
-				fmt.Println("TypeError: list index must be type <int>"); os.Exit(0);
-			} else {
-				IntValue = expr.AsId.Index[i].AsInt
-			}
-			if len(VisitedListValue.AsArr) <= IntValue {
-				fmt.Println("Error: index out of range"); os.Exit(0);
-			}
-			VisitedListValue = &VisitedListValue.AsArr[IntValue]
-		}
-		VisitedVar = *VisitedListValue
-	}
-	*/
 	return VisitedVar
-}
-
-func OpBuildArr(exprs []Expr)/*Expr*/ {
-	/*
-	expr := Expr{}
-	expr.Type = ExprArr
-	var arrExprs = []Expr{}
-	for i := 0; i < len(exprs); i++ {
-		if exprs[i].Type == ExprId {
-			exprVar := VisitVar(exprs[i].AsId.Name, exprs[i])
-			arrExprs = append(arrExprs, exprVar)
-		} else if exprs[i].Type == ExprArr {
-			exprArr := OpBuildArr(exprs[i].AsArr)
-			arrExprs = append(arrExprs, exprArr)
-		} else {
-			arrExprs = append(arrExprs, exprs[i])
-		}
-	}
-	expr.AsArr = arrExprs
-	return expr
-	*/
-	fmt.Println("Error: not implmented")
-    os.Exit(0)
 }
 
 func OpPush(item Expr) {
 	if item.Type == ExprId {
 		item = VisitVar(item.AsId.Name, item)
-	}/* else if  item.Type == ExprArr {
-		expr := Expr{}
-		expr.Type = ExprArr
-		var arrExprs = []Expr{}
-		for i := 0; i < len(item.AsArr); i++ {
-			if item.AsArr[i].Type == ExprId {
-				exprVar := VisitVar(item.AsArr[i].AsId.Name, item.AsArr[i])
-				arrExprs = append(arrExprs, exprVar)
-			} else if item.AsArr[i].Type == ExprArr {
-				exprArr := OpBuildArr(item.AsArr[i].AsArr)
-				arrExprs = append(arrExprs, exprArr)
-			} else {
-				arrExprs = append(arrExprs, item.AsArr[i])
-			}
-		}
-		expr.AsArr = arrExprs
-		Stack = append(Stack, expr)
-		return
-	}*/
+	}
 	Stack = append(Stack, item)
 }
 
@@ -973,7 +878,7 @@ func OpPuts() {
 		case ExprStr: fmt.Print(visitedExpr.AsStr)
 		case ExprBool: fmt.Print(visitedExpr.AsBool)
 		case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
-		// case ExprArr: PrintArray(visitedExpr)
+		case ExprArr: PrintArray(visitedExpr)
 	}
 	OpDrop()
 }
@@ -992,7 +897,7 @@ func OpPrintS() {
 			case ExprStr: fmt.Print(visitedExpr.AsStr)
 			case ExprBool: fmt.Print(visitedExpr.AsBool)
 			case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",visitedExpr.AsType))
-			// case ExprArr: PrintArray(visitedExpr)
+			case ExprArr: PrintArray(visitedExpr)
 		}
 		fmt.Print(" ")
 	}
@@ -1256,47 +1161,55 @@ func OpFor(expr Expr) {
 }
 
 func OpAppend(expr Expr) {
-	/*
 	if len(Stack) < 2 {
 		fmt.Println("Error: 'append' expected more than two element in stack."); os.Exit(0);
 	}
 	visitedList := Stack[len(Stack)-2]
 	visitedExpr := Stack[len(Stack)-1]
 	if visitedList.Type != ExprArr {
-		fmt.Println("TypeError: 'append' expected type list"); os.Exit(0);
+		fmt.Println("TypeError: 'append' expected type <list>"); os.Exit(0);
 	}
+	visitedList.AsArr = append(visitedList.AsArr, visitedExpr)
 	OpDrop()
 	OpDrop()
-	if expr.AsAppend.Index != nil {
-		var arr *Expr
-		arr = &visitedList
-		var IntValue int
-		for i := 0; i < len(expr.AsAppend.Index); i++ {
-			if expr.AsAppend.Index[i].Type == ExprId {
-				var VarExpr Expr
-				VarExpr = VisitVar(expr.AsAppend.Index[i].AsId.Name, expr.AsAppend.Index[i])
-				IntValue = VarExpr.AsInt
-			} else if expr.AsAppend.Index[i].Type != ExprInt {
-				fmt.Println("TypeError: 'append' index must be type int"); os.Exit(0);
-			} else {
-				IntValue = expr.AsAppend.Index[i].AsInt
-			}
-			if len(arr.AsArr) <= IntValue {
-				fmt.Println("Error: 'append' list index out of range"); os.Exit(0);
-			}
-			arr = &arr.AsArr[IntValue]
-			if arr.Type != ExprArr {
-				fmt.Println("Error: 'append' list index out of range"); os.Exit(0);
-			}
-		}
-		arr.AsArr = append(arr.AsArr, visitedExpr)
-	} else {
-		visitedList.AsArr = append(visitedList.AsArr, visitedExpr)
-	}
 	OpPush(visitedList)
-	*/
-	fmt.Println("Error: 'append' not implmented")
-	os.Exit(0)
+}
+
+func OpReplace() {
+	if len(Stack) < 3 {
+		fmt.Println("Error: 'replace' expected more than three element in stack."); os.Exit(0);
+	}
+	visitedList := Stack[len(Stack)-3]
+	visitedValue := Stack[len(Stack)-2]
+	visitedIndex := Stack[len(Stack)-1]
+	if visitedIndex.Type != ExprInt {
+		fmt.Println("TypeError: 'replace' index expected type <int>"); os.Exit(0);
+	}
+	if visitedList.Type != ExprArr {
+		fmt.Println("TypeError: 'replace' expected type <list>"); os.Exit(0);
+	}
+	visitedList.AsArr[visitedIndex.AsInt] = visitedValue
+	OpDrop()
+	OpDrop()
+	OpDrop()
+	OpPush(visitedList)
+}
+
+func OpRead() {
+	if len(Stack) < 2 {
+		fmt.Println("Error: 'read' expected more than two element in stack."); os.Exit(0);
+	}
+	visitedList := Stack[len(Stack)-2]
+	visitedIndex := Stack[len(Stack)-1]
+	if visitedIndex.Type != ExprInt {
+		fmt.Println("TypeError: 'replace' index expected type <int>"); os.Exit(0);
+	}
+	if visitedList.Type != ExprArr {
+		fmt.Println("TypeError: 'replace' expected type <list>"); os.Exit(0);
+	}
+	OpDrop()
+	ExprValue := visitedList.AsArr[visitedIndex.AsInt]
+	OpPush(ExprValue)
 }
 
 
@@ -1361,6 +1274,10 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpPrintS()
 			case ExprAppend:
 				OpAppend(expr)
+			case ExprReplace:
+				OpReplace()
+			case ExprRead:
+				OpRead()
 			case ExprTypeOf:
 				OpTypeOf()
 			case ExprSwap:
