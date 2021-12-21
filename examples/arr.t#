@@ -1,0 +1,17 @@
+
+[]
+
+"Hello World!" append
+
+1 append
+
+234 append
+
+"T# Programming Language" 0 1 + replace
+
+0 read
+
+print
+
+printS
+
