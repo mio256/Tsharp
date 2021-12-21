@@ -101,9 +101,9 @@ end
 
 ## Variable
 ```pascal
-10 -> x drop
+10 -> x
 
-x -> y drop
+x -> y
 
 y print
 ```
