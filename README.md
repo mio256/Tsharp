@@ -48,13 +48,13 @@ $ ./main.exe <filename>.t#
 > Fibonacci Sequence
 ```pascal
 block fb do
-    1 -> a drop
-    0 -> b drop
+    1 -> a
+    0 -> b
     
     for dup 0 > do
-        a -> x drop
-        a b + -> a drop
-        x -> b drop
+        a -> x
+        a b + -> a
+        x -> b
         dec
     end drop
     b
@@ -94,9 +94,9 @@ end drop
 > Multiplication table
 ```pascal
 block dclone do
-    -> tmpa
+    dup -> tmpa
     swap
-    -> tmpb
+    dup -> tmpb
     swap
     tmpb
     tmpa
