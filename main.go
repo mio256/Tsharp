@@ -1185,6 +1185,9 @@ func OpReplace() {
 	if visitedIndex.Type != ExprInt {
 		fmt.Println("TypeError: 'replace' index expected type <int>"); os.Exit(0);
 	}
+	if visitedIndex.AsInt >= len(visitedList.AsArr) {
+		fmt.Println("Error: 'replace' index out of range."); os.Exit(0);
+	}
 	if visitedList.Type != ExprArr {
 		fmt.Println("TypeError: 'replace' expected type <list>"); os.Exit(0);
 	}
