@@ -1,0 +1,19 @@
+block fb do
+    1 -> a
+    0 -> b
+
+    for dup 0 > do
+        a -> x
+        a b + -> a
+        x -> b
+        dec
+    end drop
+    b
+end
+0
+for dup 15 <= do
+    dup call fb puts
+    " " puts
+    inc
+end
+" " print
