@@ -47,27 +47,15 @@ $ ./main.exe <filename>.t#
 
 > Fibonacci Sequence
 ```pascal
-block fb do
-    1 -> a
-    0 -> b
-    
-    for dup 0 > do
-        a -> x
-        a b + -> a
-        x -> b
-        dec
-    end drop
-    b
-end
+10000 -> n
 
-0
-for dup 15 <= do
-    dup call fb puts
-    " " puts
-    inc
+0 1 for over n < do
+  over puts " " puts
+  swap over +
 end
+drop drop
 
-" " print
+"" print
 ```
 
 > FizzBuzz
