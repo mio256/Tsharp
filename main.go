@@ -1228,6 +1228,7 @@ func OpVardef(expr Expr) {
 	}
 	exprValue := Stack[len(Stack)-1]
 	VariableScope[expr.AsVardef.Name] = exprValue
+	OpDrop()
 }
 
 
