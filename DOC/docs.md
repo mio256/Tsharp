@@ -158,22 +158,22 @@ print
 ```
 'exit' will exit the program.
 
-<!------
+
 ## List
 ```python
-["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
+[] # push empty list
 
-"V" append dup print
+"Hello World!" append # append string "Hello World!"
 
-["HTML"] append dup print
+34 append # append int 34
 
-[1, 2, 3] append[7]
+68 append # append int 68
 
-"Hello World!" append[7][1]
+"T# Programming Language" 1 replace # replace list index '1' to string "T# Programming Language"
 
 print
 ```
-------->
+
 
 ## FizzBuzz
 ```pascal
