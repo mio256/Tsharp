@@ -131,7 +131,6 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 					}
 				} else if r == '-' {
 					r, _, err := lexer.reader.ReadRune()
-					if r == '\n' {break}
 					if err != nil {
 						if err == io.EOF {
 							return lexer.pos, TOKEN_MINUS, "-"
