@@ -80,6 +80,20 @@ printS
 ```
 'printS' print all stack values. 'printS' won't drop stack value after print.
 
+## PrintV
+```pascal
+10 -> N
+"Hello World!" -> text
+
+printV
+
+/*
+N : 10
+text : "Hello World!"
+*/
+```
+'printV' print all variables.
+
 ## For loop
 ```pascal
 for true do
