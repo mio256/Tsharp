@@ -1,17 +1,15 @@
 block BubbleSort do
-    0
-    for dup length <= do
-        0
-        for dup length 1 - < do
+    0 for dup length <= do
+        0 for dup length 1 - < do
             dup -> j
-            if arr j read swap drop arr j 1 + read swap drop > do
-                arr j read swap drop -> x
-                arr j 1 + read swap drop -> y
-                arr y j replace
-                arr x j 1 + replace
+            j 1 + -> i
+            if arr j read swap i read swap drop > do
+                arr j read -> x
+                i read -> y
+                y j replace
+                x i replace
                 drop
-                drop
-            end
+            end 
             inc
         end drop
         inc
@@ -23,13 +21,11 @@ block Main do
 
     len -> length
 
-    "before:      " puts
-    arr print
+    "before:      " puts arr print
 
     call BubbleSort
 
-    "sorted list: " puts
-    print
+    "sorted list: " puts print
 end
 
 call Main
