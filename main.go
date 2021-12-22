@@ -309,6 +309,7 @@ const (
 	ExprBlockdef
 	ExprPrint
 	ExprPrintS
+	ExprPrintV
 	ExprPuts
 	ExprInput
 	ExprOver
@@ -494,6 +495,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "printS" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrintS
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "printV" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprPrintV
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "input" {
 				parser.ParserEat(TOKEN_ID)
@@ -903,6 +908,20 @@ func OpPrintS() {
 	fmt.Println("← top")
 }
 
+func OpPrintV() {
+	for name, value := range VariableScope {
+		fmt.Print(fmt.Sprintf("%s : ", name))
+		switch (value.Type) {
+			case ExprInt: fmt.Print(value.AsInt)
+			case ExprStr: fmt.Print(value.AsStr)
+			case ExprBool: fmt.Print(value.AsBool)
+			case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",value.AsType))
+			case ExprArr: PrintArray(value)
+		}
+		fmt.Println()
+	}
+}
+
 func OpInput() {
 	var input string
 	fmt.Scanln(&input)
@@ -1275,6 +1294,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpPuts()
 			case ExprPrintS:
 				OpPrintS()
+			case ExprPrintV:
+				OpPrintV()
 			case ExprAppend:
 				OpAppend(expr)
 			case ExprReplace:
