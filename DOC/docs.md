@@ -87,10 +87,9 @@ printS
 
 printV
 
-/*
-N : 10
-text : "Hello World!"
-*/
+# N : 10
+# text : "Hello World!"
+
 ```
 'printV' print all variables.
 
