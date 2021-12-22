@@ -81,7 +81,7 @@ printS
 'printS' print all stack values. 'printS' won't drop stack value after print.
 
 ## PrintV
-```pascal
+```python
 10 -> N
 "Hello World!" -> text
 
