@@ -46,8 +46,10 @@ call main
 ```pascal
 if false do
     "Hello World" print
+elif false do
+    "elif body!" print
 else
-    "Hello World else body!" print
+    "else body!" print
 end
 
 10 10 == print
