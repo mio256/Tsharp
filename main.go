@@ -29,6 +29,7 @@ const (
 	TOKEN_END
 	TOKEN_DO
 	TOKEN_BOOL
+	TOKEN_ELIF
 	TOKEN_ELSE
 	TOKEN_DIV
 	TOKEN_MUL
@@ -57,6 +58,7 @@ var tokens = []string{
 	TOKEN_END:            "TOKEN_END",
 	TOKEN_DO:             "TOKEN_DO",
 	TOKEN_BOOL:           "TOKEN_BOOL",
+	TOKEN_ELIF:           "TOKEN_ELIF",
 	TOKEN_ELSE:           "TOKEN_ELSE",
 	TOKEN_DIV:            "TOKEN_DIV",
 	TOKEN_MUL:            "TOKEN_MUL",
@@ -206,6 +208,8 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 						return startPos, TOKEN_TYPE, val
 					} else if val == "else" {
 						return startPos, TOKEN_ELSE, val
+					} else if val == "elif" {
+						return startPos, TOKEN_ELIF, val
 					}
 					return startPos, TOKEN_ID, val
 				} else if r == '"' {
@@ -368,6 +372,8 @@ type Blockdef struct {
 type If struct {
 	Op []Expr
 	Body []Expr
+	ElifBodys [][]Expr
+	ElifOps [][]Expr
 	ElseBody []Expr
 }
 
@@ -605,6 +611,32 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					os.Exit(0)
 				}
 				body, _ := ParserParse(parser)
+				ElifBodys := [][]Expr{}
+				ElifOps := [][]Expr{}
+				if parser.current_token_type == TOKEN_ELIF {
+					for {
+						parser.ParserEat(TOKEN_ELIF)
+						if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_DO {
+							fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement invalid syntax", parser.line, parser.column))
+							os.Exit(0)
+						}
+						ElifOp, _ := ParserParse(parser)
+						parser.ParserEat(TOKEN_DO)
+						if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
+							fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement elif body is empty", parser.line, parser.column))
+							os.Exit(0)
+						}
+						ElifBody, _ := ParserParse(parser)
+						ElifBodys = append(ElifBodys, ElifBody)
+						ElifOps = append(ElifOps, ElifOp)
+						if parser.current_token_type != TOKEN_ELIF {
+							break
+						}
+					}
+				} else {
+					ElifBodys = nil
+					ElifOps = nil
+				}
 				if parser.current_token_type == TOKEN_ELSE {
 					parser.ParserEat(TOKEN_ELSE)
 					if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
@@ -616,6 +648,8 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					expr.AsIf = &If{
 						Op: op,
 						Body: body,
+						ElifBodys: ElifBodys,
+						ElifOps: ElifOps,
 						ElseBody: ElseBody,
 					}
 					exprs = append(exprs, expr)
@@ -624,6 +658,8 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					expr.AsIf = &If{
 						Op: op,
 						Body: body,
+						ElifBodys: ElifBodys,
+						ElifOps: ElifOps,
 					}
 					exprs = append(exprs, expr)
 				}
@@ -731,7 +767,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				Arg: ParserParseExpr(parser),
 			}
 			exprs = append(exprs, expr)
-		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF {
+		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF || parser.current_token_type == TOKEN_ELIF {
 			return exprs, *parser
 		} else {
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
@@ -1076,23 +1112,32 @@ func RetBool() (bool) {
 		fmt.Println("Error: if op should be bool")
 		os.Exit(0)
 	}
-	bool_value := visitedExpr.AsBool
 	OpDrop()
-	return bool_value
+	return visitedExpr.AsBool
 }
 
 func OpIf(expr Expr) (bool) {
 	VisitExpr(expr.AsIf.Op)
-	bool_value := RetBool()
-	var breakValue bool
-	if bool_value {
-		breakValue = VisitExpr(expr.AsIf.Body)
+	BoolValue := RetBool()
+	if BoolValue {
+		return VisitExpr(expr.AsIf.Body)
 	} else {
+		if expr.AsIf.ElifBodys != nil {
+			i := 0
+			for _, elifOp := range(expr.AsIf.ElifOps) {
+				VisitExpr(elifOp)
+				BoolValue = RetBool()
+				if BoolValue {
+					return VisitExpr(expr.AsIf.ElifBodys[i])
+				}
+				i++
+			}
+		}
 		if expr.AsIf.ElseBody != nil {
-			breakValue = VisitExpr(expr.AsIf.ElseBody)
+			return VisitExpr(expr.AsIf.ElseBody)
 		}
 	}
-	return breakValue
+	return false
 }
 
 func OpCondition(expr Expr) {
