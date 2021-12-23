@@ -20,7 +20,7 @@ end
         " " puts
         inc
     end
-    " " print
+    "" print
     drop
     inc
 end
