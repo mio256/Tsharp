@@ -1,0 +1,6 @@
+block main do
+    dup print inc
+    call main
+end
+
+0 call main

@@ -1,0 +1,141 @@
+# python ver
+# def partition(A, start, end):
+#     pivot = A[end]
+#     i = start - 1
+#     for j in range(start, end):
+#         if A[j] <= pivot:
+#             i += 1
+#             A[i], A[j] = A[j], A[i] 
+#     A[i+1], A[end] = A[end], A[i+1]
+#     print(A)
+#     return i+1
+# def quicksort(A, start, end):
+#     if start < end:
+#         pivot_position = partition(A, start, end)
+#         quicksort(A, start, pivot_position -1)
+#         quicksort(A,pivot_position + 1, end)
+# A = list(range(1,11))
+# random.shuffle(A)
+# print(A)
+# quicksort(A, 0, len(A)-1)
+# print(A)
+
+block reset do
+    "reset" puts printS
+    0 -> pivot drop
+    0 -> pivotposition drop
+    0 -> liststart drop
+    0 -> listend drop
+    0 -> i drop
+    0 -> j drop
+    0 -> x drop
+    0 -> y drop
+    0 -> arr drop
+    0 -> length drop
+end
+
+block debug do
+    "debug" puts printS
+    "    " puts "arr=" puts arr print
+    "    " puts "pivot=" puts pivot puts
+    "    " puts "pivotposition=" puts pivotposition puts
+    "    " puts "liststart=" puts liststart puts
+    "    " puts "listend=" puts listend puts
+    "    " puts "i=" puts i puts
+    "    " puts "j=" puts j puts
+    "    " puts "x=" puts x puts
+    "    " puts "y=" puts y puts
+    "    " puts "length=" puts length puts
+    " " print
+end
+
+block partition do
+    -> partitionend drop
+    -> partitionstart drop
+    input drop
+    arr partitionend read -> pivot drop drop
+    partitionstart 1 - -> i drop
+    partitionstart for dup partitionend < do
+        -> j
+        "arr=" puts arr print
+        if arr j read swap drop pivot <= do
+            i 1 + -> i drop
+            arr i read swap drop -> x drop
+            arr j read swap drop -> y drop
+            arr y i replace drop
+            arr x j replace drop
+        end
+        inc
+    end drop
+    arr i 1 + read swap drop -> x drop
+    arr partitionend read swap drop -> y drop
+    arr y i 1 + replace drop
+    arr x partitionend replace drop
+    i 1 + 
+end
+
+block quicksort do
+    -> sortend drop
+    -> sortstart drop
+    
+    if sortstart sortend < do
+        "--------1--------" print
+        sortstart
+        sortend
+        printS
+        call partition
+        -> pivotposition drop
+        
+        "--------2--------" print
+        sortstart
+        pivotposition 1 - 
+        printS
+        call quicksort
+        
+        "--------3--------" print
+        pivotposition 1 +
+        sortend
+        printS
+        call quicksort
+        
+    end
+end
+
+block main do
+    call reset
+
+    # set list
+    [] 3 append 2 append 0 append 5 append 8 append 3 append 4 append 1 append 3 append 2 append -> arr
+    # set len
+    len -> length drop
+    # clear stack
+    drop
+
+    "before" puts arr print
+
+    0 -> liststart
+    length 1 - -> listend
+    
+    "--------1--------" print
+    liststart
+    listend
+    printS
+    call partition
+    -> pivotposition drop
+    
+    "--------2--------" print
+    liststart
+    pivotposition 1 - 
+    printS
+    call quicksort
+    
+    "--------3--------" print
+    pivotposition 1 +
+    listend
+    printS
+    call quicksort
+
+    "after " puts arr print
+end
+
+call main

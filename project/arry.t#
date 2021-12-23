@@ -1,0 +1,9 @@
+[] 5 append 5 append 10 append 12 append 3 append 7 append -> array
+drop
+printS
+array 0
+printS
+read
+printS
+print
+printS

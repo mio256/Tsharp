@@ -1,0 +1,72 @@
+block partition do
+    -> partitionend drop
+    -> partitionstart drop
+    arr partitionend read -> pivot drop drop
+    partitionstart 1 - -> i drop
+    partitionstart for dup partitionend < do
+        -> j
+        "arr=" puts arr print
+        if arr j read swap drop pivot <= do
+            i 1 + -> i drop
+            arr i read swap drop -> x drop
+            arr j read swap drop -> y drop
+            arr y i replace drop
+            arr x j replace drop
+        end
+        inc
+    end drop
+    arr i 1 + read swap drop -> x drop
+    arr partitionend read swap drop -> y drop
+    arr y i 1 + replace drop
+    arr x partitionend replace drop
+    i 1 + 
+end
+
+block quicksort do
+    -> sortend drop
+    -> sortstart drop
+    
+    if sortstart sortend < do
+        sortstart
+        sortend
+        call partition
+        -> pivotposition drop
+        
+        sortstart
+        pivotposition 1 - 
+        call quicksort
+        
+        pivotposition 1 +
+        sortend
+        call quicksort
+        
+    end
+end
+
+block main do
+    [] 432 append 321 append 0 append 5 append 8 append 3 append 4 append 1 append 3 append 232 append -> arr
+    len -> length drop
+    drop
+
+    "before" puts arr print
+
+    0 -> liststart
+    length 1 - -> listend
+    
+    liststart
+    listend
+    call partition
+    -> pivotposition drop
+    
+    liststart
+    pivotposition 1 - 
+    call quicksort
+    
+    pivotposition 1 +
+    listend
+    call quicksort
+
+    "after " puts arr print
+end
+
+call main

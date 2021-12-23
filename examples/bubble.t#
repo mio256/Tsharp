@@ -1,8 +1,6 @@
 block BubbleSort do
-    0
-    for dup length <= do
-        0
-        for dup length 1 - < do
+    0 for dup length <= do
+        0 for dup length 1 - < do
             -> j
             if arr j read swap drop arr j 1 + read swap drop > do
                 arr j read swap drop -> x drop
