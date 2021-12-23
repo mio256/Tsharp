@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"reflect"
+	"math"
 	"github.com/fatih/color"
 )
 
@@ -339,7 +340,7 @@ const (
 
 type Expr struct {
 	Type ExprType
-	AsInt int
+	AsInt float64
 	AsStr string
 	AsId *Id
 	AsArr []Expr
@@ -426,21 +427,8 @@ func (parser *Parser) ParserEat(token Token) {
 	parser.column = pos.column
 }
 
-// just so you can call it later 
-// like in a type cast or input
-func isInt(num string) bool {
-	_, err := strconv.Atoi(num)
-	return err == nil
-}
-
-// for use later when floats are added
-func isFloat(num string) bool {
-	_, err := strconv.ParseFloat(num, 64)
-	return err == nil
-}
-
-func StrToInt(num string) int {
-	i, err := strconv.Atoi(num)
+func StrToInt(num string) float64 {
+	i, err := strconv.ParseFloat(num, 64)
 	if err != nil{
 		panic(err)
 	}
@@ -1097,7 +1085,7 @@ func OpLen() {
 	
 	IntExpr := Expr{}
 	IntExpr.Type = ExprInt
-	IntExpr.AsInt = len(visitedExpr.AsArr)
+	IntExpr.AsInt = float64(len(visitedExpr.AsArr))
 	OpPush(IntExpr)
 }
 
@@ -1192,7 +1180,12 @@ func OpBinop(value int) {
 		} else if value == TOKEN_DIV {
 			ValueExpr.AsInt = visitedExprSecond.AsInt / visitedExpr.AsInt
 		} else if value == TOKEN_REM {
-			ValueExpr.AsInt = visitedExprSecond.AsInt % visitedExpr.AsInt
+			if visitedExprSecond.AsInt == math.Trunc(visitedExprSecond.AsInt) && visitedExpr.AsInt == math.Trunc(visitedExpr.AsInt) {
+				ValueExpr.AsInt = float64(int(visitedExprSecond.AsInt) % int(visitedExpr.AsInt))
+			} else {
+				fmt.Println("Error: operator '%' not defined on float")
+				os.Exit(0)
+			}
 		}
 	}
 
@@ -1248,13 +1241,16 @@ func OpReplace() {
 	if visitedIndex.Type != ExprInt {
 		fmt.Println("TypeError: 'replace' index expected type <int>"); os.Exit(0);
 	}
-	if visitedIndex.AsInt >= len(visitedList.AsArr) {
+	if visitedIndex.AsInt != math.Trunc(visitedIndex.AsInt) {
+		fmt.Println("Error: list index must be integer not float"); os.Exit(0);
+	}
+	if int(visitedIndex.AsInt) >= len(visitedList.AsArr) {
 		fmt.Println("Error: 'replace' index out of range."); os.Exit(0);
 	}
 	if visitedList.Type != ExprArr {
 		fmt.Println("TypeError: 'replace' expected type <list>"); os.Exit(0);
 	}
-	visitedList.AsArr[visitedIndex.AsInt] = visitedValue
+	visitedList.AsArr[int(visitedIndex.AsInt)] = visitedValue
 	OpDrop()
 	OpDrop()
 	OpDrop()
@@ -1273,8 +1269,11 @@ func OpRead() {
 	if visitedList.Type != ExprArr {
 		fmt.Println("TypeError: 'replace' expected type <list>"); os.Exit(0);
 	}
+	if visitedIndex.AsInt != math.Trunc(visitedIndex.AsInt) {
+		fmt.Println("Error: list index must be integer not float"); os.Exit(0);
+	}
 	OpDrop()
-	ExprValue := visitedList.AsArr[visitedIndex.AsInt]
+	ExprValue := visitedList.AsArr[int(visitedIndex.AsInt)]
 	OpPush(ExprValue)
 }
 
