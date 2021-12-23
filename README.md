@@ -40,12 +40,12 @@ or
 $ ./main.exe <filename>.t#
 ```
 
-> Hello World
+### Hello World
 ```pascal
 "Hello World" print
 ```
 
-> Fibonacci Sequence
+### Fibonacci Sequence
 ```pascal
 10000 -> n
 
@@ -58,7 +58,7 @@ drop drop
 "" print
 ```
 
-> Bubble Sort
+### Bubble Sort
 ```pascal
 block BubbleSort do
     0 for dup length <= do
@@ -93,7 +93,7 @@ end
 call Main
 ```
 
-> Factorial
+### Factorial
 ```pascal
 block Factorial do
     -> n
@@ -110,7 +110,7 @@ call Factorial
 print
 ```
 
-> FizzBuzz
+### FizzBuzz
 ```pascal
 1 
 for dup 100 <= do
@@ -127,7 +127,7 @@ for dup 100 <= do
 end drop
 ```
 
-> Multiplication table
+### Multiplication table
 ```pascal
 block dclone do
     dup -> tmpa
