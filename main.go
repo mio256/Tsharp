@@ -476,7 +476,7 @@ func ParserParseExpr(parser *Parser) (Expr) {
 	return expr
 }
 
-func ParserParse(parser *Parser)  ([]Expr, Parser) {
+func ParserParse(parser *Parser)  ([]Expr) {
 	exprs := []Expr{}
 
 	for {
@@ -566,7 +566,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: block '%s' body is empty", parser.line, parser.column, name))
 					os.Exit(0)
 				}
-				body, _ := ParserParse(parser)
+				body := ParserParse(parser)
 				expr.AsBlockdef = &Blockdef{
 					Name: name,
 					Body: body,
@@ -576,13 +576,13 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "for" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprFor
-				op, _ := ParserParse(parser)
+				op := ParserParse(parser)
 				parser.ParserEat(TOKEN_DO)
 				if parser.current_token_type == TOKEN_END {
 					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: for loop body is empty", parser.line, parser.column))
 					os.Exit(0)
 				}
-				body, _ := ParserParse(parser)
+				body := ParserParse(parser)
 				parser.ParserEat(TOKEN_END)
 				expr.AsFor = &For{
 					Op: op,
@@ -592,13 +592,13 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "if" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprIf
-				op, _ := ParserParse(parser)
+				op := ParserParse(parser)
 				parser.ParserEat(TOKEN_DO)
 				if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
 					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement body is empty", parser.line, parser.column))
 					os.Exit(0)
 				}
-				body, _ := ParserParse(parser)
+				body := ParserParse(parser)
 				ElifBodys := [][]Expr{}
 				ElifOps := [][]Expr{}
 				if parser.current_token_type == TOKEN_ELIF {
@@ -608,13 +608,13 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 							fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement invalid syntax", parser.line, parser.column))
 							os.Exit(0)
 						}
-						ElifOp, _ := ParserParse(parser)
+						ElifOp := ParserParse(parser)
 						parser.ParserEat(TOKEN_DO)
 						if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
 							fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement elif body is empty", parser.line, parser.column))
 							os.Exit(0)
 						}
-						ElifBody, _ := ParserParse(parser)
+						ElifBody := ParserParse(parser)
 						ElifBodys = append(ElifBodys, ElifBody)
 						ElifOps = append(ElifOps, ElifOp)
 						if parser.current_token_type != TOKEN_ELIF {
@@ -631,7 +631,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 						fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement body is empty", parser.line, parser.column))
 						os.Exit(0)
 					}
-					ElseBody, _ := ParserParse(parser)
+					ElseBody := ParserParse(parser)
 					parser.ParserEat(TOKEN_END)
 					expr.AsIf = &If{
 						Op: op,
@@ -756,14 +756,14 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			}
 			exprs = append(exprs, expr)
 		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF || parser.current_token_type == TOKEN_ELIF {
-			return exprs, *parser
+			return exprs
 		} else {
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 			os.Exit(0)
 		}
 	}
 
-	return exprs, *parser
+	return exprs
 }
 
 
@@ -1203,7 +1203,7 @@ func OpImport(expr Expr) {
 	}
 	lexer := LexerInit(file)
 	parser := ParserInit(lexer)
-	exprs, _ := ParserParse(parser)
+	exprs := ParserParse(parser)
 	VisitExpr(exprs)
 }
 
@@ -1425,6 +1425,6 @@ func main() {
 
 	lexer := LexerInit(file)
 	parser := ParserInit(lexer)
-	exprs, _ := ParserParse(parser)
+	exprs := ParserParse(parser)
 	VisitExpr(exprs)
 }
