@@ -46,8 +46,10 @@ call main
 ```pascal
 if false do
     "Hello World" print
+elif false do
+    "elif body!" print
 else
-    "Hello World else body!" print
+    "else body!" print
 end
 
 10 10 == print
@@ -80,6 +82,19 @@ printS
 ```
 'printS' print all stack values. 'printS' won't drop stack value after print.
 
+## PrintV
+```python
+10 -> N
+"Hello World!" -> text
+
+printV
+
+# N : 10
+# text : "Hello World!"
+
+```
+'printV' print all variables.
+
 ## For loop
 ```pascal
 for true do
@@ -101,9 +116,9 @@ end
 
 ## Variable
 ```pascal
-10 -> x drop
+10 -> x
 
-x -> y drop
+x -> y
 
 y print
 ```
@@ -158,39 +173,35 @@ print
 ```
 'exit' will exit the program.
 
-<!------
+
 ## List
 ```python
-["T#", "Ruby", "Python", "C", "Go", "Julia"] dup print
+[] # push empty list
 
-"V" append dup print
+"Hello World!" append # append string "Hello World!"
 
-["HTML"] append dup print
+34 append # append int 34
 
-[1, 2, 3] append[7]
+68 append # append int 68
 
-"Hello World!" append[7][1]
+"T# Programming Language" 1 replace # replace list index '1' to string "T# Programming Language"
 
 print
 ```
-------->
+
 
 ## FizzBuzz
 ```pascal
-1
-for dup 101 < do
-    if dup 3 % 0 == do
-        if dup 15 % 0 == do
-            "FizzBuzz" print
-        else
-            "Fizz" print
-        end
+1 
+for dup 100 <= do
+    if dup 15 % 0 == do
+        "FizzBuzz" print
+    elif dup 3 % 0 == do
+        "Fizz" print
+    elif dup 5 % 0 == do
+        "Buzz" print
     else
-        if dup 5 % 0 == do
-            "Buzz" print
-        else
-            dup print
-        end
+        dup print
     end
     inc
 end drop

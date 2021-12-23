@@ -8,8 +8,7 @@ block BubbleSort do
                 arr y j replace
                 arr x j 1 + replace
                 drop
-                drop
-            end
+            end 
             inc
         end drop
         inc
@@ -17,17 +16,15 @@ block BubbleSort do
 end
 
 block Main do
-    [] 19 append 13 append 6  append 2  append 18 append 8 append 1 append -> arr
+    [] 19 append 13 append 6  append 2  append 18 append 8 append 1 append dup -> arr
 
-    len -> length drop
+    len -> length
 
-    "before:      " puts
-    arr print
+    "before:      " puts arr print
 
     call BubbleSort
 
-    "sorted list: " puts
-    print
+    "sorted list: " puts print
 end
 
 call Main

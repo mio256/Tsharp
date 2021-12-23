@@ -1,9 +1,9 @@
 # https://twitter.com/mio2561 created this program.
 
 block dclone do
-    -> tmpa
+    dup -> tmpa
     swap
-    -> tmpb
+    dup -> tmpb
     swap
     tmpb
     tmpa
@@ -20,7 +20,7 @@ end
         " " puts
         inc
     end
-    " " print
+    "" print
     drop
     inc
 end

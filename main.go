@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"reflect"
+	"math"
 	"github.com/fatih/color"
 )
 
@@ -29,6 +30,7 @@ const (
 	TOKEN_END
 	TOKEN_DO
 	TOKEN_BOOL
+	TOKEN_ELIF
 	TOKEN_ELSE
 	TOKEN_DIV
 	TOKEN_MUL
@@ -57,6 +59,7 @@ var tokens = []string{
 	TOKEN_END:            "TOKEN_END",
 	TOKEN_DO:             "TOKEN_DO",
 	TOKEN_BOOL:           "TOKEN_BOOL",
+	TOKEN_ELIF:           "TOKEN_ELIF",
 	TOKEN_ELSE:           "TOKEN_ELSE",
 	TOKEN_DIV:            "TOKEN_DIV",
 	TOKEN_MUL:            "TOKEN_MUL",
@@ -131,7 +134,6 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 					}
 				} else if r == '-' {
 					r, _, err := lexer.reader.ReadRune()
-					if r == '\n' {break}
 					if err != nil {
 						if err == io.EOF {
 							return lexer.pos, TOKEN_MINUS, "-"
@@ -207,6 +209,8 @@ func (lexer *Lexer) Lex() (Position, Token, string) {
 						return startPos, TOKEN_TYPE, val
 					} else if val == "else" {
 						return startPos, TOKEN_ELSE, val
+					} else if val == "elif" {
+						return startPos, TOKEN_ELIF, val
 					}
 					return startPos, TOKEN_ID, val
 				} else if r == '"' {
@@ -310,6 +314,7 @@ const (
 	ExprBlockdef
 	ExprPrint
 	ExprPrintS
+	ExprPrintV
 	ExprPuts
 	ExprInput
 	ExprOver
@@ -335,7 +340,7 @@ const (
 
 type Expr struct {
 	Type ExprType
-	AsInt int
+	AsInt float64
 	AsStr string
 	AsId *Id
 	AsArr []Expr
@@ -368,6 +373,8 @@ type Blockdef struct {
 type If struct {
 	Op []Expr
 	Body []Expr
+	ElifBodys [][]Expr
+	ElifOps [][]Expr
 	ElseBody []Expr
 }
 
@@ -420,21 +427,8 @@ func (parser *Parser) ParserEat(token Token) {
 	parser.column = pos.column
 }
 
-// just so you can call it later 
-// like in a type cast or input
-func isInt(num string) bool {
-	_, err := strconv.Atoi(num)
-	return err == nil
-}
-
-// for use later when floats are added
-func isFloat(num string) bool {
-	_, err := strconv.ParseFloat(num, 64)
-	return err == nil
-}
-
-func StrToInt(num string) int {
-	i, err := strconv.Atoi(num)
+func StrToInt(num string) float64 {
+	i, err := strconv.ParseFloat(num, 64)
 	if err != nil{
 		panic(err)
 	}
@@ -482,7 +476,7 @@ func ParserParseExpr(parser *Parser) (Expr) {
 	return expr
 }
 
-func ParserParse(parser *Parser)  ([]Expr, Parser) {
+func ParserParse(parser *Parser)  ([]Expr) {
 	exprs := []Expr{}
 
 	for {
@@ -495,6 +489,10 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "printS" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprPrintS
+				exprs = append(exprs, expr)
+			} else if parser.current_token_value == "printV" {
+				parser.ParserEat(TOKEN_ID)
+				expr.Type = ExprPrintV
 				exprs = append(exprs, expr)
 			} else if parser.current_token_value == "input" {
 				parser.ParserEat(TOKEN_ID)
@@ -568,7 +566,7 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: block '%s' body is empty", parser.line, parser.column, name))
 					os.Exit(0)
 				}
-				body, _ := ParserParse(parser)
+				body := ParserParse(parser)
 				expr.AsBlockdef = &Blockdef{
 					Name: name,
 					Body: body,
@@ -578,13 +576,13 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "for" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprFor
-				op, _ := ParserParse(parser)
+				op := ParserParse(parser)
 				parser.ParserEat(TOKEN_DO)
 				if parser.current_token_type == TOKEN_END {
 					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: for loop body is empty", parser.line, parser.column))
 					os.Exit(0)
 				}
-				body, _ := ParserParse(parser)
+				body := ParserParse(parser)
 				parser.ParserEat(TOKEN_END)
 				expr.AsFor = &For{
 					Op: op,
@@ -594,24 +592,52 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 			} else if parser.current_token_value == "if" {
 				parser.ParserEat(TOKEN_ID)
 				expr.Type = ExprIf
-				op, _ := ParserParse(parser)
+				op := ParserParse(parser)
 				parser.ParserEat(TOKEN_DO)
 				if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
 					fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement body is empty", parser.line, parser.column))
 					os.Exit(0)
 				}
-				body, _ := ParserParse(parser)
+				body := ParserParse(parser)
+				ElifBodys := [][]Expr{}
+				ElifOps := [][]Expr{}
+				if parser.current_token_type == TOKEN_ELIF {
+					for {
+						parser.ParserEat(TOKEN_ELIF)
+						if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_DO {
+							fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement invalid syntax", parser.line, parser.column))
+							os.Exit(0)
+						}
+						ElifOp := ParserParse(parser)
+						parser.ParserEat(TOKEN_DO)
+						if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
+							fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement elif body is empty", parser.line, parser.column))
+							os.Exit(0)
+						}
+						ElifBody := ParserParse(parser)
+						ElifBodys = append(ElifBodys, ElifBody)
+						ElifOps = append(ElifOps, ElifOp)
+						if parser.current_token_type != TOKEN_ELIF {
+							break
+						}
+					}
+				} else {
+					ElifBodys = nil
+					ElifOps = nil
+				}
 				if parser.current_token_type == TOKEN_ELSE {
 					parser.ParserEat(TOKEN_ELSE)
 					if parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_END {
 						fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: if statement body is empty", parser.line, parser.column))
 						os.Exit(0)
 					}
-					ElseBody, _ := ParserParse(parser)
+					ElseBody := ParserParse(parser)
 					parser.ParserEat(TOKEN_END)
 					expr.AsIf = &If{
 						Op: op,
 						Body: body,
+						ElifBodys: ElifBodys,
+						ElifOps: ElifOps,
 						ElseBody: ElseBody,
 					}
 					exprs = append(exprs, expr)
@@ -620,6 +646,8 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 					expr.AsIf = &If{
 						Op: op,
 						Body: body,
+						ElifBodys: ElifBodys,
+						ElifOps: ElifOps,
 					}
 					exprs = append(exprs, expr)
 				}
@@ -727,15 +755,15 @@ func ParserParse(parser *Parser)  ([]Expr, Parser) {
 				Arg: ParserParseExpr(parser),
 			}
 			exprs = append(exprs, expr)
-		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF {
-			return exprs, *parser
+		} else if parser.current_token_type == TOKEN_END || parser.current_token_type == TOKEN_ELSE || parser.current_token_type == TOKEN_DO || parser.current_token_type == TOKEN_EOF || parser.current_token_type == TOKEN_ELIF {
+			return exprs
 		} else {
 			fmt.Println(fmt.Sprintf("SyntaxError:%d:%d: unexpected token value '%s'", parser.line, parser.column, parser.current_token_value))
 			os.Exit(0)
 		}
 	}
 
-	return exprs, *parser
+	return exprs
 }
 
 
@@ -904,6 +932,20 @@ func OpPrintS() {
 	fmt.Println("← top")
 }
 
+func OpPrintV() {
+	for name, value := range VariableScope {
+		fmt.Print(fmt.Sprintf("%s : ", name))
+		switch (value.Type) {
+			case ExprInt: fmt.Print(value.AsInt)
+			case ExprStr: fmt.Print(value.AsStr)
+			case ExprBool: fmt.Print(value.AsBool)
+			case ExprTypeType: fmt.Print(fmt.Sprintf("<%s>",value.AsType))
+			case ExprArr: PrintArray(value)
+		}
+		fmt.Println()
+	}
+}
+
 func OpInput() {
 	var input string
 	fmt.Scanln(&input)
@@ -1043,7 +1085,7 @@ func OpLen() {
 	
 	IntExpr := Expr{}
 	IntExpr.Type = ExprInt
-	IntExpr.AsInt = len(visitedExpr.AsArr)
+	IntExpr.AsInt = float64(len(visitedExpr.AsArr))
 	OpPush(IntExpr)
 }
 
@@ -1058,23 +1100,32 @@ func RetBool() (bool) {
 		fmt.Println("Error: if op should be bool")
 		os.Exit(0)
 	}
-	bool_value := visitedExpr.AsBool
 	OpDrop()
-	return bool_value
+	return visitedExpr.AsBool
 }
 
 func OpIf(expr Expr) (bool) {
 	VisitExpr(expr.AsIf.Op)
-	bool_value := RetBool()
-	var breakValue bool
-	if bool_value {
-		breakValue = VisitExpr(expr.AsIf.Body)
+	BoolValue := RetBool()
+	if BoolValue {
+		return VisitExpr(expr.AsIf.Body)
 	} else {
+		if expr.AsIf.ElifBodys != nil {
+			i := 0
+			for _, elifOp := range(expr.AsIf.ElifOps) {
+				VisitExpr(elifOp)
+				BoolValue = RetBool()
+				if BoolValue {
+					return VisitExpr(expr.AsIf.ElifBodys[i])
+				}
+				i++
+			}
+		}
 		if expr.AsIf.ElseBody != nil {
-			breakValue = VisitExpr(expr.AsIf.ElseBody)
+			return VisitExpr(expr.AsIf.ElseBody)
 		}
 	}
-	return breakValue
+	return false
 }
 
 func OpCondition(expr Expr) {
@@ -1129,7 +1180,12 @@ func OpBinop(value int) {
 		} else if value == TOKEN_DIV {
 			ValueExpr.AsInt = visitedExprSecond.AsInt / visitedExpr.AsInt
 		} else if value == TOKEN_REM {
-			ValueExpr.AsInt = visitedExprSecond.AsInt % visitedExpr.AsInt
+			if visitedExprSecond.AsInt == math.Trunc(visitedExprSecond.AsInt) && visitedExpr.AsInt == math.Trunc(visitedExpr.AsInt) {
+				ValueExpr.AsInt = float64(int(visitedExprSecond.AsInt) % int(visitedExpr.AsInt))
+			} else {
+				fmt.Println("Error: operator '%' not defined on float")
+				os.Exit(0)
+			}
 		}
 	}
 
@@ -1147,7 +1203,7 @@ func OpImport(expr Expr) {
 	}
 	lexer := LexerInit(file)
 	parser := ParserInit(lexer)
-	exprs, _ := ParserParse(parser)
+	exprs := ParserParse(parser)
 	VisitExpr(exprs)
 }
 
@@ -1185,10 +1241,16 @@ func OpReplace() {
 	if visitedIndex.Type != ExprInt {
 		fmt.Println("TypeError: 'replace' index expected type <int>"); os.Exit(0);
 	}
+	if visitedIndex.AsInt != math.Trunc(visitedIndex.AsInt) {
+		fmt.Println("Error: list index must be integer not float"); os.Exit(0);
+	}
+	if int(visitedIndex.AsInt) >= len(visitedList.AsArr) {
+		fmt.Println("Error: 'replace' index out of range."); os.Exit(0);
+	}
 	if visitedList.Type != ExprArr {
 		fmt.Println("TypeError: 'replace' expected type <list>"); os.Exit(0);
 	}
-	visitedList.AsArr[visitedIndex.AsInt] = visitedValue
+	visitedList.AsArr[int(visitedIndex.AsInt)] = visitedValue
 	OpDrop()
 	OpDrop()
 	OpDrop()
@@ -1207,8 +1269,11 @@ func OpRead() {
 	if visitedList.Type != ExprArr {
 		fmt.Println("TypeError: 'replace' expected type <list>"); os.Exit(0);
 	}
+	if visitedIndex.AsInt != math.Trunc(visitedIndex.AsInt) {
+		fmt.Println("Error: list index must be integer not float"); os.Exit(0);
+	}
 	OpDrop()
-	ExprValue := visitedList.AsArr[visitedIndex.AsInt]
+	ExprValue := visitedList.AsArr[int(visitedIndex.AsInt)]
 	OpPush(ExprValue)
 }
 
@@ -1226,6 +1291,7 @@ func OpVardef(expr Expr) {
 	}
 	exprValue := Stack[len(Stack)-1]
 	VariableScope[expr.AsVardef.Name] = exprValue
+	OpDrop()
 }
 
 
@@ -1272,6 +1338,8 @@ func VisitExpr(exprs []Expr) (bool) {
 				OpPuts()
 			case ExprPrintS:
 				OpPrintS()
+			case ExprPrintV:
+				OpPrintV()
 			case ExprAppend:
 				OpAppend(expr)
 			case ExprReplace:
@@ -1357,6 +1425,6 @@ func main() {
 
 	lexer := LexerInit(file)
 	parser := ParserInit(lexer)
-	exprs, _ := ParserParse(parser)
+	exprs := ParserParse(parser)
 	VisitExpr(exprs)
 }

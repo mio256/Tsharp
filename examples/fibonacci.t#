@@ -1,22 +1,10 @@
 
-block fb do
-    1 -> a drop
-    0 -> b drop
-    
-    for dup 0 > do
-        a -> x drop
-        a b + -> a drop
-        x -> b drop
-        dec
-    end drop
-    b
-end
+10000 -> n
 
-0
-for dup 15 <= do
-    dup call fb puts
-    " " puts
-    inc
+0 1 for over n < do
+  over puts " " puts
+  swap over +
 end
+drop drop
 
-" " print
+"" print

@@ -40,63 +40,99 @@ or
 $ ./main.exe <filename>.t#
 ```
 
-> Hello World
+### Hello World
 ```pascal
 "Hello World" print
 ```
 
-> Fibonacci Sequence
+### Fibonacci Sequence
 ```pascal
-block fb do
-    1 -> a drop
-    0 -> b drop
-    
-    for dup 0 > do
-        a -> x drop
-        a b + -> a drop
-        x -> b drop
-        dec
-    end drop
-    b
-end
+10000 -> n
 
-0
-for dup 15 <= do
-    dup call fb puts
-    " " puts
-    inc
+0 1 for over n < do
+  over puts " " puts
+  swap over +
 end
+drop drop
 
-" " print
+"" print
 ```
 
-> FizzBuzz
+### Bubble Sort
 ```pascal
-1
+block BubbleSort do
+    0 for dup length <= do
+        0 for dup length 1 - < do
+            dup -> j
+            j 1 + -> i
+            if arr j read swap i read swap drop > do
+                arr j read -> x
+                i read -> y
+                y j replace
+                x i replace
+                drop
+            end 
+            inc
+        end drop
+        inc
+    end drop
+end
+
+block Main do
+    [] 19 append 13 append 6  append 2  append 18 append 8 append 1 append dup -> arr
+
+    len -> length
+
+    "before:      " puts arr print
+
+    call BubbleSort
+
+    "sorted list: " puts print
+end
+
+call Main
+```
+
+### Factorial
+```pascal
+block Factorial do
+    -> n
+    1 -> x
+    for n 1 >= do
+        x n * -> x
+        n 1 - -> n
+    end
+    x
+end
+
+5
+call Factorial
+print
+```
+
+### FizzBuzz
+```pascal
+1 
 for dup 100 <= do
-    if dup 3 % 0 == do
-        if dup 15 % 0 == do
-            "FizzBuzz" print
-        else
-            "Fizz" print
-        end
+    if dup 15 % 0 == do
+        "FizzBuzz" print
+    elif dup 3 % 0 == do
+        "Fizz" print
+    elif dup 5 % 0 == do
+        "Buzz" print
     else
-        if dup 5 % 0 == do
-            "Buzz" print
-        else
-            dup print
-        end
+        dup print
     end
     inc
 end drop
 ```
 
-> Multiplication table
+### Multiplication table
 ```pascal
 block dclone do
-    -> tmpa
+    dup -> tmpa
     swap
-    -> tmpb
+    dup -> tmpb
     swap
     tmpb
     tmpa
